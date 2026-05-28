@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our World — Travel Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --ink:#1a1612; --parchment:#f5f0e8; --cream:#faf7f2;
+  --gold:#c9922a; --gold-light:#e8c97a; --rust:#9b3a1e;
+  --muted:#7a726a; --border:#d4c9b8;
+  --wife:#9b3a1e; --husband:#3d4a5c;
+  --visited:#2d4228; --planned:#c9922a; --candidate:#6b5b8a; --none-col:#c8c0b4;
+  --shadow:0 2px 12px rgba(26,22,18,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);min-height:100vh;font-size:13px}
+
+.conn-status{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:2px;white-space:nowrap}
+.cs-online{background:#d4edd8;color:#2d4228}
+.cs-offline{background:#fce8e8;color:#9b2020}
+.cs-connecting{background:#fef3dc;color:#7a4f00}
+.cs-config{background:#e8e4f8;color:#4a3880;cursor:pointer;text-decoration:underline dotted}
+
+header{background:var(--ink);padding:22px 36px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+header h1{font-family:'Cormorant Garamond',serif;font-size:2.3rem;font-weight:300;color:var(--parchment);line-height:1}
+header h1 span{color:var(--gold-light);font-style:italic}
+.subtitle{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.names-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.name-field{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.name-field .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.name-field input{padding:3px 8px;border:1px solid #333;border-radius:3px;background:#2a2620;font-family:'DM Mono',monospace;font-size:12px;color:var(--parchment);width:100px;outline:none}
+.name-field input:focus{border-color:var(--gold)}
+
+/* CONFIG MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--cream);border-radius:6px;padding:28px 32px;width:min(520px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-bottom:6px}
+.modal p{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:18px}
+.modal label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;margin-top:12px}
+.modal input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
+.modal input:focus{border-color:var(--gold)}
+.modal-hint{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
+.modal-btns{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.btn{padding:8px 18px;border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--gold);color:white}.btn-primary:hover{background:var(--rust)}
+.btn-secondary{background:var(--parchment);border:1px solid var(--border);color:var(--muted)}.btn-secondary:hover{color:var(--ink)}
+.modal-error{background:#fce8e8;color:#9b2020;font-size:11px;padding:8px 10px;border-radius:3px;margin-top:10px;display:none}
+.modal-error.show{display:block}
+
+nav{background:var(--ink);border-top:1px solid #2e2a26;display:flex;padding:0 36px}
+nav button{background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+nav button:hover{color:var(--parchment)}
+nav button.active{color:var(--gold-light);border-bottom-color:var(--gold)}
+
+main{max-width:1180px;margin:0 auto;padding:26px 20px}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.legend span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.ldot{width:9px;height:9px;border-radius:2px}
+
+.goals-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.goal-card{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:16px 20px;box-shadow:var(--shadow)}
+.goal-card h3{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.goal-card h3 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.prog-line{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px}
+.prog-label{width:60px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;font-size:10px}
+.bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;display:flex}
+.bar-seg{height:100%;transition:width .5s;flex-shrink:0}
+.bar-v{background:#2d4228}.bar-p{background:#c9922a}.bar-c{background:#6b5b8a}
+.bar-count{min-width:80px;text-align:right;font-size:10px;color:var(--muted);letter-spacing:.04em}
+.goal-edit{display:flex;align-items:center;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);letter-spacing:.06em}
+.goal-edit input{width:52px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);text-align:center;outline:none}
+
+.chart-wrap{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:20px}
+.chart-together{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.tog-pill{display:flex;align-items:center;gap:7px;font-size:11px}
+.tog-pill .num{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;line-height:1;color:var(--ink)}
+.tog-pill .lbl{color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-size:10px;line-height:1.3}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.search-wrap input{width:100%;padding:8px 12px 8px 30px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--gold)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+.fbtns{display:flex;gap:4px;flex-wrap:wrap}
+.fbtn{padding:7px 11px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap}
+.fbtn:hover{border-color:var(--gold);color:var(--ink)}
+.fbtn.fa{color:white;border-color:transparent}
+.fbtn.fv{background:var(--visited)}.fbtn.fp{background:var(--planned)}.fbtn.fc{background:var(--candidate)}.fbtn.fu{background:var(--ink)}.fbtn.fall{background:var(--ink)}
+
+.add-panel{background:var(--parchment);border:1px dashed var(--border);border-radius:4px;padding:14px 18px;margin-bottom:18px}
+.add-panel h4{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600;color:var(--muted);margin-bottom:10px;letter-spacing:.04em}
+.add-mode-tabs{display:flex;margin-bottom:10px;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:fit-content}
+.amt{padding:5px 13px;background:white;border:none;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s}
+.amt:last-child{border-right:none}
+.amt.active{background:var(--ink);color:var(--parchment)}
+.add-form{display:none;flex-direction:column;gap:10px}
+.add-form.show{display:flex}
+.add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.add-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.add-inp{padding:7px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
+.add-inp:focus{border-color:var(--gold)}
+.add-inp.nm{flex:1;min-width:150px}
+.add-inp.dt{width:140px}
+select.add-inp{cursor:pointer}
+.bulk-ta{width:100%;min-height:80px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;resize:vertical}
+.bulk-ta:focus{border-color:var(--gold)}
+.bulk-hint{font-size:10px;color:var(--muted);line-height:1.6;margin-top:2px}
+.bulk-status-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bulk-status-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.btn-primary{padding:7px 15px;background:var(--gold);color:white;border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-primary:hover{background:var(--rust)}
+.person-checks{display:flex;gap:10px;align-items:center}
+.pcheck{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer}
+.pcheck input{cursor:pointer;accent-color:var(--gold)}
+
+.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.place-card{background:white;border:1px solid var(--border);border-left:3px solid var(--border);border-radius:4px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;transition:box-shadow .15s}
+.place-card:hover{box-shadow:var(--shadow)}
+.place-card.hv{border-left-color:var(--visited)}
+.place-card.hp{border-left-color:var(--planned)}
+.place-card.hc{border-left-color:var(--candidate)}
+.place-name{font-family:'Cormorant Garamond',serif;font-size:.92rem;font-weight:600;color:var(--ink);line-height:1.2}
+.place-badges{display:flex;flex-direction:column;gap:4px}
+.person-row{display:flex;align-items:center;gap:6px}
+.person-who{font-size:10px;width:46px;flex-shrink:0;color:var(--muted);letter-spacing:.04em}
+.st-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:2px;font-weight:500;cursor:pointer;border:1px solid;transition:all .15s;user-select:none;white-space:nowrap}
+.st-none{color:var(--none-col);border-color:var(--none-col);background:transparent}
+.st-visited{color:white;border-color:var(--visited);background:var(--visited)}
+.st-planned{color:white;border-color:var(--planned);background:var(--planned)}
+.st-candidate{color:white;border-color:var(--candidate);background:var(--candidate)}
+.date-chip{font-size:10px;color:var(--muted);cursor:pointer;padding:2px 5px;border:1px dashed var(--border);border-radius:2px;white-space:nowrap}
+.date-chip:hover{border-color:var(--gold);color:var(--ink)}
+.date-chip.has-date{border-style:solid;color:var(--ink)}
+.date-edit{display:flex;align-items:center;gap:4px}
+.date-edit input{padding:2px 6px;border:1px solid var(--border);border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);outline:none;width:130px}
+.date-edit input:focus{border-color:var(--gold)}
+.date-edit button{padding:2px 7px;background:var(--gold);color:white;border:none;border-radius:3px;font-size:10px;cursor:pointer}
+
+.saving-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:6px;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:12px;letter-spacing:.06em;grid-column:1/-1}
+.panel{display:none}.panel.active{display:block}
+.section-hdr{margin-bottom:12px}.section-hdr h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400}
+
+@media(max-width:600px){
+  header{padding:16px}.goals-row{grid-template-columns:1fr}
+  main{padding:16px 12px}nav{padding:0 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- CONFIG MODAL -->
+<div class="modal-overlay" id="config-modal">
+  <div class="modal">
+    <h2>Connect to Supabase</h2>
+    <p>Enter your Supabase project credentials. These are saved in your browser and never sent anywhere except directly to Supabase.</p>
+    <label>Project URL</label>
+    <input type="text" id="cfg-url" placeholder="https://xxxxxxxxxxxx.supabase.co" />
+    <div class="modal-hint">Project Settings → API → Project URL</div>
+    <label>Anon / Public Key</label>
+    <input type="text" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+    <div class="modal-hint">Project Settings → API → Project API Keys → anon public</div>
+    <div class="modal-error" id="cfg-error"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeConfig()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <h1>Our <span>World</span></h1>
+    <div class="subtitle">Travel Tracker</div>
+  </div>
+  <div class="header-right">
+    <span id="conn-status" class="conn-status cs-config" onclick="openConfig()">⚙ Configure Supabase</span>
+    <div class="names-row">
+      <div class="name-field">
+        <div class="dot" style="background:var(--wife)"></div>
+        <input id="name1" value="Laura" oninput="updateNames()" />
+      </div>
+      <div class="name-field">
+        <div class="dot" style="background:var(--husband)"></div>
+        <input id="name2" value="Faron" oninput="updateNames()" />
+      </div>
+    </div>bvg
+<nav>
+  <button class="active" onclick="switchTab('countries',this)">Countries</button>
+  <button onclick="switchTab('states',this)">US States</button>
+</nav>
+
+<main>
+  <div class="legend">
+    <span>Status:</span>
+    <div class="legend-item"><div class="ldot" style="background:var(--visited)"></div>Visited</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--planned)"></div>Planned</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--candidate)"></div>Candidate</div>
+    <div class="legend-item"><div class="ldot" style="background:var(--none-col)"></div>None</div>
+    <span style="margin-left:6px;font-size:10px">Click status badge to cycle · Click date chip to edit</span>
+  </div>
+
+  <!-- COUNTRIES -->
+  <div id="panel-countries" class="panel active">
+    <div class="goals-row">
+      <div class="goal-card">
+        <h3><div class="dot" style="background:var(--wife)"></div><span class="pn-wife">wife</span></h3>
+        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barcv-l" style="width:0%"></div><div class="bar-seg bar-p" id="barcp-l" style="width:0%"></div><div class="bar-seg bar-c" id="barcc-l" style="width:0%"></div></div><div class="bar-count" id="cntc-l">0/50</div></div>
+        <div class="goal-edit">Goal:<input type="number" id="gcl" value="50" min="1" max="250" onchange="saveSettings()">countries</div>
+      </div>
+      <div class="goal-card">
+        <h3><div class="dot" style="background:var(--husband)"></div><span class="pn-husband">Faron</span></h3>
+        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barcv-h" style="width:0%"></div><div class="bar-seg bar-p" id="barcp-h" style="width:0%"></div><div class="bar-seg bar-c" id="barcc-h" style="width:0%"></div></div><div class="bar-count" id="cntc-h">0/50</div></div>
+        <div class="goal-edit">Goal:<input type="number" id="gch" value="50" min="1" max="250" onchange="saveSettings()">countries</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-countries"></canvas><div class="chart-together" id="together-countries"></div></div>
+    <div class="section-hdr"><h2>Countries of the World</h2></div>
+    <div class="controls">
+      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries…" oninput="renderTab('countries')"/></div>
+      <div class="fbtns" id="fbtns-countries"></div>
+    </div>
+    <div class="add-panel">
+      <h4>+ Add Entry</h4>
+      <div class="add-mode-tabs">
+        <button class="amt active" onclick="switchAddMode('countries','single',this)">Single</button>
+        <button class="amt" onclick="switchAddMode('countries','bulk',this)">Bulk Paste</button>
+      </div>
+      <div class="add-form show" id="af-single-countries">
+        <div class="add-row">
+          <label>Name</label>
+          <input class="add-inp nm" type="text" id="si-name-countries" placeholder="e.g. Kosovo, Hong Kong…" onkeydown="if(event.key==='Enter')doAddSingle('countries')"/>
+        </div>
+        <div class="add-row">
+          <label>Who</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="si-cl-countries" checked/><span class="pn-wife">wife</span></label>
+            <label class="pcheck"><input type="checkbox" id="si-ch-countries" checked/><span class="pn-husband">Faron</span></label>
+          </div>
+          <label>Status</label>
+          <select class="add-inp" id="si-st-countries">
+            <option value="none">— None</option>
+            <option value="visited">✓ Visited</option>
+            <option value="planned">◷ Planned</option>
+            <option value="candidate">★ Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="si-dt-countries" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddSingle('countries')">Add</button>
+        </div>
+      </div>
+      <div class="add-form" id="af-bulk-countries">
+        <textarea class="bulk-ta" id="bk-ta-countries" placeholder="One per line or comma-separated:&#10;France, Italy, Spain&#10;Japan&#10;Brazil, Argentina"></textarea>
+        <div class="bulk-hint">Accepts commas and/or newlines. Duplicates skipped.</div>
+        <div class="bulk-status-row">
+          <label>Apply to:</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="bk-cl-countries" checked/><span class="pn-wife">wife</span></label>
+            <label class="pcheck"><input type="checkbox" id="bk-ch-countries" checked/><span class="pn-husband">Faron</span></label>
+          </div>
+          <label>Status</label>
+          <select class="add-inp" id="bk-st-countries">
+            <option value="none">— None</option>
+            <option value="visited">✓ Visited</option>
+            <option value="planned">◷ Planned</option>
+            <option value="candidate">★ Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="bk-dt-countries" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddBulk('countries')">Add All</button>
+        </div>
+      </div>
+    </div>
+    <div class="place-grid" id="grid-countries"></div>
+  </div>
+
+  <!-- STATES -->
+  <div id="panel-states" class="panel">
+    <div class="goals-row">
+      <div class="goal-card">
+        <h3><div class="dot" style="background:var(--wife)"></div><span class="pn-wife">wife</span></h3>
+        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barsv-l" style="width:0%"></div><div class="bar-seg bar-p" id="barsp-l" style="width:0%"></div><div class="bar-seg bar-c" id="barsc-l" style="width:0%"></div></div><div class="bar-count" id="cnts-l">0/50</div></div>
+        <div class="goal-edit">Goal:<input type="number" id="gsl" value="50" min="1" max="60" onchange="saveSettings()">states</div>
+      </div>
+      <div class="goal-card">
+        <h3><div class="dot" style="background:var(--husband)"></div><span class="pn-husband">Faron</span></h3>
+        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barsv-h" style="width:0%"></div><div class="bar-seg bar-p" id="barsp-h" style="width:0%"></div><div class="bar-seg bar-c" id="barsc-h" style="width:0%"></div></div><div class="bar-count" id="cnts-h">0/50</div></div>
+        <div class="goal-edit">Goal:<input type="number" id="gsh" value="50" min="1" max="60" onchange="saveSettings()">states</div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-states"></canvas></div>
+    <div class="section-hdr"><h2>United States</h2></div>
+    <div class="controls">
+      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states…" oninput="renderTab('states')"/></div>
+      <div class="fbtns" id="fbtns-states"></div>
+    </div>
+    <div class="add-panel">
+      <h4>+ Add Entry</h4>
+      <div class="add-mode-tabs">
+        <button class="amt active" onclick="switchAddMode('states','single',this)">Single</button>
+        <button class="amt" onclick="switchAddMode('states','bulk',this)">Bulk Paste</button>
+      </div>
+      <div class="add-form show" id="af-single-states">
+        <div class="add-row">
+          <label>Name</label>
+          <input class="add-inp nm" type="text" id="si-name-states" placeholder="e.g. Puerto Rico, DC…" onkeydown="if(event.key==='Enter')doAddSingle('states')"/>
+        </div>
+        <div class="add-row">
+          <label>Who</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="si-cl-states" checked/><span class="pn-wife">wife</span></label>
+            <label class="pcheck"><input type="checkbox" id="si-ch-states" checked/><span class="pn-husband">Faron</span></label>
+          </div>
+          <label>Status</label>
+          <select class="add-inp" id="si-st-states">
+            <option value="none">— None</option>
+            <option value="visited">✓ Visited</option>
+            <option value="planned">◷ Planned</option>
+            <option value="candidate">★ Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="si-dt-states" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddSingle('states')">Add</button>
+        </div>
+      </div>
+      <div class="add-form" id="af-bulk-states">
+        <textarea class="bulk-ta" id="bk-ta-states" placeholder="One per line or comma-separated:&#10;Alabama, Georgia&#10;Florida&#10;Texas"></textarea>
+        <div class="bulk-hint">Accepts commas and/or newlines. Duplicates skipped.</div>
+        <div class="bulk-status-row">
+          <label>Apply to:</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="bk-cl-states" checked/><span class="pn-wife">wife</span></label>
+            <label class="pcheck"><input type="checkbox" id="bk-ch-states" checked/><span class="pn-husband">Faron</span></label>
+          </div>
+          <label>Status</label>
+          <select class="add-inp" id="bk-st-states">
+            <option value="none">— None</option>
+            <option value="visited">✓ Visited</option>
+            <option value="planned">◷ Planned</option>
+            <option value="candidate">★ Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="bk-dt-states" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddBulk('states')">Add All</button>
+        </div>
+      </div>
+    </div>
+    <div class="place-grid" id="grid-states"></div>
+  </div>
+</main>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const COUNTRIES=["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+const US_STATES=["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+const CYCLE=['none','visited','planned','candidate'];
+const ICON={none:'○',visited:'✓',planned:'◷',candidate:'★'};
+
+// ─── LOCAL STATE ─────────────────────────────────────────────────────────────
+// visits: { 'countries|France|wife': {status,date,is_custom}, ... }
+let visits = {};
+let settings = {
+  wife_name:'Laura', husband_name:'Faron',
+  goal_countries_wife:50, goal_countries_husband:50,
+  goal_states_wife:50, goal_states_husband:50
+};
+let customPlaces = { countries:[], states:[] };
+let editing = {};
+let filters = { countries:'all', states:'all' };
+let supabase = null;
+let saveDebounce = null;
+let realtimeChannel = null;
+
+// ─── SUPABASE CONFIG ─────────────────────────────────────────────────────────
+function loadConfig() {
+  return {
+    url: localStorage.getItem('sb_url') || '',
+    key: localStorage.getItem('sb_key') || ''
+  };
+}
+function openConfig() {
+  const cfg = loadConfig();
+  document.getElementById('cfg-url').value = cfg.url;
+  document.getElementById('cfg-key').value = cfg.key;
+  document.getElementById('cfg-error').classList.remove('show');
+  document.getElementById('config-modal').classList.add('show');
+}
+function closeConfig() {
+  document.getElementById('config-modal').classList.remove('show');
+}
+async function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  const errEl = document.getElementById('cfg-error');
+  errEl.classList.remove('show');
+  if (!url || !key) { errEl.textContent='Both fields required.'; errEl.classList.add('show'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  closeConfig();
+  await initSupabase(url, key);
+}
+
+// ─── SUPABASE INIT ───────────────────────────────────────────────────────────
+async function initSupabase(url, key) {
+  setStatus('connecting','Connecting…');
+  try {
+    supabase = window.supabase.createClient(url, key);
+    // Test connection
+    const { error } = await supabase.from('settings').select('id').limit(1);
+    if (error) throw error;
+    setStatus('online','Live ✓');
+    await loadAllData();
+    subscribeRealtime();
+  } catch(e) {
+    setStatus('offline','Connection failed — ' + e.message);
+    supabase = null;
+  }
+}
+
+function setStatus(state, msg) {
+  const el = document.getElementById('conn-status');
+  el.textContent = msg;
+  el.className = 'conn-status cs-' + state;
+  el.onclick = state === 'offline' || state === 'config' ? openConfig : null;
+  if (state !== 'online') el.style.cursor = 'pointer';
+  else el.style.cursor = 'default';
+}
+
+// ─── LOAD DATA ───────────────────────────────────────────────────────────────
+async function loadAllData() {
+  if (!supabase) return;
+
+  // Load settings
+  const { data: sData } = await supabase.from('settings').select('*').eq('id','main').single();
+  if (sData) {
+    settings = sData;
+    syncSettingsToUI();
+  } else {
+    // First run — insert defaults
+    await supabase.from('settings').upsert({ id:'main', ...settings });
+  }
+
+  // Load visits
+  const { data: vData } = await supabase.from('visits').select('*');
+  visits = {};
+  customPlaces = { countries:[], states:[] };
+  if (vData) {
+    vData.forEach(row => {
+      const key = `${row.type}|${row.place}|${row.who}`;
+      visits[key] = { status: row.status, date: row.date_label || '' };
+      if (row.is_custom) {
+        const list = customPlaces[row.type];
+        if (list && !list.includes(row.place)) list.push(row.place);
+      }
+    });
+  }
+
+  refreshAll();
+}
+
+function syncSettingsToUI() {
+  document.getElementById('name1').value = settings.wife_name || 'Laura';
+  document.getElementById('name2').value = settings.husband_name || 'Faron';
+  document.getElementById('gcl').value = settings.goal_countries_wife || 50;
+  document.getElementById('gch').value = settings.goal_countries_husband || 50;
+  document.getElementById('gsl').value = settings.goal_states_wife || 50;
+  document.getElementById('gsh').value = settings.goal_states_husband || 50;
+  document.querySelectorAll('.pn-wife').forEach(el => el.textContent = settings.wife_name || 'Laura');
+  document.querySelectorAll('.pn-husband').forEach(el => el.textContent = settings.husband_name || 'Faron');
+}
+
+// ─── REALTIME ─────────────────────────────────────────────────────────────────
+function subscribeRealtime() {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+
+  realtimeChannel = supabase
+    .channel('tracker-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'visits' }, payload => {
+      handleVisitChange(payload);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, payload => {
+      if (payload.new) { settings = payload.new; syncSettingsToUI(); refreshAll(); }
+    })
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') setStatus('online','Live ✓');
+      if (status === 'CLOSED') setStatus('offline','Disconnected — click to reconnect');
+    });
+}
+
+function handleVisitChange(payload) {
+  const { eventType, new: row, old } = payload;
+  if (eventType === 'DELETE' && old) {
+    delete visits[`${old.type}|${old.place}|${old.who}`];
+  } else if (row) {
+    const key = `${row.type}|${row.place}|${row.who}`;
+    visits[key] = { status: row.status, date: row.date_label || '' };
+    if (row.is_custom) {
+      const list = customPlaces[row.type];
+      if (list && !list.includes(row.place)) list.push(row.place);
+    }
+  }
+  ['countries','states'].forEach(t => { renderTab(t); updateGoals(t); updateStats(t); });
+}
+
+// ─── SAVE ────────────────────────────────────────────────────────────────────
+async function saveVisit(type, place, who, status, date, isCustom) {
+  if (!supabase) return;
+  showSaving();
+  const { error } = await supabase.from('visits').upsert(
+    { type, place, who, status, date_label: date || null, is_custom: isCustom || false },
+    { onConflict: 'type,place,who' }
+  );
+  if (error) console.error('Save error:', error);
+  hideSaving();
+}
+
+async function saveSettings() {
+  if (!supabase) return;
+  const s = {
+    id: 'main',
+    wife_name: document.getElementById('name1').value || 'Laura',
+    husband_name: document.getElementById('name2').value || 'Faron',
+    goal_countries_wife: +document.getElementById('gcl').value || 50,
+    goal_countries_husband: +document.getElementById('gch').value || 50,
+    goal_states_wife: +document.getElementById('gsl').value || 50,
+    goal_states_husband: +document.getElementById('gsh').value || 50,
+  };
+  settings = s;
+  await supabase.from('settings').upsert(s);
+  refreshAll();
+}
+
+function showSaving() {
+  const el = document.getElementById('conn-status');
+  if (!el.querySelector('.saving-dot')) {
+    const dot = document.createElement('span');
+    dot.className = 'saving-dot';
+    el.appendChild(dot);
+  }
+}
+function hideSaving() {
+  const dot = document.querySelector('.saving-dot');
+  if (dot) dot.remove();
+}
+
+// ─── DATA HELPERS ─────────────────────────────────────────────────────────────
+function getEntry(type, place, who) {
+  return visits[`${type}|${place}|${who}`] || { status:'none', date:'' };
+}
+function getPlaces(type) {
+  return [...(type==='countries'?COUNTRIES:US_STATES), ...(customPlaces[type]||[])];
+}
+function isCustomPlace(type, place) {
+  return (customPlaces[type]||[]).includes(place);
+}
+
+// ─── STATUS CYCLE ─────────────────────────────────────────────────────────────
+async function cycleStatus(type, place, who) {
+  const e = getEntry(type, place, who);
+  const i = CYCLE.indexOf(e.status || 'none');
+  const newStatus = CYCLE[(i+1) % CYCLE.length];
+  const key = `${type}|${place}|${who}`;
+  visits[key] = { status: newStatus, date: e.date };
+  renderTab(type); updateGoals(type); updateStats(type);
+  await saveVisit(type, place, who, newStatus, e.date, isCustomPlace(type,place));
+}
+
+async function setDate(type, place, who, date) {
+  const e = getEntry(type, place, who);
+  const key = `${type}|${place}|${who}`;
+  visits[key] = { status: e.status, date };
+  renderTab(type);
+  await saveVisit(type, place, who, e.status, date, isCustomPlace(type,place));
+}
+
+// ─── ADD ENTRIES ──────────────────────────────────────────────────────────────
+async function applyEntry(type, place, who, status, date) {
+  const isCustom = isCustomPlace(type, place);
+  const key = `${type}|${place}|${who}`;
+  const existing = visits[key] || { status:'none', date:'' };
+  const newStatus = status !== 'none' ? status : existing.status;
+  const newDate = date || existing.date;
+  visits[key] = { status: newStatus, date: newDate };
+  await saveVisit(type, place, who, newStatus, newDate, isCustom);
+}
+
+async function doAddSingle(type) {
+  const nameEl = document.getElementById('si-name-'+type);
+  const val = nameEl.value.trim(); if (!val) return;
+  const status = document.getElementById('si-st-'+type).value;
+  const date = document.getElementById('si-dt-'+type).value.trim();
+  const forwife = document.getElementById('si-cl-'+type).checked;
+  const forHusband = document.getElementById('si-ch-'+type).checked;
+  const allLow = getPlaces(type).map(p=>p.toLowerCase());
+  if (!allLow.includes(val.toLowerCase())) {
+    customPlaces[type].push(val);
+    // save placeholder row so custom place persists
+    if (forwife) await saveVisit(type, val, 'wife', status, date, true);
+    if (forHusband) await saveVisit(type, val, 'husband', status, date, true);
+  } else {
+    const canon = getPlaces(type).find(p=>p.toLowerCase()===val.toLowerCase()) || val;
+    if (forwife) await applyEntry(type, canon, 'wife', status, date);
+    if (forHusband) await applyEntry(type, canon, 'husband', status, date);
+  }
+  nameEl.value = ''; document.getElementById('si-dt-'+type).value = '';
+  renderTab(type); updateGoals(type); updateStats(type);
+}
+
+async function doAddBulk(type) {
+  const ta = document.getElementById('bk-ta-'+type);
+  const raw = ta.value; if (!raw.trim()) { alert('Paste some names first.'); return; }
+  const status = document.getElementById('bk-st-'+type).value;
+  const date = document.getElementById('bk-dt-'+type).value.trim();
+  const forwife = document.getElementById('bk-cl-'+type).checked;
+  const forHusband = document.getElementById('bk-ch-'+type).checked;
+  const items = raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(s=>s.length>0);
+  if (!items.length) { alert('No valid entries found.'); return; }
+  const existing = getPlaces(type).map(p=>p.toLowerCase());
+  let added=0, updated=0;
+  for (const item of items) {
+    const lower = item.toLowerCase();
+    const isNew = !existing.includes(lower);
+    if (isNew) { customPlaces[type].push(item); existing.push(lower); added++; }
+    else { updated++; }
+    const canon = getPlaces(type).find(p=>p.toLowerCase()===lower) || item;
+    if (forwife) await saveVisit(type, canon, 'wife', status!=='none'?status:getEntry(type,canon,'wife').status, date||getEntry(type,canon,'wife').date, isNew);
+    if (forHusband) await saveVisit(type, canon, 'husband', status!=='none'?status:getEntry(type,canon,'husband').status, date||getEntry(type,canon,'husband').date, isNew);
+  }
+  ta.value = '';
+  renderTab(type); updateGoals(type); updateStats(type);
+  alert(`Done! ${added} new entr${added!==1?'ies':'y'} added, ${updated} existing updated.`);
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function bestStatus(type, place) {
+  const order=['visited','planned','candidate','none'];
+  for (const s of order) for (const w of ['wife','husband']) if (getEntry(type,place,w).status===s) return s;
+  return 'none';
+}
+function filteredPlaces(type) {
+  const f = filters[type];
+  const q = (document.getElementById('search-'+type)||{value:''}).value.toLowerCase();
+  return getPlaces(type).filter(p => {
+    const l = getEntry(type,p,'wife').status||'none';
+    const h = getEntry(type,p,'husband').status||'none';
+    let show = true;
+    if (f==='visited') show=l==='visited'||h==='visited';
+    else if (f==='planned') show=l==='planned'||h==='planned';
+    else if (f==='candidate') show=l==='candidate'||h==='candidate';
+    else if (f==='unvisited') show=l==='none'&&h==='none';
+    if (show && q) show=p.toLowerCase().includes(q);
+    return show;
+  });
+}
+function makeCard(type, place) {
+  const best = bestStatus(type, place);
+  const card = document.createElement('div');
+  card.className = 'place-card' + (best!=='none'?' h'+best[0]:'');
+  const nm = document.createElement('div'); nm.className='place-name'; nm.textContent=place; card.appendChild(nm);
+  const badges = document.createElement('div'); badges.className='place-badges';
+  ['wife','husband'].forEach(who => {
+    const e = getEntry(type,place,who);
+    const st = e.status||'none'; const dt = e.date||'';
+    const k = `${type}|${place}|${who}`;
+    const row = document.createElement('div'); row.className='person-row';
+    const whoLabel = document.createElement('div'); whoLabel.className='person-who';
+    whoLabel.textContent = (who==='wife'?settings.wife_name:settings.husband_name)||who;
+    row.appendChild(whoLabel);
+    const stBtn = document.createElement('div'); stBtn.className='st-btn st-'+st;
+    stBtn.innerHTML=ICON[st]+' '+st; stBtn.onclick=()=>cycleStatus(type,place,who); row.appendChild(stBtn);
+    if (st!=='none') {
+      if (editing[k]) {
+        const de=document.createElement('div'); de.className='date-edit';
+        const inp=document.createElement('input'); inp.type='text'; inp.value=dt; inp.placeholder='e.g. Aug 2026';
+        inp.onclick=ev=>ev.stopPropagation();
+        const saveBtn=document.createElement('button'); saveBtn.textContent='✓';
+        saveBtn.onclick=ev=>{ev.stopPropagation();setDate(type,place,who,inp.value.trim());editing[k]=false;};
+        de.appendChild(inp); de.appendChild(saveBtn); row.appendChild(de);
+        setTimeout(()=>inp.focus(),30);
+      } else {
+        const chip=document.createElement('div'); chip.className='date-chip'+(dt?' has-date':'');
+        chip.textContent=dt||'+ date';
+        chip.onclick=ev=>{ev.stopPropagation();editing[k]=true;renderTab(type);}; row.appendChild(chip);
+      }
+    }
+    badges.appendChild(row);
+  });
+  card.appendChild(badges); return card;
+}
+function renderTab(type) {
+  const grid=document.getElementById('grid-'+type); grid.innerHTML='';
+  const places=filteredPlaces(type);
+  if (!places.length) { const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return; }
+  places.forEach(p=>grid.appendChild(makeCard(type,p)));
+}
+function updateGoals(type) {
+  const places=getPlaces(type);
+  let lv=0,lp=0,lc=0,hv=0,hp=0,hc=0;
+  places.forEach(p=>{
+    const l=getEntry(type,p,'wife').status||'none';
+    const h=getEntry(type,p,'husband').status||'none';
+    if(l==='visited')lv++;else if(l==='planned')lp++;else if(l==='candidate')lc++;
+    if(h==='visited')hv++;else if(h==='planned')hp++;else if(h==='candidate')hc++;
+  });
+  const pre=type==='countries'?'c':'s';
+  const gl=+document.getElementById('g'+pre+'l').value||50;
+  const gh=+document.getElementById('g'+pre+'h').value||50;
+  const cap=(v,p,c,g)=>{
+    const vp=Math.min(100,(v/g)*100);
+    const pp=Math.min(100-vp,(p/g)*100);
+    const cp=Math.min(100-vp-pp,(c/g)*100);
+    return[vp+'%',pp+'%',cp+'%'];
+  };
+  const[lvp,lpp,lcp]=cap(lv,lp,lc,gl);
+  const[hvp,hpp,hcp]=cap(hv,hp,hc,gh);
+  document.getElementById('bar'+pre+'v-l').style.width=lvp;
+  document.getElementById('bar'+pre+'p-l').style.width=lpp;
+  document.getElementById('bar'+pre+'c-l').style.width=lcp;
+  document.getElementById('bar'+pre+'v-h').style.width=hvp;
+  document.getElementById('bar'+pre+'p-h').style.width=hpp;
+  document.getElementById('bar'+pre+'c-h').style.width=hcp;
+  document.getElementById('cnt'+pre+'-l').textContent=lv+'/'+gl+' visited · '+lp+' planned · '+lc+' candidate';
+  document.getElementById('cnt'+pre+'-h').textContent=hv+'/'+gh+' visited · '+hp+' planned · '+hc+' candidate';
+}
+function updateStats(type) {
+  const places=getPlaces(type);
+  let lv=0,lp=0,lc=0,hv=0,hp=0,hc=0,both=0;
+  places.forEach(p=>{
+    const l=getEntry(type,p,'wife').status||'none';
+    const h=getEntry(type,p,'husband').status||'none';
+    if(l==='visited')lv++;if(l==='planned')lp++;if(l==='candidate')lc++;
+    if(h==='visited')hv++;if(h==='planned')hp++;if(h==='candidate')hc++;
+    if(l==='visited'&&h==='visited')both++;
+  });
+  const ln=settings.wife_name||'Laura', hn=settings.husband_name||'Faron';
+  const canvas=document.getElementById('chart-'+type);
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-40;
+  const H=160;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const categories=['Visited','Planned','Candidate'];
+  const wifeData=[lv,lp,lc]; const faronData=[hv,hp,hc];
+  const colors=['#2d4228','#c9922a','#6b5b8a'];
+  const maxVal=Math.max(lv,lp,lc,hv,hp,hc,1);
+  const padL=8,padR=8,padT=14,padB=28;
+  const chartW=W-padL-padR, chartH=H-padT-padB;
+  ctx.strokeStyle='#d4c9b8'; ctx.lineWidth=1;
+  ctx.fillStyle='#7a726a'; ctx.font=`10px "DM Mono",monospace`; ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const y=padT+chartH-(i/4)*chartH;
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+chartW,y);ctx.stroke();
+    ctx.fillText(Math.round((i/4)*maxVal),padL-2,y+3);
+  }
+  const groupW=chartW/3; const barW=Math.min(groupW*0.3,28); const gap=4;
+  categories.forEach((cat,ci)=>{
+    const groupX=padL+ci*groupW; const cx=groupX+groupW/2;
+    const lh=(wifeData[ci]/maxVal)*chartH; const lx=cx-barW-gap/2;
+    ctx.fillStyle=colors[ci]; ctx.globalAlpha=1;
+    ctx.fillRect(lx,padT+chartH-lh,barW,lh);
+    if(wifeData[ci]>0){ctx.fillStyle='#1a1612';ctx.textAlign='center';ctx.font=`bold 10px "DM Mono",monospace`;ctx.fillText(wifeData[ci],lx+barW/2,padT+chartH-lh-3);}
+    const hh=(faronData[ci]/maxVal)*chartH; const hx=cx+gap/2;
+    ctx.globalAlpha=0.5; ctx.fillStyle=colors[ci];
+    ctx.fillRect(hx,padT+chartH-hh,barW,hh);
+    ctx.globalAlpha=1;
+    if(faronData[ci]>0){ctx.fillStyle='#1a1612';ctx.textAlign='center';ctx.font=`bold 10px "DM Mono",monospace`;ctx.fillText(faronData[ci],hx+barW/2,padT+chartH-hh-3);}
+    ctx.fillStyle='#7a726a';ctx.font=`10px "DM Mono",monospace`;ctx.textAlign='center';ctx.globalAlpha=1;
+    ctx.fillText(cat,cx,padT+chartH+14);
+  });
+  [[ln,1],[hn,0.5]].forEach(([name,alpha],i)=>{
+    ctx.globalAlpha=alpha;ctx.fillStyle='#7a726a';ctx.fillRect(padL+chartW-120+i*60,2,10,10);
+    ctx.globalAlpha=1;ctx.fillStyle='#7a726a';ctx.textAlign='left';ctx.font=`10px "DM Mono",monospace`;
+    ctx.fillText(name,padL+chartW-120+i*60+13,11);
+  });
+  if(type==='countries'){
+    const wrap=document.getElementById('together-countries');
+    const eitherV=places.filter(p=>getEntry(type,p,'wife').status==='visited'||getEntry(type,p,'husband').status==='visited').length;
+    wrap.innerHTML=`
+      <div class="tog-pill"><div class="tdot" style="background:#2d4228"></div><div><div class="num">${both}</div><div class="lbl">Both visited</div></div></div>
+      <div class="tog-pill"><div class="tdot" style="background:var(--gold)"></div><div><div class="num">${eitherV}</div><div class="lbl">Either visited</div></div></div>
+      <div class="tog-pill"><div><div class="num">${places.length}</div><div class="lbl">Total tracked</div></div></div>`;
+  }
+}
+function buildFilterBtns(type) {
+  const defs=[{k:'all',label:'All',fc:'fall'},{k:'visited',label:'✓ Visited',fc:'fv'},{k:'planned',label:'◷ Planned',fc:'fp'},{k:'candidate',label:'★ Candidate',fc:'fc'},{k:'unvisited',label:'○ Unvisited',fc:'fu'}];
+  const wrap=document.getElementById('fbtns-'+type); wrap.innerHTML='';
+  defs.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='fbtn'+(filters[type]===d.k?' fa '+d.fc:'');
+    b.textContent=d.label;
+    b.onclick=()=>{filters[type]=d.k;buildFilterBtns(type);renderTab(type);};
+    wrap.appendChild(b);
+  });
+}
+function switchAddMode(type,mode,btn){
+  btn.closest('.add-mode-tabs').querySelectorAll('.amt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('af-single-'+type).className='add-form'+(mode==='single'?' show':'');
+  document.getElementById('af-bulk-'+type).className='add-form'+(mode==='bulk'?' show':'');
+}
+function updateNames(){
+  settings.wife_name=document.getElementById('name1').value||'Laura';
+  settings.husband_name=document.getElementById('name2').value||'Faron';
+  document.querySelectorAll('.pn-wife').forEach(el=>el.textContent=settings.wife_name);
+  document.querySelectorAll('.pn-husband').forEach(el=>el.textContent=settings.husband_name);
+  clearTimeout(saveDebounce);
+  saveDebounce=setTimeout(saveSettings,1000);
+  renderTab('countries');renderTab('states');updateStats('countries');updateStats('states');
+}
+function switchTab(tab,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active'); btn.classList.add('active');
+}
+function refreshAll(){
+  syncSettingsToUI();
+  ['countries','states'].forEach(t=>{buildFilterBtns(t);renderTab(t);updateGoals(t);updateStats(t);});
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  refreshAll();
+  const cfg = loadConfig();
+  if (cfg.url && cfg.key) {
+    await initSupabase(cfg.url, cfg.key);
+  } else {
+    setStatus('config','⚙ Configure Supabase — click here');
+  }
+});
+window.addEventListener('resize',()=>{updateStats('countries');updateStats('states');});
+</script>
+</body>
+</html>
