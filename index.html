@@ -139,8 +139,27 @@ select.add-inp{cursor:pointer;min-width:200px}
 .date-edit input{padding:2px 6px;border:1px solid var(--border);border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);outline:none;width:130px}
 .date-edit input:focus{border-color:var(--gold)}
 .date-edit button{padding:2px 7px;background:var(--gold);color:white;border:none;border-radius:3px;font-size:10px;cursor:pointer}
+.remove-btn{display:none;position:absolute;top:7px;right:7px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;border-radius:2px;transition:all .15s}
+.remove-btn:hover{color:var(--rust);background:#fce8e8}
+.place-card:hover .remove-btn{display:block}
+.place-card{position:relative}
 .saving-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:6px;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-version{margin-left:auto;padding:0 16px;font-size:10px;color:#4a4440;letter-spacing:.1em;text-transform:uppercase;align-self:center}
+.changelog-wrap{max-width:720px;margin:0 auto;padding:8px 0 40px}
+.cl-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:28px;color:var(--ink)}
+.cl-entry{border-left:2px solid var(--border);padding:0 0 28px 20px;margin-bottom:4px;position:relative}
+.cl-entry::before{content:'';position:absolute;left:-5px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:2px solid var(--cream)}
+.cl-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.cl-version{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--ink)}
+.cl-date{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.cl-badge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;font-weight:500}
+.cl-badge-feat{background:#e8f4e8;color:#2d4228}
+.cl-badge-fix{background:#fce8e8;color:#9b2020}
+.cl-badge-improve{background:#fef3dc;color:#7a4f00}
+.cl-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.cl-list li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.5}
+.cl-list li::before{content:'·';position:absolute;left:0;color:var(--gold);font-weight:700}
+.cl-list code{background:var(--parchment);padding:1px 5px;border-radius:2px;font-size:11px;color:var(--ink)}
 .empty{text-align:center;padding:40px;color:var(--muted);font-size:12px;letter-spacing:.06em;grid-column:1/-1}
 .panel{display:none}.panel.active{display:block}
 .section-hdr{margin-bottom:12px}.section-hdr h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400}
@@ -164,6 +183,8 @@ select.add-inp{cursor:pointer;min-width:200px}
 <nav>
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
+  <button onclick="switchTab('changelog',this)">Changelog</button>
+  <span class="nav-version">v1.5.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -329,6 +350,107 @@ select.add-inp{cursor:pointer;min-width:200px}
       </div>
     </div>
     <div class="place-grid" id="grid-states"></div>
+  <!-- CHANGELOG -->
+  <div id="panel-changelog" class="panel">
+    <div class="changelog-wrap">
+      <h2 class="cl-title">Our World — Changelog</h2>
+      <div class="cl-entries" id="cl-entries">
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.5.0</span>
+            <span class="cl-date">May 28 2026</span>
+            <span class="cl-badge cl-badge-feat">Feature</span>
+          </div>
+          <ul class="cl-list">
+            <li>Full ISO 3166 country list (232 countries) with ISO2/ISO3 codes</li>
+            <li>Full US states list including DC, Puerto Rico and territories</li>
+            <li>Searchable dropdown for single add — type name, code or abbreviation</li>
+            <li>Fuzzy bulk matching — resolves UK, USA, Deutschland, TX, ISO codes etc.</li>
+            <li>Bulk Preview step shows matched / fuzzy / unrecognized before committing</li>
+            <li>Remove button on cards (hover to reveal ✕) — clears both people's data</li>
+            <li>Filter auto-switches to show added status after bulk or single add</li>
+            <li>Anon key hardcoded — no modal needed</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.4.0</span>
+            <span class="cl-date">May 27 2026</span>
+            <span class="cl-badge cl-badge-fix">Fix</span>
+          </div>
+          <ul class="cl-list">
+            <li>Fixed <code>supabase</code> variable name conflict with CDN SDK (renamed to <code>sbClient</code>)</li>
+            <li>Fixed <code>subscribeRealtime()</code> still referencing old variable — realtime now works</li>
+            <li>Settings columns renamed to <code>p1_name</code> / <code>p2_name</code> for generality</li>
+            <li>Removed config modal — credentials hardcoded in file</li>
+            <li>Added console logging for all DB operations to aid debugging</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.3.0</span>
+            <span class="cl-date">May 27 2026</span>
+            <span class="cl-badge cl-badge-feat">Feature</span>
+          </div>
+          <ul class="cl-list">
+            <li>Migrated from localStorage to Supabase Realtime Database</li>
+            <li>Real-time sync — changes appear instantly on both devices</li>
+            <li>Hosted on GitHub Pages for shared access</li>
+            <li>Connection status indicator (Live / Connecting / Failed)</li>
+            <li>Saving pulse animation while writes are in flight</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.2.0</span>
+            <span class="cl-date">May 26 2026</span>
+            <span class="cl-badge cl-badge-feat">Feature</span>
+          </div>
+          <ul class="cl-list">
+            <li>Stacked progress bar — Visited / Planned / Candidate in one bar per person</li>
+            <li>Bar chart (canvas) showing counts per status per person</li>
+            <li>Countries panel: "Both visited" and "Either visited" summary</li>
+            <li>Visited color darkened for better contrast</li>
+            <li>Removed per-person stats strip — chart replaces it</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.1.0</span>
+            <span class="cl-date">May 25 2026</span>
+            <span class="cl-badge cl-badge-feat">Feature</span>
+          </div>
+          <ul class="cl-list">
+            <li>Three-tier status system: Visited / Planned / Candidate (replaces binary toggle)</li>
+            <li>Per-person date field — click chip to set free-text date (e.g. "Aug 2026")</li>
+            <li>Bulk paste add with comma and newline support</li>
+            <li>Status filter buttons: All / Visited / Planned / Candidate / Unvisited</li>
+            <li>Faron added as named partner (replaces generic "Husband")</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.0.0</span>
+            <span class="cl-date">May 24 2026</span>
+            <span class="cl-badge cl-badge-feat">Launch</span>
+          </div>
+          <ul class="cl-list">
+            <li>Initial build — Countries and US States tracker</li>
+            <li>Per-person visited toggle for Laura and partner</li>
+            <li>Goal setting with progress bar</li>
+            <li>Grid view with search and filter</li>
+            <li>localStorage persistence</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
   </div>
 </main>
 
@@ -674,7 +796,20 @@ async function setDate(type,place,who,date){
   await saveVisit(type,place,who,e.status,date);
 }
 
-// ─── ADD ──────────────────────────────────────────────────────────────────────
+async function removePlace(type,place){
+  const lSt=getEntry(type,place,'laura').status,hSt=getEntry(type,place,'husband').status;
+  const who=lSt!=='none'&&hSt!=='none'?'both':lSt!=='none'?'laura':'husband';
+  const whoLabel=who==='both'?'both people':who==='laura'?settings.p1_name:settings.p2_name;
+  if(!confirm(`Remove ${place} for ${whoLabel}? This clears status and date.`))return;
+  if(!sbClient)return;
+  showSaving();
+  const{error}=await sbClient.from('visits').delete().eq('type',type).eq('place',place);
+  if(error){console.error('[DB] remove:',error);hideSaving();return;}
+  delete visits[`${type}|${place}|laura`];
+  delete visits[`${type}|${place}|husband`];
+  hideSaving();
+  renderTab(type);updateGoals(type);updateStats(type);
+}
 async function doAddSingle(type){
   const sel=selSelected[type];
   if(!sel){alert('Please select a '+(type==='countries'?'country':'state')+' from the dropdown first.');return;}
@@ -688,27 +823,55 @@ async function doAddSingle(type){
   if(forP2){visits[`${type}|${place}|husband`]={status:status!=='none'?status:getEntry(type,place,'husband').status,date:date||getEntry(type,place,'husband').date};await saveVisit(type,place,'husband',visits[`${type}|${place}|husband`].status,visits[`${type}|${place}|husband`].date);}
   clearSelection(type);
   document.getElementById('si-dt-'+type).value='';
+  const status=document.getElementById('si-st-'+type).value;
+  if(status!=='none') filters[type]=status;
+  buildFilterBtns(type);
   renderTab(type);updateGoals(type);updateStats(type);
 }
 
 async function doAddBulk(type){
+  // Auto-preview if not done yet
+  const ta=document.getElementById('bk-ta-'+type);
+  if(!bulkResolved[type]||!bulkResolved[type].length){
+    previewBulk(type);
+  }
   const matched=bulkResolved[type];
-  if(!matched||!matched.length){alert('Click Preview first to resolve your list.');return;}
+  if(!matched||!matched.length){
+    alert('No recognizable entries found. Check your list and try again.');return;
+  }
   const status=document.getElementById('bk-st-'+type).value;
   const date=document.getElementById('bk-dt-'+type).value.trim();
   const forP1=document.getElementById('bk-cl-'+type).checked;
   const forP2=document.getElementById('bk-ch-'+type).checked;
   if(!forP1&&!forP2){alert('Select at least one person.');return;}
+  console.log('[BULK] saving',matched.length,'entries, status:',status,'forP1:',forP1,'forP2:',forP2);
   let count=0;
   for(const r of matched){
-    if(forP1){const ex=getEntry(type,r.name,'laura');visits[`${type}|${r.name}|laura`]={status:status!=='none'?status:ex.status,date:date||ex.date};await saveVisit(type,r.name,'laura',visits[`${type}|${r.name}|laura`].status,visits[`${type}|${r.name}|laura`].date);}
-    if(forP2){const ex=getEntry(type,r.name,'husband');visits[`${type}|${r.name}|husband`]={status:status!=='none'?status:ex.status,date:date||ex.date};await saveVisit(type,r.name,'husband',visits[`${type}|${r.name}|husband`].status,visits[`${type}|${r.name}|husband`].date);}
+    const place=r.name;
+    console.log('[BULK] saving:',place);
+    if(forP1){
+      const ex=getEntry(type,place,'laura');
+      const ns=status!=='none'?status:ex.status;
+      const nd=date||ex.date;
+      visits[`${type}|${place}|laura`]={status:ns,date:nd};
+      await saveVisit(type,place,'laura',ns,nd);
+    }
+    if(forP2){
+      const ex=getEntry(type,place,'husband');
+      const ns=status!=='none'?status:ex.status;
+      const nd=date||ex.date;
+      visits[`${type}|${place}|husband`]={status:ns,date:nd};
+      await saveVisit(type,place,'husband',ns,nd);
+    }
     count++;
   }
-  document.getElementById('bk-ta-'+type).value='';
+  ta.value='';
   document.getElementById('bulk-results-'+type).classList.remove('show');
   bulkResolved[type]=[];
+  if(status!=='none') filters[type]=status;
+  buildFilterBtns(type);
   renderTab(type);updateGoals(type);updateStats(type);
+  document.getElementById('grid-'+type).scrollIntoView({behavior:'smooth',block:'start'});
   alert(`Done! ${count} ${type==='countries'?'countr':'state'}${count!==1?'ies':'y'} updated.`);
 }
 
@@ -766,6 +929,13 @@ function makeCard(type,place){
     }
     badges.appendChild(row);
   });
+  // Remove button — only show if either person has a status set
+  if(best!=='none'){
+    const rmBtn=document.createElement('button');
+    rmBtn.className='remove-btn';rmBtn.title='Remove / clear this entry';rmBtn.innerHTML='✕';
+    rmBtn.onclick=ev=>{ev.stopPropagation();removePlace(type,place);};
+    card.appendChild(rmBtn);
+  }
   card.appendChild(badges);return card;
 }
 function renderTab(type){
@@ -849,13 +1019,22 @@ function updateNames(){
 function switchTab(tab,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');btn.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab!=='changelog'){updateStats(tab);}
 }
 function refreshAll(){
   syncSettingsToUI();
   ['countries','states'].forEach(t=>{buildFilterBtns(t);renderTab(t);updateGoals(t);updateStats(t);});
 }
-window.addEventListener('DOMContentLoaded',async()=>{refreshAll();await initSupabase(SB_URL,SB_KEY);});
+window.addEventListener('DOMContentLoaded',async()=>{
+  refreshAll();
+  if(SB_KEY==='PASTE_ANON_KEY_HERE'){
+    setStatus('offline','⚠ Anon key not set — open index.html and paste your key');
+    return;
+  }
+  await initSupabase(SB_URL,SB_KEY);
+});
 window.addEventListener('resize',()=>{updateStats('countries');updateStats('states');});
 </script>
 </body>
