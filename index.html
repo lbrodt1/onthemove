@@ -350,6 +350,8 @@ select.add-inp{cursor:pointer;min-width:200px}
       </div>
     </div>
     <div class="place-grid" id="grid-states"></div>
+  </div><!-- end panel-states -->
+
   <!-- CHANGELOG -->
   <div id="panel-changelog" class="panel">
     <div class="changelog-wrap">
@@ -823,8 +825,8 @@ async function doAddSingle(type){
   if(forP2){visits[`${type}|${place}|husband`]={status:status!=='none'?status:getEntry(type,place,'husband').status,date:date||getEntry(type,place,'husband').date};await saveVisit(type,place,'husband',visits[`${type}|${place}|husband`].status,visits[`${type}|${place}|husband`].date);}
   clearSelection(type);
   document.getElementById('si-dt-'+type).value='';
-  const status=document.getElementById('si-st-'+type).value;
-  if(status!=='none') filters[type]=status;
+  const addedStatus=document.getElementById('si-st-'+type).value;
+  if(addedStatus!=='none') filters[type]=addedStatus;
   buildFilterBtns(type);
   renderTab(type);updateGoals(type);updateStats(type);
 }
