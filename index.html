@@ -57,6 +57,12 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 .lb-actions{display:flex;gap:4px;justify-content:flex-end}
 .lb-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px}
 .lb-edit-btn:hover{background:var(--border);color:var(--ink)}
+.lb-tooltip{position:relative;cursor:default}
+.lb-tooltip-box{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--ink);color:var(--parchment);border-radius:4px;padding:8px 12px;font-size:10px;line-height:1.7;white-space:nowrap;min-width:160px;max-width:260px;white-space:normal;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.lb-tooltip-box .tt-section{margin-bottom:4px}
+.lb-tooltip-box .tt-label{color:var(--gold-light);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.lb-tooltip-box .tt-list{color:var(--parchment);opacity:.9}
+.lb-tooltip:hover .lb-tooltip-box{display:block}
 
 /* ADD PERSON MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,22,18,.5);z-index:200;align-items:center;justify-content:center}
@@ -206,7 +212,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.5</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.6</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -217,7 +223,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.0.5</span>
+  <span class="nav-version">v2.0.6</span>
 </nav>
 <main>
   <div class="legend">
@@ -380,7 +386,7 @@ select.add-inp{cursor:pointer;min-width:160px}
       <div class="cl-entries">
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v2.0.5</span>
+            <span class="cl-version">v2.0.6</span>
             <span class="cl-date">May 30 2026</span>
             <span class="cl-badge cl-badge-feat">Feature</span>
           </div>
@@ -396,7 +402,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           </ul>
         </div>
         <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.0.5</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <div class="cl-header"><span class="cl-version">v2.0.6</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>Cards narrower — min width reduced from 180px to 160px, tighter padding and gap for more countries per row</li></ul>
         </div>
         <div class="cl-entry">
@@ -878,10 +884,14 @@ function updateLeaderboard(type){
     const pPct=Math.min(100-vPct,(r.pl/Math.max(r.goal,1))*100);
     const cPct=Math.min(100-vPct-pPct,(r.c/Math.max(r.goal,1))*100);
     const isSoon=r.deadline&&r.v<r.goal;
+    const vList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='visited').sort().join(', ');
+    const pList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='planned').sort().join(', ');
+    const cList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='candidate').sort().join(', ');
+    const ttHtml=`<div class="lb-tooltip-box">${vList?`<div class="tt-section"><div class="tt-label">Visited (${r.v})</div><div class="tt-list">${vList}</div></div>`:''}${pList?`<div class="tt-section"><div class="tt-label">Planned (${r.pl})</div><div class="tt-list">${pList}</div></div>`:''}${cList?`<div class="tt-section"><div class="tt-label">Candidate (${r.c})</div><div class="tt-list">${cList}</div></div>`:''}</div>`;
     html+=`<div class="lb-row">
       <div class="lb-rank">${i+1}</div>
       <div class="lb-name"><div class="lb-dot" style="background:${r.p.color}"></div>${r.p.name}</div>
-      <div><div class="lb-bar-wrap"><div class="lb-bar-seg bar-v" style="width:${vPct}%;background:var(--visited)"></div><div class="lb-bar-seg" style="width:${pPct}%;background:var(--planned)"></div><div class="lb-bar-seg" style="width:${cPct}%;background:var(--candidate)"></div></div></div>
+      <div class="lb-tooltip"><div class="lb-bar-wrap"><div class="lb-bar-seg bar-v" style="width:${vPct}%;background:var(--visited)"></div><div class="lb-bar-seg" style="width:${pPct}%;background:var(--planned)"></div><div class="lb-bar-seg" style="width:${cPct}%;background:var(--candidate)"></div></div>${ttHtml}</div>
       <div class="lb-count">${r.v}<span style="color:var(--planned);font-size:10px;opacity:.8;margin-left:2px">${r.pl?'+'+r.pl+'p':''}</span><span style="color:var(--candidate);font-size:10px;opacity:.8;margin-left:1px">${r.c?'+'+r.c+'c':''}</span><span style="color:var(--muted);font-size:10px;margin-left:3px">/ ${r.goal}</span></div>
       <div class="lb-goal">${total}</div>
       <div class="lb-deadline${isSoon?' soon':''}">${r.deadline||'—'}</div>
