@@ -3,7 +3,7 @@
 
 ---
 
-### v1.9.2 — May 30 2026
+### v1.9.3 — May 30 2026
 **Fix: Regex syntax errors**
 - Removed all non-ASCII characters from regex patterns — were causing SyntaxError in strict JS environments
 - Simplified possessive stripping regex (now handled by alias map instead)
@@ -18,7 +18,9 @@
 - Added Supabase SDK readiness check — waits up to 2 seconds for CDN to load before attempting connection
 - Verbose connection logging — each step shown in real time in the header
 - Updated to `sb_publishable` key format
-- Fixed broken regex (unterminated possessive strip) that was silently killing the entire script on load — root cause of persistent connection failures
+- Fixed broken regex (unterminated possessive strip)
+- Removed ALL non-ASCII characters from script — Cyrillic/Japanese/symbols in alias map were crashing JS parser
+- Cleaned COUNTRY_ALIASES to ASCII/unicode escapes only that was silently killing the entire script on load — root cause of persistent connection failures
 
 ---
 

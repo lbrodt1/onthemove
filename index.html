@@ -170,7 +170,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.1em;color:#4a4440;margin-left:8px">v1.9.2</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.1em;color:#4a4440;margin-left:8px">v1.9.3</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
@@ -185,7 +185,7 @@ select.add-inp{cursor:pointer;min-width:200px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.9.2</span>
+  <span class="nav-version">v1.9.3</span>
 </nav>
 <main>
   <div class="legend">
@@ -393,7 +393,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v1.9.2</span>
+            <span class="cl-version">v1.9.3</span>
             <span class="cl-date">May 30 2026</span>
             <span class="cl-badge cl-badge-fix">Fix</span>
           </div>
@@ -403,6 +403,8 @@ select.add-inp{cursor:pointer;min-width:200px}
             <li>Verbose connection logging — each step (client created, query sent, response received) shown in real time</li>
             <li>Updated to <code>sb_publishable</code> key format</li>
             <li>Fixed broken regex (unterminated possessive strip) that was killing the entire script on load</li>
+            <li>Removed ALL non-ASCII characters from script code — Cyrillic, Japanese, special symbols were crashing JS parser</li>
+            <li>Cleaned COUNTRY_ALIASES to pure ASCII/unicode escape sequences only</li>
           </ul>
         </div>
 
@@ -636,36 +638,44 @@ const STATE_DATA=[
   ["American Samoa","AS"],["Northern Mariana Islands","MP"]
 ];
 
-// ─── FUZZY ALIASES ────────────────────────────────────────────────────────────
-// Common alternate names → ISO2 code
+// ─── FUZZY ALIASES ─────────────────────────────────────────────────────────
 const COUNTRY_ALIASES={
-  "russia":"RU","uk":"GB","england":"GB","britain":"GB","great britain":"GB","northern ireland":"GB",
-  "scotland":"GB","wales":"GB","usa":"US","united states of america":"US","america":"US","us":"US",
-  "south korea":"KR","north korea":"KP","taiwan":"TW","vietnam":"VN","laos":"LA","iran":"IR",
-  "syria":"SY","bolivia":"BO","tanzania":"TZ","moldova":"MD","congo dr":"CD","drc":"CD",
-  "democratic republic of congo":"CD","republic of congo":"CG","ivory coast":"CI","cape verde":"CV",
-  "czech republic":"CZ","turkey":"TR","turkiye":"TR","brunei":"BN","myanmar":"MM","burma":"MM",
-  "macau":"MO","swaziland":"SZ","holy see":"VA","vatican":"VA","palestine":"PS","uae":"AE",
-  "deutschland":"DE","allemagne":"DE","alemania":"DE","france":"FR","espagne":"ES",
-  "россия":"RU","китай":"CN","日本":"JP","中国":"CN","deutschland":"DE",
-  "new guinea":"PG","guinea republic":"GN","eq guinea":"GQ","equatorial guinea":"GQ",
-  "s africa":"ZA","s korea":"KR","n korea":"KP","n macedonia":"MK","trinidad":"TT",
-  "st kitts":"KN","st lucia":"LC","st vincent":"VC","sao tome":"ST","timor":"TL","east timor":"TL",
-  "mexico":"MX","méxico":"MX","canada":"CA","canadá":"CA","united kingdom":"GB","united kingdom's":"GB","the united kingdom":"GB",
-  "lichtenstein":"LI","liechtenstien":"LI",
-  "uk":"GB","u.k.":"GB","england":"GB","great britain":"GB","britain":"GB",
-  "united states":"US","usa":"US","u.s.a.":"US","u.s.":"US","america":"US",
-  "south korea":"KR","north korea":"KP","taiwan":"TW","vietnam":"VN","viet nam":"VN",
-  "iran":"IR","syria":"SY","russia":"RU","russie":"RU","rusia":"RU",
-  "czechia":"CZ","czech republic":"CZ","ivory coast":"CI","cape verde":"CV",
-  "turkey":"TR","turkiye":"TR","türkiye":"TR","holland":"NL","the netherlands":"NL",
-  "uae":"AE","u.a.e.":"AE","emirates":"AE","bosnia":"BA","herzegovina":"BA",
-  "trinidad":"TT","tobago":"TT","s. korea":"KR","n. korea":"KP","n. macedonia":"MK",
-  "congo republic":"CG","dr congo":"CD","d.r. congo":"CD","democratic republic congo":"CD",
-  "slovak republic":"SK","lao":"LA","laos":"LA","burma":"MM","myanmar":"MM",
-  "brunei":"BN","macao":"MO","macau":"MO","kyrgyzstan":"KG","kirghizstan":"KG",
-  "swaziland":"SZ","eswatini":"SZ","holy see":"VA","vatican":"VA","vatican city":"VA",
-  "timor leste":"TL","east timor":"TL","palestine":"PS","disputed territories":"PS"
+  "uk":"GB","u.k.":"GB","england":"GB","britain":"GB","great britain":"GB",
+  "northern ireland":"GB","scotland":"GB","wales":"GB","united kingdom":"GB",
+  "united kingdoms":"GB","the united kingdom":"GB",
+  "usa":"US","u.s.":"US","u.s.a.":"US","america":"US","united states of america":"US","united states":"US",
+  "russia":"RU","russie":"RU","rusia":"RU",
+  "south korea":"KR","s. korea":"KR","s korea":"KR","republic of korea":"KR",
+  "north korea":"KP","n. korea":"KP","n korea":"KP",
+  "taiwan":"TW","vietnam":"VN","viet nam":"VN",
+  "laos":"LA","lao":"LA",
+  "iran":"IR","persia":"IR",
+  "syria":"SY",
+  "turkey":"TR","turkiye":"TR",
+  "germany":"DE","deutschland":"DE","allemagne":"DE","alemania":"DE",
+  "netherlands":"NL","holland":"NL","the netherlands":"NL",
+  "czech republic":"CZ","czechia":"CZ","slovak republic":"SK",
+  "ivory coast":"CI","cape verde":"CV",
+  "bolivia":"BO","tanzania":"TZ","moldova":"MD",
+  "congo dr":"CD","drc":"CD","dr congo":"CD","d.r. congo":"CD",
+  "democratic republic of congo":"CD","democratic republic congo":"CD",
+  "republic of congo":"CG","congo republic":"CG",
+  "uae":"AE","u.a.e.":"AE","emirates":"AE",
+  "brunei":"BN","myanmar":"MM","burma":"MM",
+  "macao":"MO","macau":"MO",
+  "swaziland":"SZ","eswatini":"SZ",
+  "holy see":"VA","vatican":"VA","vatican city":"VA",
+  "palestine":"PS",
+  "timor":"TL","timor leste":"TL","east timor":"TL",
+  "mexico":"MX","canada":"CA",
+  "lichtenstein":"LI","liechtenstien":"LI","liechtensten":"LI",
+  "st kitts":"KN","st lucia":"LC","st vincent":"VC","sao tome":"ST",
+  "new guinea":"PG","guinea republic":"GN","eq guinea":"GQ",
+  "s africa":"ZA","n macedonia":"MK","n. macedonia":"MK",
+  "trinidad":"TT","tobago":"TT",
+  "kyrgyzstan":"KG","kirghizstan":"KG",
+  "bosnia":"BA","herzegovina":"BA",
+  "laos":"LA","disputed territories":"PS"
 };
 
 // ─── MASTER PLACE LISTS ───────────────────────────────────────────────────────
@@ -763,7 +773,7 @@ function selectOption(type,name,code){
   document.getElementById('sel-search-'+type).value=name;
   document.getElementById('sel-dropdown-'+type).classList.remove('open');
   const tag=document.getElementById('sel-selected-'+type);
-  tag.innerHTML=`<div class="sel-selected-tag">✓ ${name} <span style="opacity:.6;font-size:9px">${code}</span><button onclick="clearSelection('${type}')">×</button></div>`;
+  tag.innerHTML=`<div class="sel-selected-tag">OK ${name} <span style="opacity:.6;font-size:9px">${code}</span><button onclick="clearSelection('${type}')">x</button></div>`;
 }
 function clearSelection(type){
   selSelected[type]=null;
@@ -792,8 +802,8 @@ function previewBulk(type){
   bulkResolved[type]=results.filter(r=>r.status==='matched'||r.status==='fuzzy');
   const wrap=document.getElementById('bulk-results-'+type);
   wrap.innerHTML=results.map(r=>{
-    if(r.status==='unknown')return`<div class="br-row br-unknown"><span class="br-icon">✗</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
-    if(r.status==='dup')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">⟳</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate in this list</span></div>`;
+    if(r.status==='unknown')return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
+    if(r.status==='dup')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate in this list</span></div>`;
     if(r.status==='fuzzy')return`<div class="br-row br-fuzzy"><span class="br-icon">~</span><span class="br-label">"${r.input}"</span><span class="br-canon">→ ${r.name} (${r.code})</span></div>`;
     return`<div class="br-row br-matched"><span class="br-icon">✓</span><span class="br-label">${r.name}</span><span class="br-canon">${r.code}</span></div>`;
   }).join('');
@@ -811,7 +821,7 @@ const SB_KEY = "sb_publishable_K6vRtMTydN6VqqBh6d1itA_SR5RHCkz";
 
 // ─── SUPABASE ─────────────────────────────────────────────────────────────────
 async function initSupabase(url,key){
-  setStatus('connecting','Connecting…');
+  setStatus('connecting','Connecting...');
   // Wait for Supabase SDK to be available (handles CDN timing issues)
   let attempts=0;
   while(!window.supabase && attempts<20){
@@ -819,18 +829,18 @@ async function initSupabase(url,key){
     attempts++;
   }
   if(!window.supabase){
-    setStatus('offline','Supabase SDK failed to load — check network connection');
+    setStatus('offline','Supabase SDK failed to load - check network');
     return;
   }
   try{
-    setStatus('connecting','Creating Supabase client…');
+    setStatus('connecting','Creating Supabase client...');
     sbClient=window.supabase.createClient(url,key);
-    setStatus('connecting','Client created, testing query…');
+    setStatus('connecting','Client created, testing...');
     const{data,error}=await sbClient.from('settings').select('id').limit(1);
     setStatus('connecting','Query returned: data='+JSON.stringify(data)+' err='+JSON.stringify(error));
     console.log('[DB] test:',{data,error});
     if(error)throw error;
-    setStatus('online','Live ✓');
+    setStatus('online','Live OK');
     await loadAllData();
     subscribeRealtime();
   }catch(e){
@@ -891,7 +901,7 @@ function subscribeRealtime(){
     })
     .subscribe(status=>{
       console.log('[RT] status:',status);
-      if(status==='SUBSCRIBED')setStatus('online','Live ✓');
+      if(status==='SUBSCRIBED')setStatus('online','Live OK');
       if(status==='CLOSED'||status==='CHANNEL_ERROR')setStatus('offline','Disconnected');
     });
 }
@@ -1219,12 +1229,12 @@ function previewRemove(type){
   const wrap=document.getElementById('rm-results-'+type);
   wrap.innerHTML=results.map(r=>{
     if(r.status==='unknown')
-      return`<div class="br-row br-unknown"><span class="br-icon">✗</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
+      return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
     if(r.status==='dup')
-      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">⟳</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
+      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
     if(r.status==='nodata')
       return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">○</span><span class="br-label">${r.name}</span><span class="br-canon">No data to remove</span></div>`;
-    const arrow=r.method!=='exact'?` → ${r.name} (${r.code})`:`${r.code}`;
+    const arrow=r.method!=='exact'?` -> ${r.name} (${r.code})`:`${r.code}`;
     const dataInfo=`L:${r.lSt} F:${r.hSt}`;
     return`<div class="br-row br-${r.status==='fuzzy'?'fuzzy':'matched'}" style="border-left:3px solid var(--rust)">
       <span class="br-icon">🗑</span>
