@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>On The Move — The Travel Tally v1</title>
+<title>On the Move — The Travel Tally</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -169,8 +169,8 @@ select.add-inp{cursor:pointer;min-width:200px}
 <body>
 <header>
   <div>
-    <h1>Our <span>World</span></h1>
-    <div class="subtitle">Travel Tracker</div>
+    <h1>On the <span>Move</span></h1>
+    <div class="subtitle">The Travel Tally</div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
@@ -184,7 +184,7 @@ select.add-inp{cursor:pointer;min-width:200px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.5.0</span>
+  <span class="nav-version">v1.8.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -221,6 +221,7 @@ select.add-inp{cursor:pointer;min-width:200px}
       <div class="add-mode-tabs">
         <button class="amt active" onclick="switchAddMode('countries','single',this)">Single</button>
         <button class="amt" onclick="switchAddMode('countries','bulk',this)">Bulk Paste</button>
+        <button class="amt" onclick="switchAddMode('countries','remove',this)">Bulk Remove</button>
       </div>
       <!-- SINGLE -->
       <div class="add-form show" id="af-single-countries">
@@ -271,6 +272,21 @@ select.add-inp{cursor:pointer;min-width:200px}
           <button class="btn-primary" onclick="doAddBulk('countries')">Add All Matched</button>
         </div>
       </div>
+      <!-- BULK REMOVE -->
+      <div class="add-form" id="af-remove-countries">
+        <textarea class="bulk-ta" id="rm-ta-countries" placeholder="Paste countries to remove, one per line or comma-separated:&#10;France, Italy&#10;Japan&#10;Same fuzzy matching applies — ISO codes and alternate names work too."></textarea>
+        <div class="bulk-hint">⚠ Removes status and date for the selected people. Fuzzy matched — same as bulk add.</div>
+        <div id="rm-results-countries" class="bulk-results"></div>
+        <div class="bulk-status-row">
+          <button class="btn-secondary" onclick="previewRemove('countries')">Preview</button>
+          <label>Remove for:</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="rm-cl-countries" checked/><span class="pn-p1">Laura</span></label>
+            <label class="pcheck"><input type="checkbox" id="rm-ch-countries" checked/><span class="pn-p2">Faron</span></label>
+          </div>
+          <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('countries')">Remove All</button>
+        </div>
+      </div>
     </div>
     <div class="place-grid" id="grid-countries"></div>
   </div>
@@ -300,6 +316,7 @@ select.add-inp{cursor:pointer;min-width:200px}
       <div class="add-mode-tabs">
         <button class="amt active" onclick="switchAddMode('states','single',this)">Single</button>
         <button class="amt" onclick="switchAddMode('states','bulk',this)">Bulk Paste</button>
+        <button class="amt" onclick="switchAddMode('states','remove',this)">Bulk Remove</button>
       </div>
       <div class="add-form show" id="af-single-states">
         <div class="add-row">
@@ -348,6 +365,21 @@ select.add-inp{cursor:pointer;min-width:200px}
           <button class="btn-primary" onclick="doAddBulk('states')">Add All Matched</button>
         </div>
       </div>
+      <!-- BULK REMOVE -->
+      <div class="add-form" id="af-remove-states">
+        <textarea class="bulk-ta" id="rm-ta-states" placeholder="Paste states to remove, one per line or comma-separated:&#10;Texas, California&#10;NY, FL&#10;Abbreviations work too."></textarea>
+        <div class="bulk-hint">⚠ Removes status and date for the selected people. Fuzzy matched.</div>
+        <div id="rm-results-states" class="bulk-results"></div>
+        <div class="bulk-status-row">
+          <button class="btn-secondary" onclick="previewRemove('states')">Preview</button>
+          <label>Remove for:</label>
+          <div class="person-checks">
+            <label class="pcheck"><input type="checkbox" id="rm-cl-states" checked/><span class="pn-p1">Laura</span></label>
+            <label class="pcheck"><input type="checkbox" id="rm-ch-states" checked/><span class="pn-p2">Faron</span></label>
+          </div>
+          <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('states')">Remove All</button>
+        </div>
+      </div>
     </div>
     <div class="place-grid" id="grid-states"></div>
   </div><!-- end panel-states -->
@@ -357,6 +389,51 @@ select.add-inp{cursor:pointer;min-width:200px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries" id="cl-entries">
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.8.0</span>
+            <span class="cl-date">May 28 2026</span>
+            <span class="cl-badge cl-badge-feat">Feature</span>
+          </div>
+          <ul class="cl-list">
+            <li>Bulk Remove tab — paste a list of countries or states to clear, same fuzzy matching as bulk add</li>
+            <li>Preview step shows what will be removed and current status before confirming</li>
+            <li>Remove per-person — choose Laura, Faron, or both before deleting</li>
+            <li>Confirmation dialog lists all entries that will be affected</li>
+            <li>Entries with no data are skipped automatically</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.7.0</span>
+            <span class="cl-date">May 28 2026</span>
+            <span class="cl-badge cl-badge-fix">Fix</span>
+          </div>
+          <ul class="cl-list">
+            <li>Bulk add now skips existing entries — re-running a list never overwrites what you already have</li>
+            <li>Bulk add confirmation shows count of new entries added vs skipped</li>
+            <li>Remove button (hover ✕) fixed — properly clears both people and syncs to Supabase</li>
+            <li>Remove confirms who will be affected before deleting</li>
+          </ul>
+        </div>
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.6.0</span>
+            <span class="cl-date">May 28 2026</span>
+            <span class="cl-badge cl-badge-improve">Improve</span>
+          </div>
+          <ul class="cl-list">
+            <li>Renamed app to <code>On the Move — The Travel Tally</code></li>
+            <li>Accent normalization for fuzzy matching — México, Canadá, Türkiye etc. now resolve correctly</li>
+            <li>Added possessive stripping — "United Kingdom's" resolves to United Kingdom</li>
+            <li>Added common misspelling aliases — Lichtenstein → Liechtenstein etc.</li>
+            <li>Fixed duplicate <code>const status</code> declaration that was silently blocking Supabase connection</li>
+            <li>Fixed missing closing div on states panel</li>
+          </ul>
+        </div>
 
         <div class="cl-entry">
           <div class="cl-header">
@@ -557,7 +634,22 @@ const COUNTRY_ALIASES={
   "россия":"RU","китай":"CN","日本":"JP","中国":"CN","deutschland":"DE",
   "new guinea":"PG","guinea republic":"GN","eq guinea":"GQ","equatorial guinea":"GQ",
   "s africa":"ZA","s korea":"KR","n korea":"KP","n macedonia":"MK","trinidad":"TT",
-  "st kitts":"KN","st lucia":"LC","st vincent":"VC","sao tome":"ST","timor":"TL","east timor":"TL"
+  "st kitts":"KN","st lucia":"LC","st vincent":"VC","sao tome":"ST","timor":"TL","east timor":"TL",
+  "mexico":"MX","méxico":"MX","canada":"CA","canadá":"CA","united kingdom":"GB","united kingdom's":"GB","the united kingdom":"GB",
+  "lichtenstein":"LI","liechtenstien":"LI",
+  "uk":"GB","u.k.":"GB","england":"GB","great britain":"GB","britain":"GB",
+  "united states":"US","usa":"US","u.s.a.":"US","u.s.":"US","america":"US",
+  "south korea":"KR","north korea":"KP","taiwan":"TW","vietnam":"VN","viet nam":"VN",
+  "iran":"IR","syria":"SY","russia":"RU","russie":"RU","rusia":"RU",
+  "czechia":"CZ","czech republic":"CZ","ivory coast":"CI","cape verde":"CV",
+  "turkey":"TR","turkiye":"TR","türkiye":"TR","holland":"NL","the netherlands":"NL",
+  "uae":"AE","u.a.e.":"AE","emirates":"AE","bosnia":"BA","herzegovina":"BA",
+  "trinidad":"TT","tobago":"TT","s. korea":"KR","n. korea":"KP","n. macedonia":"MK",
+  "congo republic":"CG","dr congo":"CD","d.r. congo":"CD","democratic republic congo":"CD",
+  "slovak republic":"SK","lao":"LA","laos":"LA","burma":"MM","myanmar":"MM",
+  "brunei":"BN","macao":"MO","macau":"MO","kyrgyzstan":"KG","kirghizstan":"KG",
+  "swaziland":"SZ","eswatini":"SZ","holy see":"VA","vatican":"VA","vatican city":"VA",
+  "timor leste":"TL","east timor":"TL","palestine":"PS","disputed territories":"PS"
 };
 
 // ─── MASTER PLACE LISTS ───────────────────────────────────────────────────────
@@ -568,37 +660,46 @@ const COUNTRY_BY_ISO3 = Object.fromEntries(COUNTRY_DATA.map(d=>[d[2].toUpperCase
 const STATE_BY_ABBR  = Object.fromEntries(STATE_DATA.map(d=>[d[1].toUpperCase(),d[0]]));
 
 // ─── FUZZY RESOLVE ────────────────────────────────────────────────────────────
+// Normalize: strip accents, lowercase, trim
+function norm(s){
+  return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+}
+
 function resolveCountry(raw){
-  const s=raw.trim();
+  // Strip smart/curly quotes, trim whitespace
+  const s=raw.replace(/[\u201C\u201D\u2018\u2019\u00AB\u00BB\u201E\u201A]/g,'').trim();
   if(!s)return null;
   const up=s.toUpperCase();
-  const lo=s.toLowerCase();
-  // exact name
-  const exact=COUNTRY_DATA.find(d=>d[0].toLowerCase()===lo);
+  const lo=s.toLowerCase().replace(/['\u2019]s$/,'') // strip possessive 's
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // strip accents for matching
+  const loRaw=s.toLowerCase(); // keep accents for exact match
+  // exact name (try both with and without accents)
+  const exact=COUNTRY_DATA.find(d=>d[0].toLowerCase()===loRaw||d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')===lo);
   if(exact)return{name:exact[0],iso2:exact[1],method:'exact'};
   // ISO2
   if(COUNTRY_BY_ISO2[up])return{name:COUNTRY_BY_ISO2[up],iso2:up,method:'iso2'};
   // ISO3
   if(COUNTRY_BY_ISO3[up])return{name:COUNTRY_BY_ISO3[up],iso2:COUNTRY_DATA.find(d=>d[2]===up)?.[1]||'',method:'iso3'};
-  // alias map
+  // alias map (try accent-stripped version)
   if(COUNTRY_ALIASES[lo]){const iso=COUNTRY_ALIASES[lo];return{name:COUNTRY_BY_ISO2[iso],iso2:iso,method:'alias'};}
-  // starts-with
-  const sw=COUNTRY_DATA.find(d=>d[0].toLowerCase().startsWith(lo));
+  if(COUNTRY_ALIASES[loRaw]){const iso=COUNTRY_ALIASES[loRaw];return{name:COUNTRY_BY_ISO2[iso],iso2:iso,method:'alias'};}
+  // starts-with (accent-stripped)
+  const sw=COUNTRY_DATA.find(d=>d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').startsWith(lo));
   if(sw)return{name:sw[0],iso2:sw[1],method:'fuzzy'};
   // contains
-  const cont=COUNTRY_DATA.find(d=>d[0].toLowerCase().includes(lo)&&lo.length>=3);
+  const cont=COUNTRY_DATA.find(d=>d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(lo)&&lo.length>=3);
   if(cont)return{name:cont[0],iso2:cont[1],method:'fuzzy'};
   // partial word overlap
   const words=lo.split(/\s+/).filter(w=>w.length>2);
   for(const d of COUNTRY_DATA){
-    const dn=d[0].toLowerCase();
+    const dn=d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     if(words.some(w=>dn.includes(w)))return{name:d[0],iso2:d[1],method:'fuzzy'};
   }
   return null;
 }
 
 function resolveState(raw){
-  const s=raw.trim();
+  const s=raw.replace(/[\u201C\u201D\u2018\u2019\u00AB\u00BB\u201E\u201A]/g,'').trim();
   if(!s)return null;
   const up=s.toUpperCase();
   const lo=s.toLowerCase();
@@ -660,7 +761,7 @@ let bulkResolved={countries:[],states:[]};
 
 function previewBulk(type){
   const raw=document.getElementById('bk-ta-'+type).value;
-  const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
+  const items=raw.split(/[\r\n,]+/).map(s=>s.trim().replace(/^["“‘’”]+|["“‘’”]+$/g,'')).filter(Boolean);
   const already=getPlaces(type).map(p=>p.toLowerCase());
   const results=[];
   const seen=new Set();
@@ -691,7 +792,7 @@ let sbClient=null,saveDebounce=null,realtimeChannel=null;
 
 // ─── CREDENTIALS ──────────────────────────────────────────────────────────────
 const SB_URL="https://zewetwghnbiynuqkisbg.supabase.co";
-const SB_KEY="sb_publishable_K6vRtMTydN6VqqBh6d1itA_SR5RHCkz";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpld2V0d2dobmJpeW51cWtpc2JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTg0MDUsImV4cCI6MjA5NTU3NDQwNX0.HpwRKP6RZQ7xdGJwXw7dSMjKLsGktqyPNyJpJ2rqjLQE";
 
 // ─── SUPABASE ─────────────────────────────────────────────────────────────────
 async function initSupabase(url,key){
@@ -798,19 +899,34 @@ async function setDate(type,place,who,date){
   await saveVisit(type,place,who,e.status,date);
 }
 
-async function removePlace(type,place){
-  const lSt=getEntry(type,place,'laura').status,hSt=getEntry(type,place,'husband').status;
-  const who=lSt!=='none'&&hSt!=='none'?'both':lSt!=='none'?'laura':'husband';
-  const whoLabel=who==='both'?'both people':who==='laura'?settings.p1_name:settings.p2_name;
-  if(!confirm(`Remove ${place} for ${whoLabel}? This clears status and date.`))return;
-  if(!sbClient)return;
+async function removePlace(type, place){
+  if(!sbClient) return;
+  const lSt=getEntry(type,place,'laura').status;
+  const hSt=getEntry(type,place,'husband').status;
+  const lName=settings.p1_name||'Laura';
+  const hName=settings.p2_name||'Faron';
+  const hasBoth=lSt!=='none'&&hSt!=='none';
+  const hasLaura=lSt!=='none';
+  const hasHusband=hSt!=='none';
+
+  // Build confirm message
+  let msg='';
+  if(hasBoth) msg=`Remove ${place} for both ${lName} and ${hName}?`;
+  else if(hasLaura) msg=`Remove ${place} for ${lName}?`;
+  else if(hasHusband) msg=`Remove ${place} for ${hName}?`;
+  else return; // nothing to remove
+  if(!confirm(msg+' This clears their status and date.')) return;
+
   showSaving();
-  const{error}=await sbClient.from('visits').delete().eq('type',type).eq('place',place);
-  if(error){console.error('[DB] remove:',error);hideSaving();return;}
+  // Delete from Supabase
+  const { error } = await sbClient.from('visits').delete()
+    .eq('type', type).eq('place', place);
+  if(error){ console.error('[DB] remove:', error); hideSaving(); return; }
+  // Clear local state
   delete visits[`${type}|${place}|laura`];
   delete visits[`${type}|${place}|husband`];
   hideSaving();
-  renderTab(type);updateGoals(type);updateStats(type);
+  renderTab(type); updateGoals(type); updateStats(type);
 }
 async function doAddSingle(type){
   const sel=selSelected[type];
@@ -832,49 +948,54 @@ async function doAddSingle(type){
 }
 
 async function doAddBulk(type){
-  // Auto-preview if not done yet
   const ta=document.getElementById('bk-ta-'+type);
-  if(!bulkResolved[type]||!bulkResolved[type].length){
-    previewBulk(type);
-  }
+  if(!bulkResolved[type]||!bulkResolved[type].length){ previewBulk(type); }
   const matched=bulkResolved[type];
-  if(!matched||!matched.length){
-    alert('No recognizable entries found. Check your list and try again.');return;
-  }
+  if(!matched||!matched.length){ alert('No recognizable entries found. Check your list and try again.'); return; }
   const status=document.getElementById('bk-st-'+type).value;
   const date=document.getElementById('bk-dt-'+type).value.trim();
   const forP1=document.getElementById('bk-cl-'+type).checked;
   const forP2=document.getElementById('bk-ch-'+type).checked;
-  if(!forP1&&!forP2){alert('Select at least one person.');return;}
-  console.log('[BULK] saving',matched.length,'entries, status:',status,'forP1:',forP1,'forP2:',forP2);
-  let count=0;
+  if(!forP1&&!forP2){ alert('Select at least one person.'); return; }
+
+  let added=0, skipped=0;
   for(const r of matched){
     const place=r.name;
-    console.log('[BULK] saving:',place);
+    // For each person: only write if they have no status yet (none)
+    // OR if a specific status was chosen (treat as intentional override only for new entries)
     if(forP1){
       const ex=getEntry(type,place,'laura');
-      const ns=status!=='none'?status:ex.status;
-      const nd=date||ex.date;
-      visits[`${type}|${place}|laura`]={status:ns,date:nd};
-      await saveVisit(type,place,'laura',ns,nd);
+      const isNew=ex.status==='none';
+      if(isNew){
+        // New entry — apply whatever status was chosen (or 'none' if not set)
+        const ns=status!=='none'?status:'none';
+        const nd=date||'';
+        visits[`${type}|${place}|laura`]={status:ns,date:nd};
+        if(ns!=='none') await saveVisit(type,place,'laura',ns,nd);
+        if(isNew) added++;
+      } else { skipped++; }
     }
     if(forP2){
       const ex=getEntry(type,place,'husband');
-      const ns=status!=='none'?status:ex.status;
-      const nd=date||ex.date;
-      visits[`${type}|${place}|husband`]={status:ns,date:nd};
-      await saveVisit(type,place,'husband',ns,nd);
+      const isNew=ex.status==='none';
+      if(isNew){
+        const ns=status!=='none'?status:'none';
+        const nd=date||'';
+        visits[`${type}|${place}|husband`]={status:ns,date:nd};
+        if(ns!=='none') await saveVisit(type,place,'husband',ns,nd);
+      } else { if(!forP1) skipped++; }
     }
-    count++;
   }
+
   ta.value='';
   document.getElementById('bulk-results-'+type).classList.remove('show');
   bulkResolved[type]=[];
   if(status!=='none') filters[type]=status;
   buildFilterBtns(type);
-  renderTab(type);updateGoals(type);updateStats(type);
+  renderTab(type); updateGoals(type); updateStats(type);
   document.getElementById('grid-'+type).scrollIntoView({behavior:'smooth',block:'start'});
-  alert(`Done! ${count} ${type==='countries'?'countr':'state'}${count!==1?'ies':'y'} updated.`);
+  const noun=type==='countries'?'countr':'state';
+  alert(`Done! ${added} new ${noun}${added!==1?'ies':'y'} added. ${skipped} already existed and were skipped.`);
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
@@ -1009,6 +1130,7 @@ function switchAddMode(type,mode,btn){
   btn.classList.add('active');
   document.getElementById('af-single-'+type).className='add-form'+(mode==='single'?' show':'');
   document.getElementById('af-bulk-'+type).className='add-form'+(mode==='bulk'?' show':'');
+  document.getElementById('af-remove-'+type).className='add-form'+(mode==='remove'?' show':'');
 }
 function updateNames(){
   settings.p1_name=document.getElementById('name1').value||'Laura';
@@ -1029,6 +1151,94 @@ function refreshAll(){
   syncSettingsToUI();
   ['countries','states'].forEach(t=>{buildFilterBtns(t);renderTab(t);updateGoals(t);updateStats(t);});
 }
+// ─── BULK REMOVE ─────────────────────────────────────────────────────────────
+let removeResolved={countries:[],states:[]};
+
+function previewRemove(type){
+  const raw=document.getElementById('rm-ta-'+type).value;
+  const items=raw.split(/[
+,]+/).map(s=>s.trim()).filter(Boolean);
+  const results=[];
+  const seen=new Set();
+  for(const item of items){
+    const r=type==='countries'?resolveCountry(item):resolveState(item);
+    if(!r){results.push({input:item,status:'unknown'});continue;}
+    const key=r.name.toLowerCase();
+    if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
+    seen.add(key);
+    const lSt=getEntry(type,r.name,'laura').status||'none';
+    const hSt=getEntry(type,r.name,'husband').status||'none';
+    const hasData=lSt!=='none'||hSt!=='none';
+    results.push({
+      input:item, name:r.name, code:r.iso2||r.abbr||'',
+      method:r.method, hasData,
+      lSt, hSt,
+      status: hasData ? (r.method==='exact'?'matched':'fuzzy') : 'nodata'
+    });
+  }
+  removeResolved[type]=results.filter(r=>r.status==='matched'||r.status==='fuzzy');
+  const wrap=document.getElementById('rm-results-'+type);
+  wrap.innerHTML=results.map(r=>{
+    if(r.status==='unknown')
+      return`<div class="br-row br-unknown"><span class="br-icon">✗</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
+    if(r.status==='dup')
+      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">⟳</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
+    if(r.status==='nodata')
+      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">○</span><span class="br-label">${r.name}</span><span class="br-canon">No data to remove</span></div>`;
+    const arrow=r.method!=='exact'?` → ${r.name} (${r.code})`:`${r.code}`;
+    const dataInfo=`L:${r.lSt} F:${r.hSt}`;
+    return`<div class="br-row br-${r.status==='fuzzy'?'fuzzy':'matched'}" style="border-left:3px solid var(--rust)">
+      <span class="br-icon">🗑</span>
+      <span class="br-label">${r.method!=='exact'?'"'+r.input+'"':r.name}</span>
+      <span class="br-canon">${arrow} · ${dataInfo}</span>
+    </div>`;
+  }).join('');
+  wrap.classList.add('show');
+}
+
+async function doRemoveBulk(type){
+  if(!removeResolved[type]||!removeResolved[type].length){ previewRemove(type); }
+  const matched=removeResolved[type];
+  if(!matched||!matched.length){ alert('No recognizable entries with data found.'); return; }
+  const forP1=document.getElementById('rm-cl-'+type).checked;
+  const forP2=document.getElementById('rm-ch-'+type).checked;
+  if(!forP1&&!forP2){ alert('Select at least one person.'); return; }
+
+  const names=matched.map(r=>r.name).join(', ');
+  const p1Name=settings.p1_name||'Laura', p2Name=settings.p2_name||'Faron';
+  const whoStr=forP1&&forP2?`both ${p1Name} and ${p2Name}`:forP1?p1Name:p2Name;
+  if(!confirm(`Remove ${matched.length} entr${matched.length!==1?'ies':'y'} for ${whoStr}?
+
+${names}`)) return;
+
+  if(!sbClient){ alert('Not connected to Supabase.'); return; }
+  showSaving();
+  let removed=0, skipped=0;
+  for(const r of matched){
+    const place=r.name;
+    const lHasData=getEntry(type,place,'laura').status!=='none';
+    const hHasData=getEntry(type,place,'husband').status!=='none';
+    // Build delete query for affected people
+    const whoToDelete=[];
+    if(forP1&&lHasData) whoToDelete.push('laura');
+    if(forP2&&hHasData) whoToDelete.push('husband');
+    if(!whoToDelete.length){ skipped++; continue; }
+    for(const who of whoToDelete){
+      const{error}=await sbClient.from('visits').delete()
+        .eq('type',type).eq('place',place).eq('who',who);
+      if(error){ console.error('[DB] bulk remove error:',error); continue; }
+      delete visits[`${type}|${place}|${who}`];
+    }
+    removed++;
+  }
+  hideSaving();
+  document.getElementById('rm-ta-'+type).value='';
+  document.getElementById('rm-results-'+type).classList.remove('show');
+  removeResolved[type]=[];
+  renderTab(type); updateGoals(type); updateStats(type);
+  alert(`Done! ${removed} entr${removed!==1?'ies':'y'} removed. ${skipped} had no data to remove.`);
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
   refreshAll();
   if(SB_KEY==='PASTE_ANON_KEY_HERE'){
