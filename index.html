@@ -170,10 +170,11 @@ select.add-inp{cursor:pointer;min-width:200px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally</div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.1em;color:#4a4440;margin-left:8px">v1.9.2</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
+    <div id="debug-panel" style="background:#1a1612;border:1px solid #333;border-radius:3px;padding:6px 10px;max-height:120px;overflow-y:auto;width:100%;max-width:600px;font-family:monospace;color:#e8c97a;font-size:10px;margin-top:4px"></div>
     <div class="names-row">
       <div class="name-field"><div class="dot" style="background:var(--p1)"></div><input id="name1" value="Laura" oninput="updateNames()"/></div>
       <div class="name-field"><div class="dot" style="background:var(--p2)"></div><input id="name2" value="Faron" oninput="updateNames()"/></div>
@@ -184,7 +185,7 @@ select.add-inp{cursor:pointer;min-width:200px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.8.0</span>
+  <span class="nav-version">v1.9.2</span>
 </nav>
 <main>
   <div class="legend">
@@ -389,6 +390,21 @@ select.add-inp{cursor:pointer;min-width:200px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries" id="cl-entries">
+
+        <div class="cl-entry">
+          <div class="cl-header">
+            <span class="cl-version">v1.9.2</span>
+            <span class="cl-date">May 30 2026</span>
+            <span class="cl-badge cl-badge-fix">Fix</span>
+          </div>
+          <ul class="cl-list">
+            <li>Added on-screen debug panel in header — shows live connection steps and exact errors without needing the browser console</li>
+            <li>Added Supabase SDK readiness check — waits up to 2 seconds for CDN to load before attempting connection</li>
+            <li>Verbose connection logging — each step (client created, query sent, response received) shown in real time</li>
+            <li>Updated to <code>sb_publishable</code> key format</li>
+            <li>Fixed broken regex (unterminated possessive strip) that was killing the entire script on load</li>
+          </ul>
+        </div>
 
         <div class="cl-entry">
           <div class="cl-header">
@@ -662,7 +678,7 @@ const STATE_BY_ABBR  = Object.fromEntries(STATE_DATA.map(d=>[d[1].toUpperCase(),
 // ─── FUZZY RESOLVE ────────────────────────────────────────────────────────────
 // Normalize: strip accents, lowercase, trim
 function norm(s){
-  return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
 
 function resolveCountry(raw){
@@ -670,8 +686,7 @@ function resolveCountry(raw){
   const s=raw.replace(/[\u201C\u201D\u2018\u2019\u00AB\u00BB\u201E\u201A]/g,'').trim();
   if(!s)return null;
   const up=s.toUpperCase();
-  const lo=s.toLowerCase().replace(/['\u2019]s$/,'') // strip possessive 's
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // strip accents for matching
+  const lo=s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const loRaw=s.toLowerCase(); // keep accents for exact match
   // exact name (try both with and without accents)
   const exact=COUNTRY_DATA.find(d=>d[0].toLowerCase()===loRaw||d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')===lo);
@@ -761,7 +776,7 @@ let bulkResolved={countries:[],states:[]};
 
 function previewBulk(type){
   const raw=document.getElementById('bk-ta-'+type).value;
-  const items=raw.split(/[\r\n,]+/).map(s=>s.trim().replace(/^["“‘’”]+|["“‘’”]+$/g,'')).filter(Boolean);
+  const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
   const already=getPlaces(type).map(p=>p.toLowerCase());
   const results=[];
   const seen=new Set();
@@ -797,10 +812,22 @@ const SB_KEY = "sb_publishable_K6vRtMTydN6VqqBh6d1itA_SR5RHCkz";
 // ─── SUPABASE ─────────────────────────────────────────────────────────────────
 async function initSupabase(url,key){
   setStatus('connecting','Connecting…');
+  // Wait for Supabase SDK to be available (handles CDN timing issues)
+  let attempts=0;
+  while(!window.supabase && attempts<20){
+    await new Promise(r=>setTimeout(r,100));
+    attempts++;
+  }
+  if(!window.supabase){
+    setStatus('offline','Supabase SDK failed to load — check network connection');
+    return;
+  }
   try{
+    setStatus('connecting','Creating Supabase client…');
     sbClient=window.supabase.createClient(url,key);
-    console.log('[DB] connecting…');
+    setStatus('connecting','Client created, testing query…');
     const{data,error}=await sbClient.from('settings').select('id').limit(1);
+    setStatus('connecting','Query returned: data='+JSON.stringify(data)+' err='+JSON.stringify(error));
     console.log('[DB] test:',{data,error});
     if(error)throw error;
     setStatus('online','Live ✓');
@@ -812,7 +839,19 @@ async function initSupabase(url,key){
     sbClient=null;
   }
 }
-function setStatus(state,msg){const el=document.getElementById('conn-status');el.textContent=msg;el.className='conn-status cs-'+state;}
+function setStatus(state,msg){
+  const el=document.getElementById('conn-status');
+  el.textContent=msg;
+  el.className='conn-status cs-'+state;
+  // Also log to visible debug panel
+  const dbg=document.getElementById('debug-panel');
+  if(dbg){
+    const line=document.createElement('div');
+    line.style.cssText='font-size:10px;padding:2px 0;border-bottom:1px solid #eee;word-break:break-all';
+    line.textContent=new Date().toISOString().substr(11,8)+' ['+state+'] '+msg;
+    dbg.insertBefore(line,dbg.firstChild);
+  }
+}
 async function loadAllData(){
   if(!sbClient)return;
   const{data:sData,error:sErr}=await sbClient.from('settings').select('*').eq('id','main').single();
@@ -967,7 +1006,7 @@ async function doAddBulk(type){
       const ex=getEntry(type,place,'laura');
       const isNew=ex.status==='none';
       if(isNew){
-        // New entry — apply whatever status was chosen (or 'none' if not set)
+        // New entry: apply chosen status
         const ns=status!=='none'?status:'none';
         const nd=date||'';
         visits[`${type}|${place}|laura`]={status:ns,date:nd};

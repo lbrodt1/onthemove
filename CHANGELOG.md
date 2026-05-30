@@ -3,6 +3,25 @@
 
 ---
 
+### v1.9.2 — May 30 2026
+**Fix: Regex syntax errors**
+- Removed all non-ASCII characters from regex patterns — were causing SyntaxError in strict JS environments
+- Simplified possessive stripping regex (now handled by alias map instead)
+- Cleaned bulk parse regex — no longer strips smart quotes inline (not needed)
+- Version number now visible in app header subtitle
+
+---
+
+### v1.9.1 — May 30 2026
+**Fix: Connection diagnostics**
+- Added on-screen debug panel — shows live connection steps and exact errors without needing the browser console
+- Added Supabase SDK readiness check — waits up to 2 seconds for CDN to load before attempting connection
+- Verbose connection logging — each step shown in real time in the header
+- Updated to `sb_publishable` key format
+- Fixed broken regex (unterminated possessive strip) that was silently killing the entire script on load — root cause of persistent connection failures
+
+---
+
 ### v1.8.0 — May 28 2026
 **Feature: Bulk Remove**
 - Bulk Remove tab — paste a list of countries or states to clear, same fuzzy matching as bulk add
