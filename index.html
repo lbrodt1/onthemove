@@ -11,7 +11,6 @@
   --ink:#1a1612;--parchment:#f5f0e8;--cream:#faf7f2;
   --gold:#c9922a;--gold-light:#e8c97a;--rust:#9b3a1e;
   --muted:#7a726a;--border:#d4c9b8;
-  --p1:#9b3a1e;--p2:#3d4a5c;
   --visited:#2d4228;--planned:#c9922a;--candidate:#6b5b8a;--none-col:#c8c0b4;
   --shadow:0 2px 12px rgba(26,22,18,.08);
 }
@@ -19,173 +18,206 @@
 body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);min-height:100vh;font-size:13px}
 .conn-status{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:2px;white-space:nowrap}
 .cs-online{background:#d4edd8;color:#2d4228}.cs-offline{background:#fce8e8;color:#9b2020}.cs-connecting{background:#fef3dc;color:#7a4f00}
-header{background:var(--ink);padding:22px 36px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
-header h1{font-family:'Cormorant Garamond',serif;font-size:2.3rem;font-weight:300;color:var(--parchment);line-height:1}
+header{background:var(--ink);padding:16px 28px 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--parchment);line-height:1}
 header h1 span{color:var(--gold-light);font-style:italic}
-.subtitle{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
-.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.names-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.name-field{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-.name-field .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.name-field input{padding:3px 8px;border:1px solid #333;border-radius:3px;background:#2a2620;font-family:'DM Mono',monospace;font-size:12px;color:var(--parchment);width:100px;outline:none}
-.name-field input:focus{border-color:var(--gold)}
-nav{background:var(--ink);border-top:1px solid #2e2a26;display:flex;padding:0 36px}
-nav button{background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.subtitle{color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+nav{background:var(--ink);border-top:1px solid #2e2a26;display:flex;padding:0 28px}
+nav button{background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 nav button:hover{color:var(--parchment)}
 nav button.active{color:var(--gold-light);border-bottom-color:var(--gold)}
-main{max-width:1180px;margin:0 auto;padding:26px 20px}
-.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.nav-version{margin-left:auto;padding:0 14px;font-size:10px;color:#6b6460;letter-spacing:.1em;text-transform:uppercase;align-self:center}
+main{max-width:1280px;margin:0 auto;padding:20px 16px}
+
+/* PEOPLE / LEADERBOARD */
+.people-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--muted);transition:all .15s;user-select:none}
+.person-chip:hover{border-color:var(--gold);color:var(--ink)}
+.person-chip.active{background:var(--ink);color:var(--parchment);border-color:var(--ink)}
+.person-chip .chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.person-chip .chip-count{font-size:10px;opacity:.7;margin-left:2px}
+.add-person-btn{padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;transition:all .15s}
+.add-person-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* LEADERBOARD TABLE */
+.leaderboard{background:var(--parchment);border:1px solid var(--border);border-radius:4px;margin-bottom:18px;overflow:hidden}
+.lb-row{display:grid;grid-template-columns:24px 1fr 100px 80px 80px 110px 28px;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.lb-row:last-child{border-bottom:none}
+.lb-row.lb-header{background:#f0ebe2;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 14px}
+.lb-rank{color:var(--muted);font-size:10px;text-align:center}
+.lb-name{font-weight:500;display:flex;align-items:center;gap:6px}
+.lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lb-bar-wrap{display:flex;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.lb-bar-seg{height:100%;transition:width .5s;flex-shrink:0}
+.lb-count{font-size:11px;color:var(--ink);text-align:right}
+.lb-goal{font-size:10px;color:var(--muted);text-align:right}
+.lb-deadline{font-size:10px;color:var(--muted);text-align:center}
+.lb-deadline.soon{color:var(--rust)}
+.lb-actions{display:flex;gap:4px;justify-content:flex-end}
+.lb-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px}
+.lb-edit-btn:hover{background:var(--border);color:var(--ink)}
+
+/* ADD PERSON MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,22,18,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--cream);border-radius:6px;padding:24px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:16px}
+.modal-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.modal-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.modal-row input{padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
+.modal-row input:focus{border-color:var(--gold)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .legend span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
-.ldot{width:9px;height:9px;border-radius:2px}
-.goals-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
-.goal-card{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:16px 20px;box-shadow:var(--shadow)}
-.goal-card h3{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.goal-card h3 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.prog-line{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px}
-.prog-label{width:60px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;font-size:10px}
-.bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;display:flex}
-.bar-seg{height:100%;transition:width .5s;flex-shrink:0}
-.bar-v{background:#2d4228}.bar-p{background:#c9922a}.bar-c{background:#6b5b8a}
-.bar-count{min-width:80px;text-align:right;font-size:10px;color:var(--muted);letter-spacing:.04em}
-.goal-edit{display:flex;align-items:center;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);letter-spacing:.06em}
-.goal-edit input{width:52px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);text-align:center;outline:none}
-.chart-wrap{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:20px}
-.chart-together{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
-.tog-pill{display:flex;align-items:center;gap:7px;font-size:11px}
-.tog-pill .num{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;line-height:1;color:var(--ink)}
-.tog-pill .lbl{color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-size:10px;line-height:1.3}
-.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.search-wrap{position:relative;flex:1;min-width:180px}
-.search-wrap input{width:100%;padding:8px 12px 8px 30px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;transition:border-color .2s}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.ldot{width:8px;height:8px;border-radius:2px}
+
+/* CONTROLS */
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.search-wrap{position:relative;flex:1;min-width:160px}
+.search-wrap input{width:100%;padding:7px 10px 7px 28px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;transition:border-color .2s}
 .search-wrap input:focus{border-color:var(--gold)}
-.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
-.fbtns{display:flex;gap:4px;flex-wrap:wrap}
-.fbtn{padding:7px 11px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap}
+.search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+.fbtns{display:flex;gap:3px;flex-wrap:wrap}
+.fbtn{padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap}
 .fbtn:hover{border-color:var(--gold);color:var(--ink)}
 .fbtn.fa{color:white;border-color:transparent}
 .fbtn.fv{background:var(--visited)}.fbtn.fp{background:var(--planned)}.fbtn.fc{background:var(--candidate)}.fbtn.fu{background:var(--ink)}.fbtn.fall{background:var(--ink)}
 
 /* ADD PANEL */
-.add-panel{background:var(--parchment);border:1px dashed var(--border);border-radius:4px;padding:14px 18px;margin-bottom:18px}
-.add-panel h4{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600;color:var(--muted);margin-bottom:10px;letter-spacing:.04em}
-.add-mode-tabs{display:flex;margin-bottom:12px;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:fit-content}
-.amt{padding:5px 13px;background:white;border:none;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s}
+.add-panel{background:var(--parchment);border:1px dashed var(--border);border-radius:4px;padding:12px 16px;margin-bottom:14px}
+.add-panel h4{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.04em}
+.add-mode-tabs{display:flex;margin-bottom:10px;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:fit-content}
+.amt{padding:4px 12px;background:white;border:none;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .15s}
 .amt:last-child{border-right:none}
 .amt.active{background:var(--ink);color:var(--parchment)}
-.add-form{display:none;flex-direction:column;gap:10px}
+.add-form{display:none;flex-direction:column;gap:8px}
 .add-form.show{display:flex}
 .add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .add-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
-.add-inp{padding:7px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
+.add-inp{padding:6px 9px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
 .add-inp:focus{border-color:var(--gold)}
-select.add-inp{cursor:pointer;min-width:200px}
-.add-inp.dt{width:140px}
+select.add-inp{cursor:pointer;min-width:160px}
+.add-inp.dt{width:130px}
 
 /* SEARCHABLE SELECT */
-.sel-wrap{position:relative;min-width:200px;flex:1;max-width:320px}
-.sel-search{width:100%;padding:7px 10px 7px 28px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
+.sel-wrap{position:relative;min-width:180px;flex:1;max-width:300px}
+.sel-search{width:100%;padding:6px 9px 6px 26px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none}
 .sel-search:focus{border-color:var(--gold)}
-.sel-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
-.sel-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;max-height:220px;overflow-y:auto;z-index:100;box-shadow:var(--shadow)}
+.sel-search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
+.sel-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:var(--shadow)}
 .sel-dropdown.open{display:block}
-.sel-option{padding:7px 10px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sel-option{padding:6px 9px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .sel-option:hover,.sel-option.highlighted{background:var(--parchment)}
 .sel-option.selected{background:#e8f4e8;color:var(--visited)}
 .sel-code{font-size:10px;color:var(--muted);flex-shrink:0}
-.sel-none{padding:10px;font-size:11px;color:var(--muted);text-align:center;font-style:italic}
-.sel-selected-tag{display:inline-flex;align-items:center;gap:5px;background:var(--ink);color:var(--parchment);padding:3px 8px;border-radius:3px;font-size:11px;margin-top:4px}
-.sel-selected-tag button{background:none;border:none;color:var(--gold-light);cursor:pointer;font-size:13px;line-height:1;padding:0}
+.sel-none{padding:9px;font-size:11px;color:var(--muted);text-align:center;font-style:italic}
+.sel-selected-tag{display:inline-flex;align-items:center;gap:4px;background:var(--ink);color:var(--parchment);padding:2px 7px;border-radius:3px;font-size:11px;margin-top:3px}
+.sel-selected-tag button{background:none;border:none;color:var(--gold-light);cursor:pointer;font-size:12px;line-height:1;padding:0}
 
 /* BULK */
-.bulk-ta{width:100%;min-height:90px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;resize:vertical}
+.bulk-ta{width:100%;min-height:80px;padding:7px 9px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;resize:vertical}
 .bulk-ta:focus{border-color:var(--gold)}
-.bulk-hint{font-size:10px;color:var(--muted);line-height:1.7;margin-top:3px}
-.bulk-results{margin-top:8px;font-size:11px;display:none;flex-direction:column;gap:4px}
+.bulk-hint{font-size:10px;color:var(--muted);line-height:1.7;margin-top:2px}
+.bulk-results{margin-top:6px;font-size:11px;display:none;flex-direction:column;gap:3px}
 .bulk-results.show{display:flex}
-.br-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:3px}
+.br-row{display:flex;align-items:center;gap:6px;padding:3px 7px;border-radius:3px}
 .br-matched{background:#e8f4e8}.br-fuzzy{background:#fef3dc}.br-unknown{background:#fce8e8}
-.br-icon{font-size:12px;flex-shrink:0}.br-label{flex:1}.br-canon{font-size:10px;color:var(--muted)}
-.bulk-status-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.br-icon{font-size:11px;flex-shrink:0}.br-label{flex:1}.br-canon{font-size:10px;color:var(--muted)}
+.bulk-status-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
 .bulk-status-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
-.btn-primary{padding:7px 15px;background:var(--gold);color:white;border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-primary{padding:6px 13px;background:var(--gold);color:white;border:none;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .15s;white-space:nowrap}
 .btn-primary:hover{background:var(--rust)}
-.btn-secondary{padding:7px 13px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-secondary{padding:6px 11px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-secondary:hover{border-color:var(--gold);color:var(--ink)}
-.person-checks{display:flex;gap:10px;align-items:center}
-.pcheck{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer}
+.person-checks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pcheck{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer}
 .pcheck input{cursor:pointer;accent-color:var(--gold)}
 
-/* CARDS */
-.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
-.place-card{background:white;border:1px solid var(--border);border-left:3px solid var(--border);border-radius:4px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;transition:box-shadow .15s}
+/* CARDS — compact */
+.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.place-card{background:white;border:1px solid var(--border);border-left:3px solid var(--border);border-radius:3px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;transition:box-shadow .15s;position:relative}
 .place-card:hover{box-shadow:var(--shadow)}
 .place-card.hv{border-left-color:var(--visited)}.place-card.hp{border-left-color:var(--planned)}.place-card.hc{border-left-color:var(--candidate)}
-.place-name{font-family:'Cormorant Garamond',serif;font-size:.92rem;font-weight:600;color:var(--ink);line-height:1.2}
-.place-iso{font-size:9px;color:var(--muted);letter-spacing:.06em}
-.place-badges{display:flex;flex-direction:column;gap:4px}
-.person-row{display:flex;align-items:center;gap:6px}
-.person-who{font-size:10px;width:46px;flex-shrink:0;color:var(--muted);letter-spacing:.04em}
-.st-btn{display:inline-flex;align-items:center;gap:3px;font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:2px;font-weight:500;cursor:pointer;border:1px solid;transition:all .15s;user-select:none;white-space:nowrap}
+.place-top{display:flex;justify-content:space-between;align-items:baseline}
+.place-name{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:600;color:var(--ink);line-height:1.2}
+.place-iso{font-size:8px;color:var(--muted);letter-spacing:.06em}
+.place-badges{display:flex;flex-direction:column;gap:3px}
+.person-row{display:flex;align-items:center;gap:4px}
+.person-who{font-size:9px;width:42px;flex-shrink:0;color:var(--muted);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-btn{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:1px 5px;border-radius:2px;cursor:pointer;border:1px solid;transition:all .15s;user-select:none;white-space:nowrap;min-width:18px;justify-content:center}
 .st-none{color:var(--none-col);border-color:var(--none-col);background:transparent}
 .st-visited{color:white;border-color:var(--visited);background:var(--visited)}
 .st-planned{color:white;border-color:var(--planned);background:var(--planned)}
 .st-candidate{color:white;border-color:var(--candidate);background:var(--candidate)}
-.date-chip{font-size:10px;color:var(--muted);cursor:pointer;padding:2px 5px;border:1px dashed var(--border);border-radius:2px;white-space:nowrap}
+.date-chip{font-size:9px;color:var(--muted);cursor:pointer;padding:1px 4px;border:1px dashed var(--border);border-radius:2px;white-space:nowrap}
 .date-chip:hover{border-color:var(--gold);color:var(--ink)}
 .date-chip.has-date{border-style:solid;color:var(--ink)}
-.date-edit{display:flex;align-items:center;gap:4px}
-.date-edit input{padding:2px 6px;border:1px solid var(--border);border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);outline:none;width:130px}
+.date-edit{display:flex;align-items:center;gap:3px}
+.date-edit input{padding:2px 5px;border:1px solid var(--border);border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink);outline:none;width:110px}
 .date-edit input:focus{border-color:var(--gold)}
-.date-edit button{padding:2px 7px;background:var(--gold);color:white;border:none;border-radius:3px;font-size:10px;cursor:pointer}
-.remove-btn{display:none;position:absolute;top:7px;right:7px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;border-radius:2px;transition:all .15s}
+.date-edit button{padding:2px 6px;background:var(--gold);color:white;border:none;border-radius:3px;font-size:9px;cursor:pointer}
+.remove-btn{display:none;position:absolute;top:5px;right:5px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;line-height:1;padding:2px 3px;border-radius:2px;transition:all .15s}
 .remove-btn:hover{color:var(--rust);background:#fce8e8}
 .place-card:hover .remove-btn{display:block}
-.place-card{position:relative}
-.saving-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:6px;animation:pulse 1s infinite}
-.nav-version{margin-left:auto;padding:0 16px;font-size:10px;color:#6b6460;letter-spacing:.1em;text-transform:uppercase;align-self:center}
+.saving-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-left:5px;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:12px;letter-spacing:.06em;grid-column:1/-1}
+.panel{display:none}.panel.active{display:block}
+.section-hdr{margin-bottom:10px}.section-hdr h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400}
 .changelog-wrap{max-width:720px;margin:0 auto;padding:8px 0 40px}
 .cl-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:28px;color:var(--ink)}
-.cl-entry{border-left:2px solid var(--border);padding:0 0 28px 20px;margin-bottom:4px;position:relative}
+.cl-entry{border-left:2px solid var(--border);padding:0 0 24px 18px;margin-bottom:4px;position:relative}
 .cl-entry::before{content:'';position:absolute;left:-5px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:2px solid var(--cream)}
-.cl-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.cl-version{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--ink)}
+.cl-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cl-version{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--ink)}
 .cl-date{font-size:11px;color:var(--muted);letter-spacing:.06em}
 .cl-badge{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;font-weight:500}
 .cl-badge-feat{background:#e8f4e8;color:#2d4228}
 .cl-badge-fix{background:#fce8e8;color:#9b2020}
 .cl-badge-improve{background:#fef3dc;color:#7a4f00}
-.cl-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.cl-list{list-style:none;display:flex;flex-direction:column;gap:4px}
 .cl-list li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.5}
 .cl-list li::before{content:'·';position:absolute;left:0;color:var(--gold);font-weight:700}
-.cl-list code{background:var(--parchment);padding:1px 5px;border-radius:2px;font-size:11px;color:var(--ink)}
-.empty{text-align:center;padding:40px;color:var(--muted);font-size:12px;letter-spacing:.06em;grid-column:1/-1}
-.panel{display:none}.panel.active{display:block}
-.section-hdr{margin-bottom:12px}.section-hdr h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400}
-@media(max-width:600px){header{padding:16px}.goals-row{grid-template-columns:1fr}main{padding:16px 12px}nav{padding:0 10px}}
+.cl-list code{background:var(--parchment);padding:1px 4px;border-radius:2px;font-size:11px;color:var(--ink)}
+@media(max-width:600px){header{padding:12px}.main{padding:12px 10px}nav{padding:0 8px}.place-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 </style>
 </head>
 <body>
+
+<!-- ADD PERSON MODAL -->
+<div class="modal-overlay" id="person-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Participant</h3>
+    <div class="modal-row"><label>Name</label><input id="modal-name" type="text" placeholder="e.g. Marcus" autocomplete="off"/></div>
+    <div class="modal-row"><label>Country Goal</label><input id="modal-goal-c" type="number" value="50" min="1" max="300"/></div>
+    <div class="modal-row"><label>State Goal</label><input id="modal-goal-s" type="number" value="50" min="1" max="56"/></div>
+    <div class="modal-row"><label>Challenge Deadline (optional)</label><input id="modal-deadline" type="text" placeholder="e.g. Dec 2027"/></div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closePersonModal()">Cancel</button>
+      <button class="btn-primary" onclick="savePersonModal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v1.9.7</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.0</span></div>
   </div>
   <div class="header-right">
-    <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
-    <div id="debug-panel" style="background:#1a1612;border:1px solid #333;border-radius:3px;padding:6px 10px;max-height:120px;overflow-y:auto;width:100%;max-width:600px;font-family:monospace;color:#e8c97a;font-size:10px;margin-top:4px"></div>
-    <div class="names-row">
-      <div class="name-field"><div class="dot" style="background:var(--p1)"></div><input id="name1" value="Laura" oninput="updateNames()"/></div>
-      <div class="name-field"><div class="dot" style="background:var(--p2)"></div><input id="name2" value="Faron" oninput="updateNames()"/></div>
-    </div>
+    <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
+    <div id="debug-panel" style="background:#1a1612;border:1px solid #333;border-radius:3px;padding:5px 9px;max-height:100px;overflow-y:auto;width:100%;max-width:500px;font-family:monospace;color:#e8c97a;font-size:10px;margin-top:3px"></div>
   </div>
 </header>
 <nav>
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.9.7</span>
+  <span class="nav-version">v2.0.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -194,27 +226,16 @@ select.add-inp{cursor:pointer;min-width:200px}
     <div class="legend-item"><div class="ldot" style="background:var(--planned)"></div>Planned</div>
     <div class="legend-item"><div class="ldot" style="background:var(--candidate)"></div>Candidate</div>
     <div class="legend-item"><div class="ldot" style="background:var(--none-col)"></div>None</div>
-    <span style="margin-left:6px;font-size:10px">Click status badge to cycle · Click date chip to edit</span>
+    <span style="margin-left:6px;font-size:10px">Click badge to cycle status · Click date to edit</span>
   </div>
 
   <!-- COUNTRIES -->
   <div id="panel-countries" class="panel active">
-    <div class="goals-row">
-      <div class="goal-card">
-        <h3><div class="dot" style="background:var(--p1)"></div><span class="pn-p1">Laura</span></h3>
-        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barcv-l" style="width:0%"></div><div class="bar-seg bar-p" id="barcp-l" style="width:0%"></div><div class="bar-seg bar-c" id="barcc-l" style="width:0%"></div></div><div class="bar-count" id="cntc-l">0/50</div></div>
-        <div class="goal-edit">Goal:<input type="number" id="gcl" value="50" min="1" max="250" onchange="saveSettings()">countries</div>
-      </div>
-      <div class="goal-card">
-        <h3><div class="dot" style="background:var(--p2)"></div><span class="pn-p2">Faron</span></h3>
-        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barcv-h" style="width:0%"></div><div class="bar-seg bar-p" id="barcp-h" style="width:0%"></div><div class="bar-seg bar-c" id="barcc-h" style="width:0%"></div></div><div class="bar-count" id="cntc-h">0/50</div></div>
-        <div class="goal-edit">Goal:<input type="number" id="gch" value="50" min="1" max="250" onchange="saveSettings()">countries</div>
-      </div>
-    </div>
-    <div class="chart-wrap"><canvas id="chart-countries"></canvas><div class="chart-together" id="together-countries"></div></div>
+    <div id="people-bar-countries" class="people-bar"></div>
+    <div id="leaderboard-countries" class="leaderboard"></div>
     <div class="section-hdr"><h2>Countries of the World</h2></div>
     <div class="controls">
-      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries…" oninput="renderTab('countries')"/></div>
+      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries..." oninput="renderTab('countries')"/></div>
       <div class="fbtns" id="fbtns-countries"></div>
     </div>
     <div class="add-panel">
@@ -224,67 +245,55 @@ select.add-inp{cursor:pointer;min-width:200px}
         <button class="amt" onclick="switchAddMode('countries','bulk',this)">Bulk Paste</button>
         <button class="amt" onclick="switchAddMode('countries','remove',this)">Bulk Remove</button>
       </div>
-      <!-- SINGLE -->
       <div class="add-form show" id="af-single-countries">
         <div class="add-row">
           <label>Country</label>
           <div class="sel-wrap" id="selwrap-countries">
             <span class="sel-search-icon">⌕</span>
-            <input class="sel-search" id="sel-search-countries" placeholder="Type to search…" autocomplete="off" oninput="filterSelDropdown('countries')" onfocus="openSelDropdown('countries')" onblur="scheduleCloseDropdown('countries')"/>
+            <input class="sel-search" id="sel-search-countries" placeholder="Type to search..." autocomplete="off" oninput="filterSelDropdown('countries')" onfocus="openSelDropdown('countries')" onblur="scheduleCloseDropdown('countries')"/>
             <div class="sel-dropdown" id="sel-dropdown-countries"></div>
           </div>
           <div id="sel-selected-countries"></div>
         </div>
         <div class="add-row">
           <label>Who</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="si-cl-countries" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="si-ch-countries" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="si-who-countries"></div>
           <label>Status</label>
           <select class="add-inp" id="si-st-countries">
-            <option value="none">— None</option><option value="visited">✓ Visited</option>
-            <option value="planned">◷ Planned</option><option value="candidate">★ Candidate</option>
+            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
           <input class="add-inp dt" type="text" id="si-dt-countries" placeholder="e.g. Aug 2026"/>
           <button class="btn-primary" onclick="doAddSingle('countries')">Add</button>
         </div>
       </div>
-      <!-- BULK -->
       <div class="add-form" id="af-bulk-countries">
-        <textarea class="bulk-ta" id="bk-ta-countries" placeholder="Paste one per line or comma-separated. Fuzzy matched:&#10;France, Italy, UK, US, Deutschland, Россия&#10;ISO codes work too: FR, IT, GB, US, DE, RU&#10;Near-matches: Türkiye → Turkey, Viet Nam → Vietnam"></textarea>
-        <div class="bulk-hint">⚡ Fuzzy matching: common names, ISO codes, alternate spellings all accepted. Preview below before adding.</div>
+        <textarea class="bulk-ta" id="bk-ta-countries" placeholder="Paste one per line or comma-separated&#10;France, Italy, UK, DE, JP&#10;ISO codes work too: FR, IT, GB, US"></textarea>
+        <div class="bulk-hint">Fuzzy matching: common names, ISO codes, alternate spellings, misspellings all accepted.</div>
         <div id="bulk-results-countries" class="bulk-results"></div>
         <div class="bulk-status-row">
           <button class="btn-secondary" onclick="previewBulk('countries')">Preview</button>
           <label>Who:</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="bk-cl-countries" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="bk-ch-countries" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="bk-who-countries"></div>
           <label>Status</label>
           <select class="add-inp" id="bk-st-countries">
-            <option value="none">— None</option><option value="visited">✓ Visited</option>
-            <option value="planned">◷ Planned</option><option value="candidate">★ Candidate</option>
+            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
           <input class="add-inp dt" type="text" id="bk-dt-countries" placeholder="e.g. Aug 2026"/>
           <button class="btn-primary" onclick="doAddBulk('countries')">Add All Matched</button>
         </div>
       </div>
-      <!-- BULK REMOVE -->
       <div class="add-form" id="af-remove-countries">
-        <textarea class="bulk-ta" id="rm-ta-countries" placeholder="Paste countries to remove, one per line or comma-separated:&#10;France, Italy&#10;Japan&#10;Same fuzzy matching applies — ISO codes and alternate names work too."></textarea>
-        <div class="bulk-hint">⚠ Removes status and date for the selected people. Fuzzy matched — same as bulk add.</div>
+        <textarea class="bulk-ta" id="rm-ta-countries" placeholder="Paste countries to remove, one per line or comma-separated"></textarea>
+        <div class="bulk-hint">Fuzzy matched. Removes status and date for selected people.</div>
         <div id="rm-results-countries" class="bulk-results"></div>
         <div class="bulk-status-row">
           <button class="btn-secondary" onclick="previewRemove('countries')">Preview</button>
           <label>Remove for:</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="rm-cl-countries" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="rm-ch-countries" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="rm-who-countries"></div>
           <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('countries')">Remove All</button>
         </div>
       </div>
@@ -294,22 +303,11 @@ select.add-inp{cursor:pointer;min-width:200px}
 
   <!-- STATES -->
   <div id="panel-states" class="panel">
-    <div class="goals-row">
-      <div class="goal-card">
-        <h3><div class="dot" style="background:var(--p1)"></div><span class="pn-p1">Laura</span></h3>
-        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barsv-l" style="width:0%"></div><div class="bar-seg bar-p" id="barsp-l" style="width:0%"></div><div class="bar-seg bar-c" id="barsc-l" style="width:0%"></div></div><div class="bar-count" id="cnts-l">0/50</div></div>
-        <div class="goal-edit">Goal:<input type="number" id="gsl" value="50" min="1" max="60" onchange="saveSettings()">states</div>
-      </div>
-      <div class="goal-card">
-        <h3><div class="dot" style="background:var(--p2)"></div><span class="pn-p2">Faron</span></h3>
-        <div class="prog-line"><div class="prog-label">Progress</div><div class="bar-bg"><div class="bar-seg bar-v" id="barsv-h" style="width:0%"></div><div class="bar-seg bar-p" id="barsp-h" style="width:0%"></div><div class="bar-seg bar-c" id="barsc-h" style="width:0%"></div></div><div class="bar-count" id="cnts-h">0/50</div></div>
-        <div class="goal-edit">Goal:<input type="number" id="gsh" value="50" min="1" max="60" onchange="saveSettings()">states</div>
-      </div>
-    </div>
-    <div class="chart-wrap"><canvas id="chart-states"></canvas></div>
+    <div id="people-bar-states" class="people-bar"></div>
+    <div id="leaderboard-states" class="leaderboard"></div>
     <div class="section-hdr"><h2>United States</h2></div>
     <div class="controls">
-      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states…" oninput="renderTab('states')"/></div>
+      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states..." oninput="renderTab('states')"/></div>
       <div class="fbtns" id="fbtns-states"></div>
     </div>
     <div class="add-panel">
@@ -324,21 +322,18 @@ select.add-inp{cursor:pointer;min-width:200px}
           <label>State</label>
           <div class="sel-wrap" id="selwrap-states">
             <span class="sel-search-icon">⌕</span>
-            <input class="sel-search" id="sel-search-states" placeholder="Type to search…" autocomplete="off" oninput="filterSelDropdown('states')" onfocus="openSelDropdown('states')" onblur="scheduleCloseDropdown('states')"/>
+            <input class="sel-search" id="sel-search-states" placeholder="Type to search..." autocomplete="off" oninput="filterSelDropdown('states')" onfocus="openSelDropdown('states')" onblur="scheduleCloseDropdown('states')"/>
             <div class="sel-dropdown" id="sel-dropdown-states"></div>
           </div>
           <div id="sel-selected-states"></div>
         </div>
         <div class="add-row">
           <label>Who</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="si-cl-states" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="si-ch-states" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="si-who-states"></div>
           <label>Status</label>
           <select class="add-inp" id="si-st-states">
-            <option value="none">— None</option><option value="visited">✓ Visited</option>
-            <option value="planned">◷ Planned</option><option value="candidate">★ Candidate</option>
+            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
           <input class="add-inp dt" type="text" id="si-dt-states" placeholder="e.g. Aug 2026"/>
@@ -346,216 +341,86 @@ select.add-inp{cursor:pointer;min-width:200px}
         </div>
       </div>
       <div class="add-form" id="af-bulk-states">
-        <textarea class="bulk-ta" id="bk-ta-states" placeholder="Paste one per line or comma-separated:&#10;Texas, California, NY, FL, WA&#10;State codes work too: TX, CA, NY, FL"></textarea>
-        <div class="bulk-hint">⚡ Fuzzy matching: full names, abbreviations, near-spellings. Preview before adding.</div>
+        <textarea class="bulk-ta" id="bk-ta-states" placeholder="Paste one per line or comma-separated&#10;Texas, California, NY, FL, WA"></textarea>
+        <div class="bulk-hint">Fuzzy matching: full names, abbreviations, near-spellings.</div>
         <div id="bulk-results-states" class="bulk-results"></div>
         <div class="bulk-status-row">
           <button class="btn-secondary" onclick="previewBulk('states')">Preview</button>
           <label>Who:</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="bk-cl-states" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="bk-ch-states" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="bk-who-states"></div>
           <label>Status</label>
           <select class="add-inp" id="bk-st-states">
-            <option value="none">— None</option><option value="visited">✓ Visited</option>
-            <option value="planned">◷ Planned</option><option value="candidate">★ Candidate</option>
+            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
           <input class="add-inp dt" type="text" id="bk-dt-states" placeholder="e.g. Aug 2026"/>
           <button class="btn-primary" onclick="doAddBulk('states')">Add All Matched</button>
         </div>
       </div>
-      <!-- BULK REMOVE -->
       <div class="add-form" id="af-remove-states">
-        <textarea class="bulk-ta" id="rm-ta-states" placeholder="Paste states to remove, one per line or comma-separated:&#10;Texas, California&#10;NY, FL&#10;Abbreviations work too."></textarea>
-        <div class="bulk-hint">⚠ Removes status and date for the selected people. Fuzzy matched.</div>
+        <textarea class="bulk-ta" id="rm-ta-states" placeholder="Paste states to remove, one per line or comma-separated"></textarea>
+        <div class="bulk-hint">Fuzzy matched. Removes status and date for selected people.</div>
         <div id="rm-results-states" class="bulk-results"></div>
         <div class="bulk-status-row">
           <button class="btn-secondary" onclick="previewRemove('states')">Preview</button>
           <label>Remove for:</label>
-          <div class="person-checks">
-            <label class="pcheck"><input type="checkbox" id="rm-cl-states" checked/><span class="pn-p1">Laura</span></label>
-            <label class="pcheck"><input type="checkbox" id="rm-ch-states" checked/><span class="pn-p2">Faron</span></label>
-          </div>
+          <div class="person-checks" id="rm-who-states"></div>
           <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('states')">Remove All</button>
         </div>
       </div>
     </div>
     <div class="place-grid" id="grid-states"></div>
-  </div><!-- end panel-states -->
+  </div>
 
   <!-- CHANGELOG -->
   <div id="panel-changelog" class="panel">
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
-      <div class="cl-entries" id="cl-entries">
-
+      <div class="cl-entries">
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v1.9.7</span>
+            <span class="cl-version">v2.0.0</span>
             <span class="cl-date">May 30 2026</span>
-            <span class="cl-badge cl-badge-fix">Fix</span>
-          </div>
-          <ul class="cl-list">
-            <li>Added on-screen debug panel in header — shows live connection steps and exact errors without needing the browser console</li>
-            <li>Added Supabase SDK readiness check — waits up to 2 seconds for CDN to load before attempting connection</li>
-            <li>Verbose connection logging — each step (client created, query sent, response received) shown in real time</li>
-            <li>Updated to <code>sb_publishable</code> key format</li>
-            <li>Fixed broken regex (unterminated possessive strip) that was killing the entire script on load</li>
-            <li>Fixed split regex in previewRemove that was breaking across lines causing SyntaxError</li>
-            <li>Script now passes Node.js syntax check cleanly</li>
-            <li>Removed ALL non-ASCII characters from script code — Cyrillic, Japanese, special symbols were crashing JS parser</li>
-            <li>Cleaned COUNTRY_ALIASES to pure ASCII/unicode escape sequences only</li>
-          </ul>
-        </div>
-
-        <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.8.0</span>
-            <span class="cl-date">May 28 2026</span>
             <span class="cl-badge cl-badge-feat">Feature</span>
           </div>
           <ul class="cl-list">
-            <li>Bulk Remove tab — paste a list of countries or states to clear, same fuzzy matching as bulk add</li>
-            <li>Preview step shows what will be removed and current status before confirming</li>
-            <li>Remove per-person — choose Laura, Faron, or both before deleting</li>
-            <li>Confirmation dialog lists all entries that will be affected</li>
-            <li>Entries with no data are skipped automatically</li>
+            <li>Unlimited participants — add anyone to the challenge with their own goal and deadline</li>
+            <li>Per-person challenge deadlines — track when each person wants to hit their goal</li>
+            <li>Leaderboard — ranked table showing visited count, progress bar, goal, and deadline per person</li>
+            <li>People chips — click a name to isolate their countries, click again to show all</li>
+            <li>Status labels shortened to V / P / C on cards</li>
+            <li>Cards more compact — more countries visible per page</li>
+            <li>Bar chart labeled with name + count per person</li>
+            <li>Add/edit/remove participants from a modal panel</li>
           </ul>
         </div>
-
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.7.0</span>
-            <span class="cl-date">May 28 2026</span>
-            <span class="cl-badge cl-badge-fix">Fix</span>
-          </div>
-          <ul class="cl-list">
-            <li>Bulk add now skips existing entries — re-running a list never overwrites what you already have</li>
-            <li>Bulk add confirmation shows count of new entries added vs skipped</li>
-            <li>Remove button (hover ✕) fixed — properly clears both people and syncs to Supabase</li>
-            <li>Remove confirms who will be affected before deleting</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v1.9.8</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Sort debounce — cards stay in place while clicking, re-sort 1 second after last click</li></ul>
         </div>
-
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.6.0</span>
-            <span class="cl-date">May 28 2026</span>
-            <span class="cl-badge cl-badge-improve">Improve</span>
-          </div>
-          <ul class="cl-list">
-            <li>Renamed app to <code>On the Move — The Travel Tally</code></li>
-            <li>Accent normalization for fuzzy matching — México, Canadá, Türkiye etc. now resolve correctly</li>
-            <li>Added possessive stripping — "United Kingdom's" resolves to United Kingdom</li>
-            <li>Added common misspelling aliases — Lichtenstein → Liechtenstein etc.</li>
-            <li>Fixed duplicate <code>const status</code> declaration that was silently blocking Supabase connection</li>
-            <li>Fixed missing closing div on states panel</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v1.9.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Status cycle reversed: visited goes to none, planned to visited, candidate to planned</li><li>Cards sorted by group: both visited first, then one visited, then planned, then candidate, then none</li></ul>
         </div>
-
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.5.0</span>
-            <span class="cl-date">May 28 2026</span>
-            <span class="cl-badge cl-badge-feat">Feature</span>
-          </div>
-          <ul class="cl-list">
-            <li>Full ISO 3166 country list (232 countries) with ISO2/ISO3 codes</li>
-            <li>Full US states list including DC, Puerto Rico and territories</li>
-            <li>Searchable dropdown for single add — type name, code or abbreviation</li>
-            <li>Fuzzy bulk matching — resolves UK, USA, Deutschland, TX, ISO codes etc.</li>
-            <li>Bulk Preview step shows matched / fuzzy / unrecognized before committing</li>
-            <li>Remove button on cards (hover to reveal ✕) — clears both people's data</li>
-            <li>Filter auto-switches to show added status after bulk or single add</li>
-            <li>Anon key hardcoded — no modal needed</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v1.9.6</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>60+ common misspellings added — Columbia, Phillipines, Isreal, etc.</li></ul>
         </div>
-
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.4.0</span>
-            <span class="cl-date">May 27 2026</span>
-            <span class="cl-badge cl-badge-fix">Fix</span>
-          </div>
-          <ul class="cl-list">
-            <li>Fixed <code>supabase</code> variable name conflict with CDN SDK (renamed to <code>sbClient</code>)</li>
-            <li>Fixed <code>subscribeRealtime()</code> still referencing old variable — realtime now works</li>
-            <li>Settings columns renamed to <code>p1_name</code> / <code>p2_name</code> for generality</li>
-            <li>Removed config modal — credentials hardcoded in file</li>
-            <li>Added console logging for all DB operations to aid debugging</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v1.9.5</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list"><li>Kosovo (XK) added to country list with aliases</li></ul>
         </div>
-
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.3.0</span>
-            <span class="cl-date">May 27 2026</span>
-            <span class="cl-badge cl-badge-feat">Feature</span>
-          </div>
-          <ul class="cl-list">
-            <li>Migrated from localStorage to Supabase Realtime Database</li>
-            <li>Real-time sync — changes appear instantly on both devices</li>
-            <li>Hosted on GitHub Pages for shared access</li>
-            <li>Connection status indicator (Live / Connecting / Failed)</li>
-            <li>Saving pulse animation while writes are in flight</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v1.9.4</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list"><li>All regex SyntaxErrors fixed — app was silently failing to load</li><li>Supabase connection now works reliably</li></ul>
         </div>
-
-        <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.2.0</span>
-            <span class="cl-date">May 26 2026</span>
-            <span class="cl-badge cl-badge-feat">Feature</span>
-          </div>
-          <ul class="cl-list">
-            <li>Stacked progress bar — Visited / Planned / Candidate in one bar per person</li>
-            <li>Bar chart (canvas) showing counts per status per person</li>
-            <li>Countries panel: "Both visited" and "Either visited" summary</li>
-            <li>Visited color darkened for better contrast</li>
-            <li>Removed per-person stats strip — chart replaces it</li>
-          </ul>
-        </div>
-
-        <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.1.0</span>
-            <span class="cl-date">May 25 2026</span>
-            <span class="cl-badge cl-badge-feat">Feature</span>
-          </div>
-          <ul class="cl-list">
-            <li>Three-tier status system: Visited / Planned / Candidate (replaces binary toggle)</li>
-            <li>Per-person date field — click chip to set free-text date (e.g. "Aug 2026")</li>
-            <li>Bulk paste add with comma and newline support</li>
-            <li>Status filter buttons: All / Visited / Planned / Candidate / Unvisited</li>
-            <li>Faron added as named partner (replaces generic "Husband")</li>
-          </ul>
-        </div>
-
-        <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v1.0.0</span>
-            <span class="cl-date">May 24 2026</span>
-            <span class="cl-badge cl-badge-feat">Launch</span>
-          </div>
-          <ul class="cl-list">
-            <li>Initial build — Countries and US States tracker</li>
-            <li>Per-person visited toggle for Laura and partner</li>
-            <li>Goal setting with progress bar</li>
-            <li>Grid view with search and filter</li>
-            <li>localStorage persistence</li>
-          </ul>
-        </div>
-
       </div>
     </div>
   </div>
 </main>
 
 <script>
-// ─── ISO COUNTRY DATA ──────────────────────────────────────────────────────
-// [name, iso2, iso3]
 const COUNTRY_DATA=[
   ["Afghanistan","AF","AFG"],["Albania","AL","ALB"],["Algeria","DZ","DZA"],["American Samoa","AS","ASM"],
   ["Andorra","AD","AND"],["Angola","AO","AGO"],["Anguilla","AI","AIA"],["Antigua and Barbuda","AG","ATG"],
@@ -714,7 +579,7 @@ const COUNTRY_ALIASES={
   "zimbawbe":"ZW","zimabwe":"ZW","zimbabwee":"ZW"
 };
 
-// ─── MASTER PLACE LISTS ───────────────────────────────────────────────────────
+// ─── MASTER PLACE LISTS ──────────────────────────────────────────────────────
 const COUNTRIES = COUNTRY_DATA.map(d=>d[0]);
 const STATES = STATE_DATA.map(d=>d[0]);
 const COUNTRY_BY_ISO2 = Object.fromEntries(COUNTRY_DATA.map(d=>[d[1].toUpperCase(),d[0]]));
@@ -722,35 +587,25 @@ const COUNTRY_BY_ISO3 = Object.fromEntries(COUNTRY_DATA.map(d=>[d[2].toUpperCase
 const STATE_BY_ABBR  = Object.fromEntries(STATE_DATA.map(d=>[d[1].toUpperCase(),d[0]]));
 
 // ─── FUZZY RESOLVE ────────────────────────────────────────────────────────────
-// Normalize: strip accents, lowercase, trim
 function norm(s){
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
-
 function resolveCountry(raw){
-  // Strip smart/curly quotes, trim whitespace
   const s=raw.replace(/[\u201C\u201D\u2018\u2019\u00AB\u00BB\u201E\u201A]/g,'').trim();
   if(!s)return null;
   const up=s.toUpperCase();
   const lo=s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const loRaw=s.toLowerCase(); // keep accents for exact match
-  // exact name (try both with and without accents)
+  const loRaw=s.toLowerCase();
   const exact=COUNTRY_DATA.find(d=>d[0].toLowerCase()===loRaw||d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')===lo);
   if(exact)return{name:exact[0],iso2:exact[1],method:'exact'};
-  // ISO2
   if(COUNTRY_BY_ISO2[up])return{name:COUNTRY_BY_ISO2[up],iso2:up,method:'iso2'};
-  // ISO3
   if(COUNTRY_BY_ISO3[up])return{name:COUNTRY_BY_ISO3[up],iso2:COUNTRY_DATA.find(d=>d[2]===up)?.[1]||'',method:'iso3'};
-  // alias map (try accent-stripped version)
   if(COUNTRY_ALIASES[lo]){const iso=COUNTRY_ALIASES[lo];return{name:COUNTRY_BY_ISO2[iso],iso2:iso,method:'alias'};}
   if(COUNTRY_ALIASES[loRaw]){const iso=COUNTRY_ALIASES[loRaw];return{name:COUNTRY_BY_ISO2[iso],iso2:iso,method:'alias'};}
-  // starts-with (accent-stripped)
   const sw=COUNTRY_DATA.find(d=>d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').startsWith(lo));
   if(sw)return{name:sw[0],iso2:sw[1],method:'fuzzy'};
-  // contains
   const cont=COUNTRY_DATA.find(d=>d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(lo)&&lo.length>=3);
   if(cont)return{name:cont[0],iso2:cont[1],method:'fuzzy'};
-  // partial word overlap
   const words=lo.split(/\s+/).filter(w=>w.length>2);
   for(const d of COUNTRY_DATA){
     const dn=d[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -758,7 +613,6 @@ function resolveCountry(raw){
   }
   return null;
 }
-
 function resolveState(raw){
   const s=raw.replace(/[\u201C\u201D\u2018\u2019\u00AB\u00BB\u201E\u201A]/g,'').trim();
   if(!s)return null;
@@ -772,29 +626,16 @@ function resolveState(raw){
   return null;
 }
 
-// ─── SEARCHABLE DROPDOWN ──────────────────────────────────────────────────────
+// ─── SEARCHABLE DROPDOWN ─────────────────────────────────────────────────────
 const selSelected={countries:null,states:null};
 let dropCloseTimer={countries:null,states:null};
-
-function openSelDropdown(type){
-  clearTimeout(dropCloseTimer[type]);
-  filterSelDropdown(type);
-  document.getElementById('sel-dropdown-'+type).classList.add('open');
-}
-function scheduleCloseDropdown(type){
-  dropCloseTimer[type]=setTimeout(()=>{
-    document.getElementById('sel-dropdown-'+type).classList.remove('open');
-  },200);
-}
+function openSelDropdown(type){clearTimeout(dropCloseTimer[type]);filterSelDropdown(type);document.getElementById('sel-dropdown-'+type).classList.add('open');}
+function scheduleCloseDropdown(type){dropCloseTimer[type]=setTimeout(()=>{document.getElementById('sel-dropdown-'+type).classList.remove('open');},200);}
 function filterSelDropdown(type){
   const q=document.getElementById('sel-search-'+type).value.toLowerCase();
   const data=type==='countries'?COUNTRY_DATA:STATE_DATA;
   const drop=document.getElementById('sel-dropdown-'+type);
-  const matches=data.filter(d=>{
-    const name=d[0].toLowerCase();
-    const code=(d[1]||'').toLowerCase();
-    return name.includes(q)||code.startsWith(q)||code===q;
-  }).slice(0,80);
+  const matches=data.filter(d=>{const name=d[0].toLowerCase();const code=(d[1]||'').toLowerCase();return name.includes(q)||code.startsWith(q)||code===q;}).slice(0,80);
   if(!matches.length){drop.innerHTML='<div class="sel-none">No matches</div>';drop.classList.add('open');return;}
   drop.innerHTML=matches.map(d=>{
     const sel=selSelected[type]&&selSelected[type].name===d[0];
@@ -811,70 +652,38 @@ function selectOption(type,name,code){
   const tag=document.getElementById('sel-selected-'+type);
   tag.innerHTML=`<div class="sel-selected-tag">OK ${name} <span style="opacity:.6;font-size:9px">${code}</span><button onclick="clearSelection('${type}')">x</button></div>`;
 }
-function clearSelection(type){
-  selSelected[type]=null;
-  document.getElementById('sel-search-'+type).value='';
-  document.getElementById('sel-selected-'+type).innerHTML='';
-}
+function clearSelection(type){selSelected[type]=null;document.getElementById('sel-search-'+type).value='';document.getElementById('sel-selected-'+type).innerHTML='';}
 
-// ─── BULK PREVIEW ─────────────────────────────────────────────────────────────
+// ─── LOCAL STATE ─────────────────────────────────────────────────────────────
+// participants: [{id, name, color, goal_countries, goal_states, deadline_countries, deadline_states}]
+// visits: {"type|place|personId": {status, date}}
+let visits={}, participants=[];
+let editing={}, filters={countries:'all',states:'all'};
+let focusPerson=null; // null = show all, else personId
+let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
 let bulkResolved={countries:[],states:[]};
+let removeResolved={countries:[],states:[]};
 
-function previewBulk(type){
-  const raw=document.getElementById('bk-ta-'+type).value;
-  const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
-  const already=getPlaces(type).map(p=>p.toLowerCase());
-  const results=[];
-  const seen=new Set();
-  for(const item of items){
-    const r=type==='countries'?resolveCountry(item):resolveState(item);
-    if(!r){results.push({input:item,status:'unknown'});continue;}
-    const key=r.name.toLowerCase();
-    if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
-    seen.add(key);
-    const alreadyIn=already.includes(key)&&getEntry(type,r.name,'laura').status==='none'&&getEntry(type,r.name,'husband').status==='none';
-    results.push({input:item,name:r.name,code:r.iso2||r.abbr,method:r.method,status:r.method==='exact'?'matched':'fuzzy'});
-  }
-  bulkResolved[type]=results.filter(r=>r.status==='matched'||r.status==='fuzzy');
-  const wrap=document.getElementById('bulk-results-'+type);
-  wrap.innerHTML=results.map(r=>{
-    if(r.status==='unknown')return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
-    if(r.status==='dup')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate in this list</span></div>`;
-    if(r.status==='fuzzy')return`<div class="br-row br-fuzzy"><span class="br-icon">~</span><span class="br-label">"${r.input}"</span><span class="br-canon">→ ${r.name} (${r.code})</span></div>`;
-    return`<div class="br-row br-matched"><span class="br-icon">✓</span><span class="br-label">${r.name}</span><span class="br-canon">${r.code}</span></div>`;
-  }).join('');
-  wrap.classList.add('show');
-}
+// Person colors (cycles for unlimited people)
+const PERSON_COLORS=['#9b3a1e','#3d4a5c','#2d6b4a','#6b3d8a','#8a6b2d','#2d5c8a','#8a2d5c','#4a7c2d'];
+function personColor(idx){return PERSON_COLORS[idx%PERSON_COLORS.length];}
 
-// ─── LOCAL STATE ──────────────────────────────────────────────────────────────
-let visits={},settings={p1_name:'Laura',p2_name:'Faron',goal_countries_p1:50,goal_countries_p2:50,goal_states_p1:50,goal_states_p2:50};
-let editing={},filters={countries:'all',states:'all'};
-let sbClient=null,saveDebounce=null,realtimeChannel=null;
-
-// ─── CREDENTIALS ──────────────────────────────────────────────────────────────
+// ─── CREDENTIALS ─────────────────────────────────────────────────────────────
 const SB_URL="https://zewetwghnbiynuqkisbg.supabase.co";
-const SB_KEY = "sb_publishable_K6vRtMTydN6VqqBh6d1itA_SR5RHCkz";
+const SB_KEY="sb_publishable_K6vRtMTydN6VqqBh6d1itA_SR5RHCkz";
 
 // ─── SUPABASE ─────────────────────────────────────────────────────────────────
 async function initSupabase(url,key){
   setStatus('connecting','Connecting...');
-  // Wait for Supabase SDK to be available (handles CDN timing issues)
   let attempts=0;
-  while(!window.supabase && attempts<20){
-    await new Promise(r=>setTimeout(r,100));
-    attempts++;
-  }
-  if(!window.supabase){
-    setStatus('offline','Supabase SDK failed to load - check network');
-    return;
-  }
+  while(!window.supabase&&attempts<20){await new Promise(r=>setTimeout(r,100));attempts++;}
+  if(!window.supabase){setStatus('offline','SDK failed to load');return;}
   try{
-    setStatus('connecting','Creating Supabase client...');
+    setStatus('connecting','Creating client...');
     sbClient=window.supabase.createClient(url,key);
-    setStatus('connecting','Client created, testing...');
+    setStatus('connecting','Testing query...');
     const{data,error}=await sbClient.from('settings').select('id').limit(1);
-    setStatus('connecting','Query returned: data='+JSON.stringify(data)+' err='+JSON.stringify(error));
-    console.log('[DB] test:',{data,error});
+    setStatus('connecting','Got: '+JSON.stringify(data)+' err:'+JSON.stringify(error));
     if(error)throw error;
     setStatus('online','Live OK');
     await loadAllData();
@@ -887,60 +696,60 @@ async function initSupabase(url,key){
 }
 function setStatus(state,msg){
   const el=document.getElementById('conn-status');
-  el.textContent=msg;
-  el.className='conn-status cs-'+state;
-  // Also log to visible debug panel
+  el.textContent=msg; el.className='conn-status cs-'+state;
   const dbg=document.getElementById('debug-panel');
-  if(dbg){
-    const line=document.createElement('div');
-    line.style.cssText='font-size:10px;padding:2px 0;border-bottom:1px solid #eee;word-break:break-all';
-    line.textContent=new Date().toISOString().substr(11,8)+' ['+state+'] '+msg;
-    dbg.insertBefore(line,dbg.firstChild);
-  }
+  if(dbg){const line=document.createElement('div');line.style.cssText='font-size:10px;padding:2px 0;border-bottom:1px solid #333;word-break:break-all';line.textContent=new Date().toISOString().substr(11,8)+' ['+state+'] '+msg;dbg.insertBefore(line,dbg.firstChild);}
 }
+
 async function loadAllData(){
   if(!sbClient)return;
-  const{data:sData,error:sErr}=await sbClient.from('settings').select('*').eq('id','main').single();
-  console.log('[DB] settings:',{sData,sErr});
-  if(sData){settings=sData;syncSettingsToUI();}
-  else{await sbClient.from('settings').upsert({id:'main',...settings});}
-  const{data:vData,error:vErr}=await sbClient.from('visits').select('*');
-  console.log('[DB] visits:',{count:vData?.length,vErr});
+  // Load participants from settings
+  const{data:sData}=await sbClient.from('settings').select('*').eq('id','main').single();
+  if(sData&&sData.participants){
+    try{participants=JSON.parse(sData.participants);}catch(e){participants=defaultParticipants();}
+  } else {
+    participants=defaultParticipants();
+    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
+  }
+  // Load visits
+  const{data:vData}=await sbClient.from('visits').select('*');
   visits={};
   if(vData)vData.forEach(row=>{visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};});
   refreshAll();
 }
-function syncSettingsToUI(){
-  document.getElementById('name1').value=settings.p1_name||'Laura';
-  document.getElementById('name2').value=settings.p2_name||'Faron';
-  document.getElementById('gcl').value=settings.goal_countries_p1||50;
-  document.getElementById('gch').value=settings.goal_countries_p2||50;
-  document.getElementById('gsl').value=settings.goal_states_p1||50;
-  document.getElementById('gsh').value=settings.goal_states_p2||50;
-  document.querySelectorAll('.pn-p1').forEach(el=>el.textContent=settings.p1_name||'Laura');
-  document.querySelectorAll('.pn-p2').forEach(el=>el.textContent=settings.p2_name||'Faron');
+
+function defaultParticipants(){
+  return[
+    {id:'laura',name:'Laura',color:PERSON_COLORS[0],goal_countries:50,goal_states:50,deadline_countries:'',deadline_states:''},
+    {id:'faron',name:'Faron',color:PERSON_COLORS[1],goal_countries:50,goal_states:50,deadline_countries:'',deadline_states:''}
+  ];
 }
+
+async function saveParticipants(){
+  if(!sbClient)return;
+  await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
+}
+
 function subscribeRealtime(){
   if(realtimeChannel)sbClient.removeChannel(realtimeChannel);
-  console.log('[RT] subscribing…');
   realtimeChannel=sbClient.channel('tracker-changes')
     .on('postgres_changes',{event:'*',schema:'public',table:'visits'},payload=>{
-      console.log('[RT] visit change:',payload);
       const{eventType,new:row,old}=payload;
       if(eventType==='DELETE'&&old){delete visits[`${old.type}|${old.place}|${old.who}`];}
       else if(row){visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};}
-      ['countries','states'].forEach(t=>{renderTab(t);updateGoals(t);updateStats(t);});
+      ['countries','states'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
     })
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},payload=>{
-      console.log('[RT] settings change:',payload);
-      if(payload.new){settings=payload.new;syncSettingsToUI();refreshAll();}
+      if(payload.new&&payload.new.participants){
+        try{participants=JSON.parse(payload.new.participants);refreshAll();}catch(e){}
+      }
     })
     .subscribe(status=>{
-      console.log('[RT] status:',status);
       if(status==='SUBSCRIBED')setStatus('online','Live OK');
       if(status==='CLOSED'||status==='CHANNEL_ERROR')setStatus('offline','Disconnected');
     });
 }
+
 async function saveVisit(type,place,who,status,date){
   if(!sbClient)return;
   showSaving();
@@ -951,167 +760,193 @@ async function saveVisit(type,place,who,status,date){
   if(error)console.error('[DB] saveVisit:',error);
   hideSaving();
 }
-async function saveSettings(){
-  if(!sbClient)return;
-  const s={id:'main',p1_name:document.getElementById('name1').value||'Laura',p2_name:document.getElementById('name2').value||'Faron',goal_countries_p1:+document.getElementById('gcl').value||50,goal_countries_p2:+document.getElementById('gch').value||50,goal_states_p1:+document.getElementById('gsl').value||50,goal_states_p2:+document.getElementById('gsh').value||50};
-  settings=s;
-  const{error}=await sbClient.from('settings').upsert(s);
-  if(error)console.error('[DB] saveSettings:',error);
-  refreshAll();
-}
 function showSaving(){const el=document.getElementById('conn-status');if(!el.querySelector('.saving-dot')){const d=document.createElement('span');d.className='saving-dot';el.appendChild(d);}}
 function hideSaving(){const d=document.querySelector('.saving-dot');if(d)d.remove();}
 
+// ─── PERSON MODAL ─────────────────────────────────────────────────────────────
+let editingPersonId=null;
+function openAddPerson(){
+  editingPersonId=null;
+  document.getElementById('modal-title').textContent='Add Participant';
+  document.getElementById('modal-name').value='';
+  document.getElementById('modal-goal-c').value=50;
+  document.getElementById('modal-goal-s').value=50;
+  document.getElementById('modal-deadline').value='';
+  document.getElementById('person-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('modal-name').focus(),50);
+}
+function openEditPerson(id){
+  const p=participants.find(x=>x.id===id);
+  if(!p)return;
+  editingPersonId=id;
+  document.getElementById('modal-title').textContent='Edit '+p.name;
+  document.getElementById('modal-name').value=p.name;
+  document.getElementById('modal-goal-c').value=p.goal_countries||50;
+  document.getElementById('modal-goal-s').value=p.goal_states||50;
+  document.getElementById('modal-deadline').value=p.deadline_countries||p.deadline_states||'';
+  document.getElementById('person-modal').classList.add('show');
+}
+function closePersonModal(){document.getElementById('person-modal').classList.remove('show');}
+async function savePersonModal(){
+  const name=document.getElementById('modal-name').value.trim();
+  if(!name)return;
+  const goalC=parseInt(document.getElementById('modal-goal-c').value)||50;
+  const goalS=parseInt(document.getElementById('modal-goal-s').value)||50;
+  const deadline=document.getElementById('modal-deadline').value.trim();
+  if(editingPersonId){
+    const p=participants.find(x=>x.id===editingPersonId);
+    if(p){p.name=name;p.goal_countries=goalC;p.goal_states=goalS;p.deadline_countries=deadline;p.deadline_states=deadline;}
+  } else {
+    const id=name.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+Date.now();
+    const color=personColor(participants.length);
+    participants.push({id,name,color,goal_countries:goalC,goal_states:goalS,deadline_countries:deadline,deadline_states:deadline});
+  }
+  await saveParticipants();
+  closePersonModal();
+  refreshAll();
+}
+async function removePerson(id){
+  const p=participants.find(x=>x.id===id);
+  if(!p)return;
+  if(!confirm('Remove '+p.name+' from the challenge? Their visit data will remain in the database.'))return;
+  participants=participants.filter(x=>x.id!==id);
+  await saveParticipants();
+  refreshAll();
+}
+
 // ─── DATA HELPERS ─────────────────────────────────────────────────────────────
 function getEntry(type,place,who){return visits[`${type}|${place}|${who}`]||{status:'none',date:''};}
-// No custom places — everything comes from ISO master lists
 function getPlaces(type){return type==='countries'?COUNTRIES:STATES;}
+function visibleParticipants(){
+  if(focusPerson)return participants.filter(p=>p.id===focusPerson);
+  return participants;
+}
 
 // ─── STATUS CYCLE ─────────────────────────────────────────────────────────────
 const CYCLE=['none','candidate','planned','visited'];
-const ICON={none:'○',visited:'✓',planned:'◷',candidate:'★'};
+const ICON={none:'○',visited:'V',planned:'P',candidate:'C'};
 async function cycleStatus(type,place,who){
   const e=getEntry(type,place,who);
   const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
-  renderTab(type);updateGoals(type);updateStats(type);
+  renderTabNoSort(type); updateLeaderboard(type);
+  clearTimeout(sortDebounce);
+  sortDebounce=setTimeout(()=>renderTab(type),1000);
   await saveVisit(type,place,who,ns,e.date);
 }
 async function setDate(type,place,who,date){
   const e=getEntry(type,place,who);
   visits[`${type}|${place}|${who}`]={status:e.status,date};
-  renderTab(type);
+  renderTabNoSort(type);
   await saveVisit(type,place,who,e.status,date);
 }
 
-async function removePlace(type, place){
-  if(!sbClient) return;
-  const lSt=getEntry(type,place,'laura').status;
-  const hSt=getEntry(type,place,'husband').status;
-  const lName=settings.p1_name||'Laura';
-  const hName=settings.p2_name||'Faron';
-  const hasBoth=lSt!=='none'&&hSt!=='none';
-  const hasLaura=lSt!=='none';
-  const hasHusband=hSt!=='none';
+// ─── LEADERBOARD ─────────────────────────────────────────────────────────────
+function updateLeaderboard(type){
+  const wrap=document.getElementById('leaderboard-'+type);
+  if(!wrap||!participants.length){if(wrap)wrap.innerHTML='';return;}
+  const places=getPlaces(type);
+  const total=places.length;
+  // Build rows with counts
+  const rows=participants.map(p=>{
+    let v=0,pl=0,c=0;
+    places.forEach(place=>{
+      const st=getEntry(type,place,p.id).status||'none';
+      if(st==='visited')v++;
+      else if(st==='planned')pl++;
+      else if(st==='candidate')c++;
+    });
+    const goal=type==='countries'?p.goal_countries:p.goal_states;
+    const deadline=type==='countries'?p.deadline_countries:p.deadline_states;
+    return{p,v,pl,c,goal,deadline};
+  }).sort((a,b)=>b.v-a.v||b.pl-a.pl||a.p.name.localeCompare(b.p.name));
 
-  // Build confirm message
-  let msg='';
-  if(hasBoth) msg=`Remove ${place} for both ${lName} and ${hName}?`;
-  else if(hasLaura) msg=`Remove ${place} for ${lName}?`;
-  else if(hasHusband) msg=`Remove ${place} for ${hName}?`;
-  else return; // nothing to remove
-  if(!confirm(msg+' This clears their status and date.')) return;
-
-  showSaving();
-  // Delete from Supabase
-  const { error } = await sbClient.from('visits').delete()
-    .eq('type', type).eq('place', place);
-  if(error){ console.error('[DB] remove:', error); hideSaving(); return; }
-  // Clear local state
-  delete visits[`${type}|${place}|laura`];
-  delete visits[`${type}|${place}|husband`];
-  hideSaving();
-  renderTab(type); updateGoals(type); updateStats(type);
-}
-async function doAddSingle(type){
-  const sel=selSelected[type];
-  if(!sel){alert('Please select a '+(type==='countries'?'country':'state')+' from the dropdown first.');return;}
-  const place=sel.name;
-  const status=document.getElementById('si-st-'+type).value;
-  const date=document.getElementById('si-dt-'+type).value.trim();
-  const forP1=document.getElementById('si-cl-'+type).checked;
-  const forP2=document.getElementById('si-ch-'+type).checked;
-  if(!forP1&&!forP2){alert('Select at least one person.');return;}
-  if(forP1){visits[`${type}|${place}|laura`]={status:status!=='none'?status:getEntry(type,place,'laura').status,date:date||getEntry(type,place,'laura').date};await saveVisit(type,place,'laura',visits[`${type}|${place}|laura`].status,visits[`${type}|${place}|laura`].date);}
-  if(forP2){visits[`${type}|${place}|husband`]={status:status!=='none'?status:getEntry(type,place,'husband').status,date:date||getEntry(type,place,'husband').date};await saveVisit(type,place,'husband',visits[`${type}|${place}|husband`].status,visits[`${type}|${place}|husband`].date);}
-  clearSelection(type);
-  document.getElementById('si-dt-'+type).value='';
-  const addedStatus=document.getElementById('si-st-'+type).value;
-  if(addedStatus!=='none') filters[type]=addedStatus;
-  buildFilterBtns(type);
-  renderTab(type);updateGoals(type);updateStats(type);
+  let html=`<div class="lb-row lb-header">
+    <div></div><div>Name</div><div>Progress</div><div>Visited</div><div>Goal</div><div>Deadline</div><div></div>
+  </div>`;
+  rows.forEach((r,i)=>{
+    const vPct=Math.min(100,(r.v/Math.max(r.goal,1))*100);
+    const pPct=Math.min(100-vPct,(r.pl/Math.max(r.goal,1))*100);
+    const cPct=Math.min(100-vPct-pPct,(r.c/Math.max(r.goal,1))*100);
+    const isSoon=r.deadline&&r.v<r.goal;
+    html+=`<div class="lb-row">
+      <div class="lb-rank">${i+1}</div>
+      <div class="lb-name"><div class="lb-dot" style="background:${r.p.color}"></div>${r.p.name}</div>
+      <div><div class="lb-bar-wrap"><div class="lb-bar-seg bar-v" style="width:${vPct}%;background:var(--visited)"></div><div class="lb-bar-seg" style="width:${pPct}%;background:var(--planned)"></div><div class="lb-bar-seg" style="width:${cPct}%;background:var(--candidate)"></div></div></div>
+      <div class="lb-count">${r.v} <span style="color:var(--muted);font-size:10px">/ ${total}</span></div>
+      <div class="lb-goal">${r.goal}</div>
+      <div class="lb-deadline${isSoon?' soon':''}">${r.deadline||'—'}</div>
+      <div class="lb-actions">
+        <button class="lb-edit-btn" onclick="openEditPerson('${r.p.id}')" title="Edit">✎</button>
+        <button class="lb-edit-btn" onclick="removePerson('${r.p.id}')" title="Remove" style="color:var(--rust)">×</button>
+      </div>
+    </div>`;
+  });
+  wrap.innerHTML=html;
 }
 
-async function doAddBulk(type){
-  const ta=document.getElementById('bk-ta-'+type);
-  if(!bulkResolved[type]||!bulkResolved[type].length){ previewBulk(type); }
-  const matched=bulkResolved[type];
-  if(!matched||!matched.length){ alert('No recognizable entries found. Check your list and try again.'); return; }
-  const status=document.getElementById('bk-st-'+type).value;
-  const date=document.getElementById('bk-dt-'+type).value.trim();
-  const forP1=document.getElementById('bk-cl-'+type).checked;
-  const forP2=document.getElementById('bk-ch-'+type).checked;
-  if(!forP1&&!forP2){ alert('Select at least one person.'); return; }
-
-  let added=0, skipped=0;
-  for(const r of matched){
-    const place=r.name;
-    // For each person: only write if they have no status yet (none)
-    // OR if a specific status was chosen (treat as intentional override only for new entries)
-    if(forP1){
-      const ex=getEntry(type,place,'laura');
-      const isNew=ex.status==='none';
-      if(isNew){
-        // New entry: apply chosen status
-        const ns=status!=='none'?status:'none';
-        const nd=date||'';
-        visits[`${type}|${place}|laura`]={status:ns,date:nd};
-        if(ns!=='none') await saveVisit(type,place,'laura',ns,nd);
-        if(isNew) added++;
-      } else { skipped++; }
-    }
-    if(forP2){
-      const ex=getEntry(type,place,'husband');
-      const isNew=ex.status==='none';
-      if(isNew){
-        const ns=status!=='none'?status:'none';
-        const nd=date||'';
-        visits[`${type}|${place}|husband`]={status:ns,date:nd};
-        if(ns!=='none') await saveVisit(type,place,'husband',ns,nd);
-      } else { if(!forP1) skipped++; }
-    }
-  }
-
-  ta.value='';
-  document.getElementById('bulk-results-'+type).classList.remove('show');
-  bulkResolved[type]=[];
-  if(status!=='none') filters[type]=status;
-  buildFilterBtns(type);
-  renderTab(type); updateGoals(type); updateStats(type);
-  document.getElementById('grid-'+type).scrollIntoView({behavior:'smooth',block:'start'});
-  const noun=type==='countries'?'countr':'state';
-  alert(`Done! ${added} new ${noun}${added!==1?'ies':'y'} added. ${skipped} already existed and were skipped.`);
+// ─── PEOPLE BAR ───────────────────────────────────────────────────────────────
+function updatePeopleBar(type){
+  const wrap=document.getElementById('people-bar-'+type);
+  if(!wrap)return;
+  const places=getPlaces(type);
+  let html='';
+  participants.forEach(p=>{
+    const v=places.filter(pl=>getEntry(type,pl,p.id).status==='visited').length;
+    const isActive=focusPerson===p.id;
+    html+=`<div class="person-chip${isActive?' active':''}" onclick="toggleFocus('${p.id}','${type}')">
+      <div class="chip-dot" style="background:${isActive?'var(--gold-light)':p.color}"></div>
+      ${p.name}<span class="chip-count">${v}</span>
+    </div>`;
+  });
+  html+=`<button class="add-person-btn" onclick="openAddPerson()">+ Add</button>`;
+  wrap.innerHTML=html;
+}
+function toggleFocus(id,type){
+  focusPerson=focusPerson===id?null:id;
+  ['countries','states'].forEach(t=>{updatePeopleBar(t);buildPersonChecks(t);});
+  renderTab(type);
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
-function bestStatus(type,place){
-  const order=['visited','planned','candidate','none'];
-  for(const s of order)for(const w of['laura','husband'])if(getEntry(type,place,w).status===s)return s;
-  return'none';
+// ─── PERSON CHECKBOXES (for add forms) ───────────────────────────────────────
+function buildPersonChecks(type){
+  ['si','bk','rm'].forEach(prefix=>{
+    const wrap=document.getElementById(prefix+'-who-'+type);
+    if(!wrap)return;
+    wrap.innerHTML=participants.map(p=>`
+      <label class="pcheck">
+        <input type="checkbox" id="${prefix}-ck-${p.id}-${type}" checked/>
+        <span style="color:${p.color}">${p.name}</span>
+      </label>`).join('');
+  });
 }
+
+// ─── SORT & FILTER ────────────────────────────────────────────────────────────
 function placeGroupScore(type,p){
-  const l=getEntry(type,p,'laura').status||'none';
-  const h=getEntry(type,p,'husband').status||'none';
-  const both=(s)=>l===s&&h===s;
-  const either=(s)=>l===s||h===s;
-  if(both('visited'))return 0;
-  if(either('visited'))return 1;
-  if(both('planned'))return 2;
-  if(either('planned'))return 3;
-  if(both('candidate'))return 4;
-  if(either('candidate'))return 5;
+  const vps=visibleParticipants();
+  const statuses=vps.map(person=>getEntry(type,p,person.id).status||'none');
+  const vCount=statuses.filter(s=>s==='visited').length;
+  const pCount=statuses.filter(s=>s==='planned').length;
+  const cCount=statuses.filter(s=>s==='candidate').length;
+  if(vCount===vps.length&&vps.length>0)return 0;
+  if(vCount>0)return 1;
+  if(pCount===vps.length&&vps.length>0)return 2;
+  if(pCount>0)return 3;
+  if(cCount===vps.length&&vps.length>0)return 4;
+  if(cCount>0)return 5;
   return 6;
 }
 function filteredPlaces(type){
   const f=filters[type];
   const q=(document.getElementById('search-'+type)||{value:''}).value.toLowerCase();
+  const vps=visibleParticipants();
   const places=getPlaces(type).filter(p=>{
-    const l=getEntry(type,p,'laura').status||'none',h=getEntry(type,p,'husband').status||'none';
+    const statuses=vps.map(person=>getEntry(type,p,person.id).status||'none');
     let show=true;
-    if(f==='visited')show=l==='visited'||h==='visited';
-    else if(f==='planned')show=l==='planned'||h==='planned';
-    else if(f==='candidate')show=l==='candidate'||h==='candidate';
-    else if(f==='unvisited')show=l==='none'&&h==='none';
+    if(f==='visited')show=statuses.some(s=>s==='visited');
+    else if(f==='planned')show=statuses.some(s=>s==='planned');
+    else if(f==='candidate')show=statuses.some(s=>s==='candidate');
+    else if(f==='unvisited')show=statuses.every(s=>s==='none');
     if(show&&q)show=p.toLowerCase().includes(q);
     return show;
   });
@@ -1121,46 +956,54 @@ function filteredPlaces(type){
     return a.localeCompare(b);
   });
 }
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 function getIsoCode(type,name){
   if(type==='countries'){const d=COUNTRY_DATA.find(d=>d[0]===name);return d?d[1]:'';}
   const d=STATE_DATA.find(d=>d[0]===name);return d?d[1]:'';
 }
 function makeCard(type,place){
-  const best=bestStatus(type,place);
+  const vps=visibleParticipants();
+  const bestSt=()=>{
+    const order=['visited','planned','candidate'];
+    for(const s of order)for(const p of vps)if(getEntry(type,place,p.id).status===s)return s;
+    return'none';
+  };
+  const best=bestSt();
   const card=document.createElement('div');
   card.className='place-card'+(best!=='none'?' h'+best[0]:'');
-  const top=document.createElement('div');top.style.display='flex';top.style.justifyContent='space-between';top.style.alignItems='baseline';
+  const top=document.createElement('div');top.className='place-top';
   const nm=document.createElement('div');nm.className='place-name';nm.textContent=place;
   const code=document.createElement('div');code.className='place-iso';code.textContent=getIsoCode(type,place);
   top.appendChild(nm);top.appendChild(code);card.appendChild(top);
   const badges=document.createElement('div');badges.className='place-badges';
-  ['laura','husband'].forEach((who,idx)=>{
-    const e=getEntry(type,place,who);
-    const st=e.status||'none',dt=e.date||'',k=`${type}|${place}|${who}`;
+  vps.forEach(person=>{
+    const e=getEntry(type,place,person.id);
+    const st=e.status||'none',dt=e.date||'',k=`${type}|${place}|${person.id}`;
     const row=document.createElement('div');row.className='person-row';
-    const wl=document.createElement('div');wl.className='person-who';wl.textContent=(idx===0?settings.p1_name:settings.p2_name)||who;row.appendChild(wl);
+    const wl=document.createElement('div');wl.className='person-who';
+    wl.textContent=person.name;wl.style.color=person.color;
+    row.appendChild(wl);
     const stBtn=document.createElement('div');stBtn.className='st-btn st-'+st;
-    stBtn.innerHTML=ICON[st]+' '+st;stBtn.onclick=()=>cycleStatus(type,place,who);row.appendChild(stBtn);
+    stBtn.textContent=ICON[st];stBtn.onclick=()=>cycleStatus(type,place,person.id);
+    row.appendChild(stBtn);
     if(st!=='none'){
       if(editing[k]){
         const de=document.createElement('div');de.className='date-edit';
         const inp=document.createElement('input');inp.type='text';inp.value=dt;inp.placeholder='e.g. Aug 2026';inp.onclick=ev=>ev.stopPropagation();
-        const sb=document.createElement('button');sb.textContent='✓';
-        sb.onclick=ev=>{ev.stopPropagation();setDate(type,place,who,inp.value.trim());editing[k]=false;};
+        const sb=document.createElement('button');sb.textContent='OK';
+        sb.onclick=ev=>{ev.stopPropagation();setDate(type,place,person.id,inp.value.trim());editing[k]=false;};
         de.appendChild(inp);de.appendChild(sb);row.appendChild(de);setTimeout(()=>inp.focus(),30);
-      }else{
-        const chip=document.createElement('div');chip.className='date-chip'+(dt?' has-date':'');chip.textContent=dt||'+ date';
-        chip.onclick=ev=>{ev.stopPropagation();editing[k]=true;renderTab(type);};row.appendChild(chip);
+      } else {
+        const chip=document.createElement('div');chip.className='date-chip'+(dt?' has-date':'');chip.textContent=dt||'+date';
+        chip.onclick=ev=>{ev.stopPropagation();editing[k]=true;renderTabNoSort(type);};row.appendChild(chip);
       }
     }
     badges.appendChild(row);
   });
-  // Remove button — only show if either person has a status set
   if(best!=='none'){
-    const rmBtn=document.createElement('button');
-    rmBtn.className='remove-btn';rmBtn.title='Remove / clear this entry';rmBtn.innerHTML='✕';
-    rmBtn.onclick=ev=>{ev.stopPropagation();removePlace(type,place);};
-    card.appendChild(rmBtn);
+    const rmBtn=document.createElement('button');rmBtn.className='remove-btn';rmBtn.title='Clear this entry';rmBtn.innerHTML='x';
+    rmBtn.onclick=ev=>{ev.stopPropagation();removePlace(type,place);};card.appendChild(rmBtn);
   }
   card.appendChild(badges);return card;
 }
@@ -1170,61 +1013,19 @@ function renderTab(type){
   if(!places.length){const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
   places.forEach(p=>grid.appendChild(makeCard(type,p)));
 }
-function updateGoals(type){
-  const places=getPlaces(type);
-  let lv=0,lp=0,lc=0,hv=0,hp=0,hc=0;
-  places.forEach(p=>{
-    const l=getEntry(type,p,'laura').status||'none',h=getEntry(type,p,'husband').status||'none';
-    if(l==='visited')lv++;else if(l==='planned')lp++;else if(l==='candidate')lc++;
-    if(h==='visited')hv++;else if(h==='planned')hp++;else if(h==='candidate')hc++;
-  });
-  const pre=type==='countries'?'c':'s';
-  const gl=+document.getElementById('g'+pre+'l').value||50,gh=+document.getElementById('g'+pre+'h').value||50;
-  const cap=(v,p,c,g)=>{const vp=Math.min(100,(v/g)*100);const pp=Math.min(100-vp,(p/g)*100);const cp=Math.min(100-vp-pp,(c/g)*100);return[vp+'%',pp+'%',cp+'%'];};
-  const[lvp,lpp,lcp]=cap(lv,lp,lc,gl),[hvp,hpp,hcp]=cap(hv,hp,hc,gh);
-  document.getElementById('bar'+pre+'v-l').style.width=lvp;document.getElementById('bar'+pre+'p-l').style.width=lpp;document.getElementById('bar'+pre+'c-l').style.width=lcp;
-  document.getElementById('bar'+pre+'v-h').style.width=hvp;document.getElementById('bar'+pre+'p-h').style.width=hpp;document.getElementById('bar'+pre+'c-h').style.width=hcp;
-  document.getElementById('cnt'+pre+'-l').textContent=lv+'/'+gl+' visited · '+lp+' planned · '+lc+' candidate';
-  document.getElementById('cnt'+pre+'-h').textContent=hv+'/'+gh+' visited · '+hp+' planned · '+hc+' candidate';
-}
-function updateStats(type){
-  const places=getPlaces(type);
-  let lv=0,lp=0,lc=0,hv=0,hp=0,hc=0,both=0;
-  places.forEach(p=>{
-    const l=getEntry(type,p,'laura').status||'none',h=getEntry(type,p,'husband').status||'none';
-    if(l==='visited')lv++;if(l==='planned')lp++;if(l==='candidate')lc++;
-    if(h==='visited')hv++;if(h==='planned')hp++;if(h==='candidate')hc++;
-    if(l==='visited'&&h==='visited')both++;
-  });
-  const ln=settings.p1_name||'Laura',hn=settings.p2_name||'Faron';
-  const canvas=document.getElementById('chart-'+type);
-  const dpr=window.devicePixelRatio||1,W=canvas.parentElement.clientWidth-40,H=160;
-  canvas.style.width=W+'px';canvas.style.height=H+'px';canvas.width=W*dpr;canvas.height=H*dpr;
-  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  const cats=['Visited','Planned','Candidate'],ld=[lv,lp,lc],hd=[hv,hp,hc],colors=['#2d4228','#c9922a','#6b5b8a'];
-  const maxV=Math.max(lv,lp,lc,hv,hp,hc,1),pL=8,pR=8,pT=14,pB=28,cW=W-pL-pR,cH=H-pT-pB;
-  ctx.strokeStyle='#d4c9b8';ctx.lineWidth=1;ctx.fillStyle='#7a726a';ctx.font='10px "DM Mono",monospace';ctx.textAlign='right';
-  for(let i=0;i<=4;i++){const y=pT+cH-(i/4)*cH;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+cW,y);ctx.stroke();ctx.fillText(Math.round((i/4)*maxV),pL-2,y+3);}
-  const gW=cW/3,bW=Math.min(gW*0.3,28),gap=4;
-  cats.forEach((cat,ci)=>{
-    const gx=pL+ci*gW,cx=gx+gW/2;
-    const lh=(ld[ci]/maxV)*cH,lx=cx-bW-gap/2;
-    ctx.fillStyle=colors[ci];ctx.globalAlpha=1;ctx.fillRect(lx,pT+cH-lh,bW,lh);
-    if(ld[ci]>0){ctx.fillStyle='#1a1612';ctx.textAlign='center';ctx.font='bold 10px "DM Mono",monospace';ctx.fillText(ld[ci],lx+bW/2,pT+cH-lh-3);}
-    const hh=(hd[ci]/maxV)*cH,hx=cx+gap/2;
-    ctx.globalAlpha=0.5;ctx.fillStyle=colors[ci];ctx.fillRect(hx,pT+cH-hh,bW,hh);ctx.globalAlpha=1;
-    if(hd[ci]>0){ctx.fillStyle='#1a1612';ctx.textAlign='center';ctx.font='bold 10px "DM Mono",monospace';ctx.fillText(hd[ci],hx+bW/2,pT+cH-hh-3);}
-    ctx.fillStyle='#7a726a';ctx.font='10px "DM Mono",monospace';ctx.textAlign='center';ctx.globalAlpha=1;ctx.fillText(cat,cx,pT+cH+14);
-  });
-  [[ln,1],[hn,0.5]].forEach(([name,alpha],i)=>{ctx.globalAlpha=alpha;ctx.fillStyle='#7a726a';ctx.fillRect(pL+cW-120+i*60,2,10,10);ctx.globalAlpha=1;ctx.fillStyle='#7a726a';ctx.textAlign='left';ctx.font='10px "DM Mono",monospace';ctx.fillText(name,pL+cW-120+i*60+13,11);});
-  if(type==='countries'){
-    const wrap=document.getElementById('together-countries');
-    const ev=places.filter(p=>getEntry(type,p,'laura').status==='visited'||getEntry(type,p,'husband').status==='visited').length;
-    wrap.innerHTML=`<div class="tog-pill"><div class="tdot" style="background:#2d4228"></div><div><div class="num">${both}</div><div class="lbl">Both visited</div></div></div><div class="tog-pill"><div class="tdot" style="background:var(--gold)"></div><div><div class="num">${ev}</div><div class="lbl">Either visited</div></div></div><div class="tog-pill"><div><div class="num">${places.length}</div><div class="lbl">Total</div></div></div>`;
-  }
+function renderTabNoSort(type){
+  const grid=document.getElementById('grid-'+type);
+  const places=filteredPlaces(type);
+  if(!places.length){grid.innerHTML='';const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
+  const existing=[...grid.querySelectorAll('.place-card')];
+  const existingNames=existing.map(c=>c.querySelector('.place-name')?.textContent);
+  const newNames=places.map(p=>p);
+  if(JSON.stringify(existingNames)===JSON.stringify(newNames)){
+    existing.forEach((card,i)=>{grid.replaceChild(makeCard(type,places[i]),card);});
+  } else {renderTab(type);}
 }
 function buildFilterBtns(type){
-  const defs=[{k:'all',label:'All',fc:'fall'},{k:'visited',label:'✓ Visited',fc:'fv'},{k:'planned',label:'◷ Planned',fc:'fp'},{k:'candidate',label:'★ Candidate',fc:'fc'},{k:'unvisited',label:'○ Unvisited',fc:'fu'}];
+  const defs=[{k:'all',label:'All',fc:'fall'},{k:'visited',label:'Visited',fc:'fv'},{k:'planned',label:'Planned',fc:'fp'},{k:'candidate',label:'Candidate',fc:'fc'},{k:'unvisited',label:'None',fc:'fu'}];
   const wrap=document.getElementById('fbtns-'+type);wrap.innerHTML='';
   defs.forEach(d=>{const b=document.createElement('button');b.className='fbtn'+(filters[type]===d.k?' fa '+d.fc:'');b.textContent=d.label;b.onclick=()=>{filters[type]=d.k;buildFilterBtns(type);renderTab(type);};wrap.appendChild(b);});
 }
@@ -1235,101 +1036,156 @@ function switchAddMode(type,mode,btn){
   document.getElementById('af-bulk-'+type).className='add-form'+(mode==='bulk'?' show':'');
   document.getElementById('af-remove-'+type).className='add-form'+(mode==='remove'?' show':'');
 }
-function updateNames(){
-  settings.p1_name=document.getElementById('name1').value||'Laura';
-  settings.p2_name=document.getElementById('name2').value||'Faron';
-  document.querySelectorAll('.pn-p1').forEach(el=>el.textContent=settings.p1_name);
-  document.querySelectorAll('.pn-p2').forEach(el=>el.textContent=settings.p2_name);
-  clearTimeout(saveDebounce);saveDebounce=setTimeout(saveSettings,1000);
-  renderTab('countries');renderTab('states');updateStats('countries');updateStats('states');
-}
 function switchTab(tab,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   btn.classList.add('active');
-  if(tab!=='changelog'){updateStats(tab);}
 }
 function refreshAll(){
-  syncSettingsToUI();
-  ['countries','states'].forEach(t=>{buildFilterBtns(t);renderTab(t);updateGoals(t);updateStats(t);});
+  ['countries','states'].forEach(t=>{
+    updatePeopleBar(t);
+    updateLeaderboard(t);
+    buildFilterBtns(t);
+    buildPersonChecks(t);
+    renderTab(t);
+  });
 }
-// ─── BULK REMOVE ─────────────────────────────────────────────────────────────
-let removeResolved={countries:[],states:[]};
 
-function previewRemove(type){
-  const raw=document.getElementById('rm-ta-'+type).value;
+// ─── ADD / REMOVE ─────────────────────────────────────────────────────────────
+function getCheckedPeople(prefix,type){
+  return participants.filter(p=>{
+    const el=document.getElementById(prefix+'-ck-'+p.id+'-'+type);
+    return el&&el.checked;
+  });
+}
+async function removePlace(type,place){
+  if(!sbClient)return;
+  const vps=visibleParticipants();
+  const hasData=vps.some(p=>getEntry(type,place,p.id).status!=='none');
+  if(!hasData)return;
+  const names=vps.filter(p=>getEntry(type,place,p.id).status!=='none').map(p=>p.name).join(', ');
+  if(!confirm(`Clear ${place} for ${names}?`))return;
+  showSaving();
+  const{error}=await sbClient.from('visits').delete().eq('type',type).eq('place',place);
+  if(!error){vps.forEach(p=>{delete visits[`${type}|${place}|${p.id}`];});}
+  hideSaving();
+  renderTab(type);updateLeaderboard(type);updatePeopleBar(type);
+}
+async function doAddSingle(type){
+  const sel=selSelected[type];
+  if(!sel){alert('Please select a '+(type==='countries'?'country':'state')+' first.');return;}
+  const place=sel.name;
+  const status=document.getElementById('si-st-'+type).value;
+  const date=document.getElementById('si-dt-'+type).value.trim();
+  const people=getCheckedPeople('si',type);
+  if(!people.length){alert('Select at least one person.');return;}
+  for(const p of people){
+    visits[`${type}|${place}|${p.id}`]={status:status!=='none'?status:getEntry(type,place,p.id).status,date:date||getEntry(type,place,p.id).date};
+    await saveVisit(type,place,p.id,visits[`${type}|${place}|${p.id}`].status,visits[`${type}|${place}|${p.id}`].date);
+  }
+  clearSelection(type);
+  document.getElementById('si-dt-'+type).value='';
+  if(status!=='none')filters[type]=status;
+  buildFilterBtns(type);renderTab(type);updateLeaderboard(type);updatePeopleBar(type);
+}
+
+// ─── BULK PREVIEW ─────────────────────────────────────────────────────────────
+function previewBulk(type){
+  const raw=document.getElementById('bk-ta-'+type).value;
   const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
-  const results=[];
-  const seen=new Set();
+  const results=[];const seen=new Set();
   for(const item of items){
     const r=type==='countries'?resolveCountry(item):resolveState(item);
     if(!r){results.push({input:item,status:'unknown'});continue;}
     const key=r.name.toLowerCase();
     if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
     seen.add(key);
-    const lSt=getEntry(type,r.name,'laura').status||'none';
-    const hSt=getEntry(type,r.name,'husband').status||'none';
-    const hasData=lSt!=='none'||hSt!=='none';
-    results.push({
-      input:item, name:r.name, code:r.iso2||r.abbr||'',
-      method:r.method, hasData,
-      lSt, hSt,
-      status: hasData ? (r.method==='exact'?'matched':'fuzzy') : 'nodata'
-    });
+    results.push({input:item,name:r.name,code:r.iso2||r.abbr,method:r.method,status:r.method==='exact'?'matched':'fuzzy'});
+  }
+  bulkResolved[type]=results.filter(r=>r.status==='matched'||r.status==='fuzzy');
+  const wrap=document.getElementById('bulk-results-'+type);
+  wrap.innerHTML=results.map(r=>{
+    if(r.status==='unknown')return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized</span></div>`;
+    if(r.status==='dup')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
+    if(r.status==='fuzzy')return`<div class="br-row br-fuzzy"><span class="br-icon">~</span><span class="br-label">"${r.input}"</span><span class="br-canon">-> ${r.name} (${r.code})</span></div>`;
+    return`<div class="br-row br-matched"><span class="br-icon">V</span><span class="br-label">${r.name}</span><span class="br-canon">${r.code}</span></div>`;
+  }).join('');
+  wrap.classList.add('show');
+}
+async function doAddBulk(type){
+  if(!bulkResolved[type]||!bulkResolved[type].length){previewBulk(type);}
+  const matched=bulkResolved[type];
+  if(!matched||!matched.length){alert('No recognizable entries found.');return;}
+  const status=document.getElementById('bk-st-'+type).value;
+  const date=document.getElementById('bk-dt-'+type).value.trim();
+  const people=getCheckedPeople('bk',type);
+  if(!people.length){alert('Select at least one person.');return;}
+  let added=0,skipped=0;
+  for(const r of matched){
+    const place=r.name;
+    for(const p of people){
+      const ex=getEntry(type,place,p.id);
+      if(ex.status==='none'){
+        const ns=status!=='none'?status:'none';
+        visits[`${type}|${place}|${p.id}`]={status:ns,date:date||''};
+        if(ns!=='none')await saveVisit(type,place,p.id,ns,date||'');
+        added++;
+      } else {skipped++;}
+    }
+  }
+  document.getElementById('bk-ta-'+type).value='';
+  document.getElementById('bulk-results-'+type).classList.remove('show');
+  bulkResolved[type]=[];
+  if(status!=='none')filters[type]=status;
+  buildFilterBtns(type);renderTab(type);updateLeaderboard(type);updatePeopleBar(type);
+  alert(`Done! ${added} new entries added. ${skipped} already existed and were skipped.`);
+}
+
+// ─── BULK REMOVE ──────────────────────────────────────────────────────────────
+function previewRemove(type){
+  const raw=document.getElementById('rm-ta-'+type).value;
+  const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
+  const results=[];const seen=new Set();
+  const vps=visibleParticipants();
+  for(const item of items){
+    const r=type==='countries'?resolveCountry(item):resolveState(item);
+    if(!r){results.push({input:item,status:'unknown'});continue;}
+    const key=r.name.toLowerCase();
+    if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
+    seen.add(key);
+    const hasData=vps.some(p=>getEntry(type,r.name,p.id).status!=='none');
+    results.push({input:item,name:r.name,code:r.iso2||r.abbr||'',method:r.method,hasData,status:hasData?(r.method==='exact'?'matched':'fuzzy'):'nodata'});
   }
   removeResolved[type]=results.filter(r=>r.status==='matched'||r.status==='fuzzy');
   const wrap=document.getElementById('rm-results-'+type);
   wrap.innerHTML=results.map(r=>{
-    if(r.status==='unknown')
-      return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized — will skip</span></div>`;
-    if(r.status==='dup')
-      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
-    if(r.status==='nodata')
-      return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">○</span><span class="br-label">${r.name}</span><span class="br-canon">No data to remove</span></div>`;
-    const arrow=r.method!=='exact'?` -> ${r.name} (${r.code})`:`${r.code}`;
-    const dataInfo=`L:${r.lSt} F:${r.hSt}`;
-    return`<div class="br-row br-${r.status==='fuzzy'?'fuzzy':'matched'}" style="border-left:3px solid var(--rust)">
-      <span class="br-icon">🗑</span>
-      <span class="br-label">${r.method!=='exact'?'"'+r.input+'"':r.name}</span>
-      <span class="br-canon">${arrow} · ${dataInfo}</span>
-    </div>`;
+    if(r.status==='unknown')return`<div class="br-row br-unknown"><span class="br-icon">X</span><span class="br-label">"${r.input}"</span><span class="br-canon">Not recognized</span></div>`;
+    if(r.status==='dup')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">~</span><span class="br-label">${r.name}</span><span class="br-canon">Duplicate</span></div>`;
+    if(r.status==='nodata')return`<div class="br-row" style="background:#f5f0e8"><span class="br-icon">O</span><span class="br-label">${r.name}</span><span class="br-canon">No data</span></div>`;
+    return`<div class="br-row br-${r.status==='fuzzy'?'fuzzy':'matched'}" style="border-left:3px solid var(--rust)"><span class="br-icon">X</span><span class="br-label">${r.name}</span><span class="br-canon">${r.code}</span></div>`;
   }).join('');
   wrap.classList.add('show');
 }
-
 async function doRemoveBulk(type){
-  if(!removeResolved[type]||!removeResolved[type].length){ previewRemove(type); }
+  if(!removeResolved[type]||!removeResolved[type].length){previewRemove(type);}
   const matched=removeResolved[type];
-  if(!matched||!matched.length){ alert('No recognizable entries with data found.'); return; }
-  const forP1=document.getElementById('rm-cl-'+type).checked;
-  const forP2=document.getElementById('rm-ch-'+type).checked;
-  if(!forP1&&!forP2){ alert('Select at least one person.'); return; }
-
+  if(!matched||!matched.length){alert('No recognizable entries with data found.');return;}
+  const people=getCheckedPeople('rm',type);
+  if(!people.length){alert('Select at least one person.');return;}
   const names=matched.map(r=>r.name).join(', ');
-  const p1Name=settings.p1_name||'Laura', p2Name=settings.p2_name||'Faron';
-  const whoStr=forP1&&forP2?`both ${p1Name} and ${p2Name}`:forP1?p1Name:p2Name;
-  if(!confirm(`Remove ${matched.length} entr${matched.length!==1?'ies':'y'} for ${whoStr}?
-
-${names}`)) return;
-
-  if(!sbClient){ alert('Not connected to Supabase.'); return; }
+  const whoStr=people.map(p=>p.name).join(', ');
+  if(!confirm(`Remove ${matched.length} entries for ${whoStr}?\n\n${names}`))return;
+  if(!sbClient){alert('Not connected.');return;}
   showSaving();
-  let removed=0, skipped=0;
+  let removed=0,skipped=0;
   for(const r of matched){
     const place=r.name;
-    const lHasData=getEntry(type,place,'laura').status!=='none';
-    const hHasData=getEntry(type,place,'husband').status!=='none';
-    // Build delete query for affected people
-    const whoToDelete=[];
-    if(forP1&&lHasData) whoToDelete.push('laura');
-    if(forP2&&hHasData) whoToDelete.push('husband');
-    if(!whoToDelete.length){ skipped++; continue; }
-    for(const who of whoToDelete){
-      const{error}=await sbClient.from('visits').delete()
-        .eq('type',type).eq('place',place).eq('who',who);
-      if(error){ console.error('[DB] bulk remove error:',error); continue; }
-      delete visits[`${type}|${place}|${who}`];
+    for(const p of people){
+      if(getEntry(type,place,p.id).status!=='none'){
+        const{error}=await sbClient.from('visits').delete().eq('type',type).eq('place',place).eq('who',p.id);
+        if(!error)delete visits[`${type}|${place}|${p.id}`];
+      } else {skipped++;}
     }
     removed++;
   }
@@ -1337,19 +1193,19 @@ ${names}`)) return;
   document.getElementById('rm-ta-'+type).value='';
   document.getElementById('rm-results-'+type).classList.remove('show');
   removeResolved[type]=[];
-  renderTab(type); updateGoals(type); updateStats(type);
-  alert(`Done! ${removed} entr${removed!==1?'ies':'y'} removed. ${skipped} had no data to remove.`);
+  renderTab(type);updateLeaderboard(type);updatePeopleBar(type);
+  alert(`Done! ${removed} entries removed. ${skipped} had no data.`);
 }
 
+// ─── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',async()=>{
+  // Show default UI while connecting
+  participants=defaultParticipants();
   refreshAll();
-  if(SB_KEY==='PASTE_ANON_KEY_HERE'){
-    setStatus('offline','⚠ Anon key not set — open index.html and paste your key');
-    return;
-  }
+  if(SB_KEY==='PASTE_ANON_KEY_HERE'){setStatus('offline','Key not set');return;}
   await initSupabase(SB_URL,SB_KEY);
 });
-window.addEventListener('resize',()=>{updateStats('countries');updateStats('states');});
+window.addEventListener('resize',()=>['countries','states'].forEach(t=>updateLeaderboard(t)));
 </script>
 </body>
 </html>
