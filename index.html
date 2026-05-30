@@ -170,7 +170,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v1.9.3</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v1.9.4</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
@@ -185,7 +185,7 @@ select.add-inp{cursor:pointer;min-width:200px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.9.3</span>
+  <span class="nav-version">v1.9.4</span>
 </nav>
 <main>
   <div class="legend">
@@ -393,7 +393,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v1.9.3</span>
+            <span class="cl-version">v1.9.4</span>
             <span class="cl-date">May 30 2026</span>
             <span class="cl-badge cl-badge-fix">Fix</span>
           </div>
@@ -403,6 +403,8 @@ select.add-inp{cursor:pointer;min-width:200px}
             <li>Verbose connection logging — each step (client created, query sent, response received) shown in real time</li>
             <li>Updated to <code>sb_publishable</code> key format</li>
             <li>Fixed broken regex (unterminated possessive strip) that was killing the entire script on load</li>
+            <li>Fixed split regex in previewRemove that was breaking across lines causing SyntaxError</li>
+            <li>Script now passes Node.js syntax check cleanly</li>
             <li>Removed ALL non-ASCII characters from script code — Cyrillic, Japanese, special symbols were crashing JS parser</li>
             <li>Cleaned COUNTRY_ALIASES to pure ASCII/unicode escape sequences only</li>
           </ul>
@@ -1205,8 +1207,7 @@ let removeResolved={countries:[],states:[]};
 
 function previewRemove(type){
   const raw=document.getElementById('rm-ta-'+type).value;
-  const items=raw.split(/[
-,]+/).map(s=>s.trim()).filter(Boolean);
+  const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
   const results=[];
   const seen=new Set();
   for(const item of items){

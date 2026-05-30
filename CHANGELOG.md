@@ -3,7 +3,7 @@
 
 ---
 
-### v1.9.3 — May 30 2026
+### v1.9.4 — May 30 2026
 **Fix: Regex syntax errors**
 - Removed all non-ASCII characters from regex patterns — were causing SyntaxError in strict JS environments
 - Simplified possessive stripping regex (now handled by alias map instead)
@@ -19,6 +19,8 @@
 - Verbose connection logging — each step shown in real time in the header
 - Updated to `sb_publishable` key format
 - Fixed broken regex (unterminated possessive strip)
+- Fixed split regex in previewRemove broken across lines (root SyntaxError)
+- Script now passes Node.js syntax validation cleanly
 - Removed ALL non-ASCII characters from script — Cyrillic/Japanese/symbols in alias map were crashing JS parser
 - Cleaned COUNTRY_ALIASES to ASCII/unicode escapes only that was silently killing the entire script on load — root cause of persistent connection failures
 
