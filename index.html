@@ -138,7 +138,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 .pcheck input{cursor:pointer;accent-color:var(--gold)}
 
 /* CARDS — compact */
-.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:5px}
+.place-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:5px}
 .place-card{background:white;border:1px solid var(--border);border-left:3px solid var(--border);border-radius:3px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;transition:box-shadow .15s;position:relative}
 .place-card:hover{box-shadow:var(--shadow)}
 .place-card.hv{border-left-color:var(--visited)}.place-card.hp{border-left-color:var(--planned)}.place-card.hc{border-left-color:var(--candidate)}
@@ -206,7 +206,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.5</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -217,7 +217,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.0.1</span>
+  <span class="nav-version">v2.0.5</span>
 </nav>
 <main>
   <div class="legend">
@@ -380,7 +380,7 @@ select.add-inp{cursor:pointer;min-width:160px}
       <div class="cl-entries">
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v2.0.1</span>
+            <span class="cl-version">v2.0.5</span>
             <span class="cl-date">May 30 2026</span>
             <span class="cl-badge cl-badge-feat">Feature</span>
           </div>
@@ -396,7 +396,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           </ul>
         </div>
         <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.0.1</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <div class="cl-header"><span class="cl-version">v2.0.5</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>Cards narrower — min width reduced from 180px to 160px, tighter padding and gap for more countries per row</li></ul>
         </div>
         <div class="cl-entry">
@@ -755,14 +755,19 @@ function subscribeRealtime(){
 }
 
 async function saveVisit(type,place,who,status,date){
-  if(!sbClient)return;
+  if(!sbClient)return false;
   showSaving();
   const{error}=await sbClient.from('visits').upsert(
     {type,place,who,status,date_label:date||null,is_custom:false},
     {onConflict:'type,place,who'}
   );
-  if(error)console.error('[DB] saveVisit:',error);
   hideSaving();
+  if(error){
+    console.error('[DB] saveVisit:',error);
+    setStatus('offline','Save failed: '+(error.message||error.code));
+    return false;
+  }
+  return true;
 }
 function showSaving(){const el=document.getElementById('conn-status');if(!el.querySelector('.saving-dot')){const d=document.createElement('span');d.className='saving-dot';el.appendChild(d);}}
 function hideSaving(){const d=document.querySelector('.saving-dot');if(d)d.remove();}
@@ -835,7 +840,7 @@ async function cycleStatus(type,place,who){
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
   renderTabNoSort(type); updateLeaderboard(type);
   clearTimeout(sortDebounce);
-  sortDebounce=setTimeout(()=>renderTab(type),1000);
+  sortDebounce=setTimeout(()=>renderTab(type),2000);
   await saveVisit(type,place,who,ns,e.date);
 }
 async function setDate(type,place,who,date){
@@ -866,7 +871,7 @@ function updateLeaderboard(type){
   }).sort((a,b)=>b.v-a.v||b.pl-a.pl||a.p.name.localeCompare(b.p.name));
 
   let html=`<div class="lb-row lb-header">
-    <div></div><div>Name</div><div>Progress</div><div>Visited</div><div>Goal</div><div>Deadline</div><div></div>
+    <div></div><div>Name</div><div>Progress</div><div>V · P · C / Goal</div><div>Total</div><div>Deadline</div><div></div>
   </div>`;
   rows.forEach((r,i)=>{
     const vPct=Math.min(100,(r.v/Math.max(r.goal,1))*100);
@@ -877,8 +882,8 @@ function updateLeaderboard(type){
       <div class="lb-rank">${i+1}</div>
       <div class="lb-name"><div class="lb-dot" style="background:${r.p.color}"></div>${r.p.name}</div>
       <div><div class="lb-bar-wrap"><div class="lb-bar-seg bar-v" style="width:${vPct}%;background:var(--visited)"></div><div class="lb-bar-seg" style="width:${pPct}%;background:var(--planned)"></div><div class="lb-bar-seg" style="width:${cPct}%;background:var(--candidate)"></div></div></div>
-      <div class="lb-count">${r.v} <span style="color:var(--muted);font-size:10px">/ ${total}</span></div>
-      <div class="lb-goal">${r.goal}</div>
+      <div class="lb-count">${r.v}<span style="color:var(--planned);font-size:10px;opacity:.8;margin-left:2px">${r.pl?'+'+r.pl+'p':''}</span><span style="color:var(--candidate);font-size:10px;opacity:.8;margin-left:1px">${r.c?'+'+r.c+'c':''}</span><span style="color:var(--muted);font-size:10px;margin-left:3px">/ ${r.goal}</span></div>
+      <div class="lb-goal">${total}</div>
       <div class="lb-deadline${isSoon?' soon':''}">${r.deadline||'—'}</div>
       <div class="lb-actions">
         <button class="lb-edit-btn" onclick="openEditPerson('${r.p.id}')" title="Edit">✎</button>
@@ -1125,16 +1130,25 @@ async function doAddBulk(type){
   const date=document.getElementById('bk-dt-'+type).value.trim();
   const people=getCheckedPeople('bk',type);
   if(!people.length){alert('Select at least one person.');return;}
-  let added=0,skipped=0;
+  let added=0,skipped=0,failed=[];
   for(const r of matched){
     const place=r.name;
     for(const p of people){
       const ex=getEntry(type,place,p.id);
       if(ex.status==='none'){
         const ns=status!=='none'?status:'none';
-        visits[`${type}|${place}|${p.id}`]={status:ns,date:date||''};
-        if(ns!=='none')await saveVisit(type,place,p.id,ns,date||'');
-        added++;
+        if(ns!=='none'){
+          const ok=await saveVisit(type,place,p.id,ns,date||'');
+          if(ok){
+            visits[`${type}|${place}|${p.id}`]={status:ns,date:date||''};
+            added++;
+          } else {
+            failed.push(place+' ('+p.name+')');
+          }
+        } else {
+          visits[`${type}|${place}|${p.id}`]={status:'none',date:date||''};
+          added++;
+        }
       } else {skipped++;}
     }
   }
@@ -1143,7 +1157,9 @@ async function doAddBulk(type){
   bulkResolved[type]=[];
   if(status!=='none')filters[type]=status;
   buildFilterBtns(type);renderTab(type);updateLeaderboard(type);updatePeopleBar(type);
-  alert(`Done! ${added} new entries added. ${skipped} already existed and were skipped.`);
+  let msg=`Done! ${added} added, ${skipped} skipped.`;
+  if(failed.length)msg+=`\n\nFAILED TO SAVE (${failed.length}):\n${failed.join(', ')}\n\nCheck your connection and re-add these.`;
+  alert(msg);
 }
 
 // ─── BULK REMOVE ──────────────────────────────────────────────────────────────

@@ -1,25 +1,36 @@
 # On the Move — Deploy Script
-# Pulls latest index.html from Claude output URL and commits to GitHub
-# Usage: double-click this file
-
 $repoPath = "C:\Users\lbrod\OneDrive\Documents\onthemove"
 Set-Location $repoPath
 
 Write-Host "On the Move — Deploy" -ForegroundColor Cyan
 Write-Host "====================" -ForegroundColor Cyan
 
-# Show current version
-$current = Select-String -Path "index.html" -Pattern 'nav-version.*v[\d\.]+' | Select-Object -First 1
-Write-Host "Current: $($current.Matches.Value)" -ForegroundColor Yellow
+# Auto-read latest version + changelog entry for commit message
+$version = ""
+$notes = ""
+try {
+    $html = Get-Content "index.html" -Raw
+    if ($html -match 'nav-version[^>]*>(v[\d\.]+)<') { $version = $matches[1] }
+    $cl = Get-Content "CHANGELOG.md" -Raw -ErrorAction SilentlyContinue
+    if ($cl -match '(?s)###\s+(v[\d\.][^\n]+)\n([^\n]+)\n([-\s\S]+?)(?=\n---|\z)') {
+        $clVersion = $matches[1].Trim()
+        $clTitle = $matches[2].Trim()
+        $clItems = ($matches[3] -split '\n' | Where-Object { $_ -match '^\s*-' } | Select-Object -First 3 | ForEach-Object { $_.Trim().TrimStart('-').Trim() }) -join '; '
+        $notes = "$clVersion — $clTitle`: $clItems"
+    }
+} catch {}
+
+$defaultMsg = if ($notes) { $notes } elseif ($version) { "$version update" } else { "update" }
 
 # Git status
 $status = git status --short
 if ($status) {
     Write-Host "`nChanges to commit:" -ForegroundColor Green
     Write-Host $status
-    
-    $msg = Read-Host "`nCommit message (Enter to use 'update')"
-    if (-not $msg) { $msg = "update" }
+    Write-Host "`nSuggested commit message:" -ForegroundColor Yellow
+    Write-Host "  $defaultMsg" -ForegroundColor White
+    $msg = Read-Host "`nCommit message (Enter to use suggested)"
+    if (-not $msg) { $msg = $defaultMsg }
     
     git add -A
     git commit -m $msg
