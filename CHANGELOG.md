@@ -3,6 +3,50 @@
 
 ---
 
+### v2.0.7 — May 30 2026
+**Improve: Leaderboard bar + tooltip**
+- Progress bar taller and wider — easier to read at a glance
+- Hover tooltip shows one country per line instead of comma-separated
+
+---
+
+### v2.0.6 — May 30 2026
+**Feature: Hover country list**
+- Hover the progress bar on the leaderboard to see the full visited, planned, and candidate list per person
+
+---
+
+### v2.0.5 — May 30 2026
+**Improve: Sort debounce**
+- Sort debounce increased to 2 seconds — cards stay in place longer while clicking through statuses
+
+---
+
+### v2.0.4 — May 30 2026
+**Improve: Compact cards**
+- Card min-width reduced to 140px — fits one more column per row
+
+---
+
+### v2.0.3 — May 30 2026
+**Fix: Bulk add silent failures**
+- Bulk add now reports failed saves instead of silently dropping them
+- Local state no longer updated until DB confirms save succeeded
+
+---
+
+### v2.0.2 — May 30 2026
+**Improve: Leaderboard count display**
+- Leaderboard shows visited + planned + candidate toward goal — planned in amber, candidate in purple
+
+---
+
+### v2.0.1 — May 30 2026
+**Improve: Compact cards**
+- Cards narrower — min width 160px, tighter padding for more countries per row
+
+---
+
 ### v2.0.0 — May 30 2026
 **Feature: Unlimited participants + leaderboard + compact cards**
 - Unlimited participants — add anyone to the challenge with name, goal, and deadline
@@ -12,7 +56,6 @@
 - Add / edit / remove participants from a modal panel
 - Status badges shortened to V / P / C on cards
 - Cards more compact — more countries visible per page
-- Person name colored on each card row
 - Participants stored in Supabase settings, synced in real time
 
 ---
@@ -20,13 +63,13 @@
 ### v1.9.8 — May 30 2026
 **Improve: Sort debounce**
 - Cards no longer jump on every status click
-- Sort re-runs 1 second after last click
+- Sort re-runs after last click
 
 ---
 
 ### v1.9.7 — May 30 2026
 **Improve: Status cycle + card sort order**
-- Cycle reversed: visited goes to none, planned to visited, candidate to planned
+- Cycle reversed: visited to none, planned to visited, candidate to planned
 - Cards sorted: both visited first, then one visited, planned, candidate, none
 - Alphabetical within each group
 
@@ -52,11 +95,5 @@
 
 ---
 
-### v1.8.0 — May 28 2026
-**Feature: Bulk Remove**
-- Bulk Remove tab with fuzzy matching and per-person selection
-
----
-
-### v1.0.0–v1.7.0 — May 24–28 2026
-- Initial build, Supabase migration, ISO country list, fuzzy matching, status tiers, bulk add/remove
+### v1.0.0–v1.8.0 — May 24–28 2026
+- Initial build, Supabase migration, ISO country list, fuzzy matching, status tiers, bulk add/remove, sort debounce

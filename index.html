@@ -42,13 +42,13 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 
 /* LEADERBOARD TABLE */
 .leaderboard{background:var(--parchment);border:1px solid var(--border);border-radius:4px;margin-bottom:18px;overflow:hidden}
-.lb-row{display:grid;grid-template-columns:24px 1fr 100px 80px 80px 110px 28px;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.lb-row{display:grid;grid-template-columns:24px 1fr 180px 100px 80px 110px 28px;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px}
 .lb-row:last-child{border-bottom:none}
 .lb-row.lb-header{background:#f0ebe2;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:6px 14px}
 .lb-rank{color:var(--muted);font-size:10px;text-align:center}
 .lb-name{font-weight:500;display:flex;align-items:center;gap:6px}
 .lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.lb-bar-wrap{display:flex;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.lb-bar-wrap{display:flex;height:14px;background:var(--border);border-radius:3px;overflow:hidden}
 .lb-bar-seg{height:100%;transition:width .5s;flex-shrink:0}
 .lb-count{font-size:11px;color:var(--ink);text-align:right}
 .lb-goal{font-size:10px;color:var(--muted);text-align:right}
@@ -58,7 +58,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 .lb-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px}
 .lb-edit-btn:hover{background:var(--border);color:var(--ink)}
 .lb-tooltip{position:relative;cursor:default}
-.lb-tooltip-box{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--ink);color:var(--parchment);border-radius:4px;padding:10px 14px;font-size:10px;line-height:1.8;width:max-content;max-width:360px;white-space:normal;word-break:break-word;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.lb-tooltip-box{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--ink);color:var(--parchment);border-radius:4px;padding:10px 14px;font-size:10px;line-height:1.8;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .lb-tooltip-box .tt-section{margin-bottom:4px}
 .lb-tooltip-box .tt-label{color:var(--gold-light);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
 .lb-tooltip-box .tt-list{color:var(--parchment);opacity:.9}
@@ -212,7 +212,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.6</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.7</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -223,7 +223,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.0.6</span>
+  <span class="nav-version">v2.0.7</span>
 </nav>
 <main>
   <div class="legend">
@@ -385,33 +385,50 @@ select.add-inp{cursor:pointer;min-width:160px}
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
         <div class="cl-entry">
-          <div class="cl-header">
-            <span class="cl-version">v2.0.6</span>
-            <span class="cl-date">May 30 2026</span>
-            <span class="cl-badge cl-badge-feat">Feature</span>
-          </div>
+          <div class="cl-header"><span class="cl-version">v2.0.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Leaderboard progress bar taller and wider — easier to read at a glance</li><li>Hover tooltip shows one country per line</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.6</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list"><li>Hover the progress bar to see full visited, planned, and candidate country list per person</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.5</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Sort debounce increased to 2 seconds</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.4</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Card min-width reduced to 140px — fits one more column per row</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.3</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list"><li>Bulk add reports failed saves instead of silently dropping them</li><li>Local state no longer updated until DB confirms save succeeded</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.2</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Leaderboard shows visited + planned + candidate toward goal — planned in amber, candidate in purple</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.1</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Cards narrower — min width 160px, tighter padding for more countries per row</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.0</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list">
-            <li>Unlimited participants — add anyone to the challenge with their own goal and deadline</li>
-            <li>Per-person challenge deadlines — track when each person wants to hit their goal</li>
-            <li>Leaderboard — ranked table showing visited count, progress bar, goal, and deadline per person</li>
-            <li>People chips — click a name to isolate their countries, click again to show all</li>
-            <li>Status labels shortened to V / P / C on cards</li>
-            <li>Cards more compact — more countries visible per page</li>
-            <li>Bar chart labeled with name + count per person</li>
-            <li>Add/edit/remove participants from a modal panel</li>
+            <li>Unlimited participants with individual goals and deadlines</li>
+            <li>Leaderboard with progress bar, visited count, goal, and deadline per person</li>
+            <li>People chips — click to isolate a person's view</li>
+            <li>Status labels shortened to V / P / C</li>
+            <li>Add/edit/remove participants from modal panel</li>
           </ul>
         </div>
         <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.0.6</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
-          <ul class="cl-list"><li>Cards narrower — min width reduced from 180px to 160px, tighter padding and gap for more countries per row</li></ul>
-        </div>
-        <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v1.9.8</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
-          <ul class="cl-list"><li>Sort debounce — cards stay in place while clicking, re-sort 1 second after last click</li></ul>
+          <ul class="cl-list"><li>Sort debounce — cards stay in place while clicking, re-sort after last click</li></ul>
         </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v1.9.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
-          <ul class="cl-list"><li>Status cycle reversed: visited goes to none, planned to visited, candidate to planned</li><li>Cards sorted by group: both visited first, then one visited, then planned, then candidate, then none</li></ul>
+          <ul class="cl-list"><li>Status cycle reversed — visited to none, planned to visited, candidate to planned</li><li>Cards sorted: both visited first, then one visited, planned, candidate, none</li></ul>
         </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v1.9.6</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
@@ -423,7 +440,7 @@ select.add-inp{cursor:pointer;min-width:160px}
         </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v1.9.4</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
-          <ul class="cl-list"><li>All regex SyntaxErrors fixed — app was silently failing to load</li><li>Supabase connection now works reliably</li></ul>
+          <ul class="cl-list"><li>All regex SyntaxErrors fixed — Supabase connection now works reliably</li></ul>
         </div>
       </div>
     </div>
@@ -884,9 +901,9 @@ function updateLeaderboard(type){
     const pPct=Math.min(100-vPct,(r.pl/Math.max(r.goal,1))*100);
     const cPct=Math.min(100-vPct-pPct,(r.c/Math.max(r.goal,1))*100);
     const isSoon=r.deadline&&r.v<r.goal;
-    const vList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='visited').sort().join(', ');
-    const pList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='planned').sort().join(', ');
-    const cList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='candidate').sort().join(', ');
+    const vList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='visited').sort().join('<br>');
+    const pList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='planned').sort().join('<br>');
+    const cList=places.filter(pl=>getEntry(type,pl,r.p.id).status==='candidate').sort().join('<br>');
     const ttHtml=`<div class="lb-tooltip-box">${vList?`<div class="tt-section"><div class="tt-label">Visited (${r.v})</div><div class="tt-list">${vList}</div></div>`:''}${pList?`<div class="tt-section"><div class="tt-label">Planned (${r.pl})</div><div class="tt-list">${pList}</div></div>`:''}${cList?`<div class="tt-section"><div class="tt-label">Candidate (${r.c})</div><div class="tt-list">${cList}</div></div>`:''}</div>`;
     html+=`<div class="lb-row">
       <div class="lb-rank">${i+1}</div>
