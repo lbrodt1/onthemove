@@ -170,7 +170,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v1.9.4</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v1.9.7</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting…</span>
@@ -185,7 +185,7 @@ select.add-inp{cursor:pointer;min-width:200px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v1.9.4</span>
+  <span class="nav-version">v1.9.7</span>
 </nav>
 <main>
   <div class="legend">
@@ -393,7 +393,7 @@ select.add-inp{cursor:pointer;min-width:200px}
 
         <div class="cl-entry">
           <div class="cl-header">
-            <span class="cl-version">v1.9.4</span>
+            <span class="cl-version">v1.9.7</span>
             <span class="cl-date">May 30 2026</span>
             <span class="cl-badge cl-badge-fix">Fix</span>
           </div>
@@ -585,7 +585,7 @@ const COUNTRY_DATA=[
   ["Ireland","IE","IRL"],["Isle of Man","IM","IMN"],["Israel","IL","ISR"],["Italy","IT","ITA"],
   ["Jamaica","JM","JAM"],["Japan","JP","JPN"],["Jordan","JO","JOR"],["Kazakhstan","KZ","KAZ"],
   ["Kenya","KE","KEN"],["Kiribati","KI","KIR"],["Korea, Democratic People's Republic of","KP","PRK"],
-  ["Korea, Republic of","KR","KOR"],["Kuwait","KW","KWT"],["Kyrgyzstan","KG","KGZ"],
+  ["Korea, Republic of","KR","KOR"],["Kuwait","KW","KWT"],["Kosovo","XK","XKX"],["Kyrgyzstan","KG","KGZ"],
   ["Lao People's Democratic Republic","LA","LAO"],["Latvia","LV","LVA"],["Lebanon","LB","LBN"],
   ["Lesotho","LS","LSO"],["Liberia","LR","LBR"],["Libya","LY","LBY"],["Liechtenstein","LI","LIE"],
   ["Lithuania","LT","LTU"],["Luxembourg","LU","LUX"],["Macao","MO","MAC"],["Madagascar","MG","MDG"],
@@ -676,8 +676,42 @@ const COUNTRY_ALIASES={
   "s africa":"ZA","n macedonia":"MK","n. macedonia":"MK",
   "trinidad":"TT","tobago":"TT",
   "kyrgyzstan":"KG","kirghizstan":"KG",
+  "kosovo":"XK","republic of kosovo":"XK","kosova":"XK",
   "bosnia":"BA","herzegovina":"BA",
-  "laos":"LA","disputed territories":"PS"
+  "laos":"LA","disputed territories":"PS",
+  "columbia":"CO","columbia republic":"CO",
+  "afganistan":"AF","afganhistan":"AF",
+  "azerbajan":"AZ","azerbajian":"AZ",
+  "baharain":"BH","bangledesh":"BD","bangaladesh":"BD",
+  "bosinia":"BA","bosina":"BA","bulgeria":"BG",
+  "camboia":"KH","cameroun":"CM","costa-rica":"CR",
+  "czeck republic":"CZ","czechslovakia":"CZ","dominican-republic":"DO",
+  "equador":"EC","eucador":"EC","ethopia":"ET","ethoipia":"ET",
+  "gautemala":"GT","guatemela":"GT","hungry":"HU",
+  "indonisia":"ID","indoneshia":"ID","isreal":"IL","jamacia":"JM",
+  "kazakhastan":"KZ","kazakstan":"KZ","kyrgystan":"KG",
+  "libia":"LY","lybia":"LY","lithunia":"LT",
+  "malasia":"MY","malayasia":"MY",
+  "marocco":"MA","moroco":"MA","maroco":"MA","mozambic":"MZ",
+  "myanamar":"MM","myanmmar":"MM",
+  "nicaraga":"NI","nicargua":"NI","nigera":"NG","nigerai":"NG",
+  "pakstan":"PK","pakisten":"PK","palastine":"PS","palestin":"PS",
+  "paraguy":"PY","paraquay":"PY",
+  "phillipines":"PH","phillippines":"PH","filipines":"PH","philipines":"PH",
+  "portugul":"PT","portgual":"PT",
+  "romaina":"RO","rumania":"RO","roumania":"RO",
+  "saudiarabia":"SA","saudi-arabia":"SA","soudi arabia":"SA",
+  "senagal":"SN","seria":"RS","seriba":"RS",
+  "singapoure":"SG","singapour":"SG","slovokia":"SK","slavakia":"SK",
+  "srilanka":"LK","sri-lanka":"LK",
+  "switerland":"CH","switserland":"CH","swizerland":"CH",
+  "tajikstan":"TJ","tansania":"TZ","tanzinia":"TZ",
+  "tunesia":"TN","tunicia":"TN",
+  "ucraine":"UA","ukrane":"UA","ukrain":"UA",
+  "uraguay":"UY","uruguai":"UY","uzebekistan":"UZ","uzbeksitan":"UZ",
+  "venezuala":"VE","venezula":"VE","venuzuela":"VE",
+  "vietname":"VN","veitnam":"VN","yeman":"YE","yemem":"YE",
+  "zimbawbe":"ZW","zimabwe":"ZW","zimbabwee":"ZW"
 };
 
 // ─── MASTER PLACE LISTS ───────────────────────────────────────────────────────
@@ -934,7 +968,7 @@ function getEntry(type,place,who){return visits[`${type}|${place}|${who}`]||{sta
 function getPlaces(type){return type==='countries'?COUNTRIES:STATES;}
 
 // ─── STATUS CYCLE ─────────────────────────────────────────────────────────────
-const CYCLE=['none','visited','planned','candidate'];
+const CYCLE=['none','candidate','planned','visited'];
 const ICON={none:'○',visited:'✓',planned:'◷',candidate:'★'};
 async function cycleStatus(type,place,who){
   const e=getEntry(type,place,who);
@@ -1055,10 +1089,23 @@ function bestStatus(type,place){
   for(const s of order)for(const w of['laura','husband'])if(getEntry(type,place,w).status===s)return s;
   return'none';
 }
+function placeGroupScore(type,p){
+  const l=getEntry(type,p,'laura').status||'none';
+  const h=getEntry(type,p,'husband').status||'none';
+  const both=(s)=>l===s&&h===s;
+  const either=(s)=>l===s||h===s;
+  if(both('visited'))return 0;
+  if(either('visited'))return 1;
+  if(both('planned'))return 2;
+  if(either('planned'))return 3;
+  if(both('candidate'))return 4;
+  if(either('candidate'))return 5;
+  return 6;
+}
 function filteredPlaces(type){
   const f=filters[type];
   const q=(document.getElementById('search-'+type)||{value:''}).value.toLowerCase();
-  return getPlaces(type).filter(p=>{
+  const places=getPlaces(type).filter(p=>{
     const l=getEntry(type,p,'laura').status||'none',h=getEntry(type,p,'husband').status||'none';
     let show=true;
     if(f==='visited')show=l==='visited'||h==='visited';
@@ -1067,6 +1114,11 @@ function filteredPlaces(type){
     else if(f==='unvisited')show=l==='none'&&h==='none';
     if(show&&q)show=p.toLowerCase().includes(q);
     return show;
+  });
+  return places.sort((a,b)=>{
+    const ga=placeGroupScore(type,a),gb=placeGroupScore(type,b);
+    if(ga!==gb)return ga-gb;
+    return a.localeCompare(b);
   });
 }
 function getIsoCode(type,name){

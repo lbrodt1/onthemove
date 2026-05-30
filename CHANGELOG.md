@@ -3,6 +3,28 @@
 
 ---
 
+### v1.9.7 — May 30 2026
+**Improve: Status cycle + card sort order**
+- Status cycle reversed: none→candidate→planned→visited→none (visited goes to none in one click, planned goes to visited, candidate goes to planned)
+- Cards sorted by group: both visited → one visited → both planned → one planned → both candidate → one candidate → none
+- Alphabetical within each group
+
+---
+
+### v1.9.6 — May 30 2026
+**Improve: Common country misspellings**
+- Added 60+ common misspellings to alias map — Columbia, Phillipines, Isreal, etc. all resolve correctly
+- Covers the most Googled country misspellings in English
+
+---
+
+### v1.9.5 — May 30 2026
+**Fix: Kosovo recognition**
+- Added Kosovo (XK/XKX) to country list — not in ISO 3166 standard but widely recognized
+- Added aliases: kosovo, kosova, republic of kosovo all resolve to XK
+
+---
+
 ### v1.9.4 — May 30 2026
 **Fix: Regex syntax errors**
 - Removed all non-ASCII characters from regex patterns — were causing SyntaxError in strict JS environments
@@ -22,7 +44,7 @@
 - Fixed split regex in previewRemove broken across lines (root SyntaxError)
 - Script now passes Node.js syntax validation cleanly
 - Removed ALL non-ASCII characters from script — Cyrillic/Japanese/symbols in alias map were crashing JS parser
-- Cleaned COUNTRY_ALIASES to ASCII/unicode escapes only that was silently killing the entire script on load — root cause of persistent connection failures
+- Cleaned COUNTRY_ALIASES to ASCII/unicode escapes only
 
 ---
 
@@ -116,4 +138,3 @@
 - Goal setting with progress bar
 - Grid view with search and filter
 - localStorage persistence
-
