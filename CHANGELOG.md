@@ -3,6 +3,21 @@
 
 ---
 
+### v2.1.1 — Jun 06 2026
+**Improve: Unique participant names**
+- New participants must have a unique name — duplicate names (case-insensitive) are blocked with a prompt to rename
+
+---
+
+### v2.1.0 — Jun 06 2026
+**Fix + Improve: Add-participant reliability + manual sort**
+- Fixed add-participant silently resetting to Laura/Faron defaults — settings reads use maybeSingle() and surface errors instead of wiping the list
+- Participant saves now report DB failures instead of failing silently; upsert pinned to onConflict:'id'
+- Sorting is now manual — click the ↕ Sort button to re-sort cards; button pulses gold when a re-sort is available
+- Removed the 2-second auto-sort debounce
+
+---
+
 ### v2.0.7 — May 30 2026
 **Improve: Leaderboard bar + tooltip**
 - Progress bar taller and wider — easier to read at a glance

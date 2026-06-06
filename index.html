@@ -92,6 +92,9 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 .fbtn:hover{border-color:var(--gold);color:var(--ink)}
 .fbtn.fa{color:white;border-color:transparent}
 .fbtn.fv{background:var(--visited)}.fbtn.fp{background:var(--planned)}.fbtn.fc{background:var(--candidate)}.fbtn.fu{background:var(--ink)}.fbtn.fall{background:var(--ink)}
+.fbtn.sort-btn{border-color:var(--gold);color:var(--gold);font-weight:500}
+.fbtn.sort-btn:hover{background:var(--gold);color:white}
+.fbtn.sort-btn.pending{background:var(--gold);color:white;animation:pulse 1.2s infinite}
 
 /* ADD PANEL */
 .add-panel{background:var(--parchment);border:1px dashed var(--border);border-radius:4px;padding:12px 16px;margin-bottom:14px}
@@ -212,7 +215,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.7</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.1</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -223,7 +226,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.0.7</span>
+  <span class="nav-version">v2.1.1</span>
 </nav>
 <main>
   <div class="legend">
@@ -243,6 +246,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries..." oninput="renderTab('countries')"/></div>
       <div class="fbtns" id="fbtns-countries"></div>
+      <button class="fbtn sort-btn" id="sort-btn-countries" onclick="sortNow('countries')" title="Re-sort cards by status">↕ Sort</button>
     </div>
     <div class="add-panel">
       <h4>+ Add Entry</h4>
@@ -315,6 +319,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states..." oninput="renderTab('states')"/></div>
       <div class="fbtns" id="fbtns-states"></div>
+      <button class="fbtn sort-btn" id="sort-btn-states" onclick="sortNow('states')" title="Re-sort cards by status">↕ Sort</button>
     </div>
     <div class="add-panel">
       <h4>+ Add Entry</h4>
@@ -384,6 +389,19 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.1.1</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>New participants must have a unique name — duplicate names (case-insensitive) are now blocked with a prompt to rename</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.1.0</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-fix">Fix</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list">
+            <li>Fixed add-participant silently resetting to defaults — settings reads now use <code>maybeSingle()</code> and surface errors instead of wiping the list</li>
+            <li>Participant saves now report DB failures instead of failing silently; upsert pinned to <code>onConflict:'id'</code></li>
+            <li>Sorting is now manual — click the <code>↕ Sort</code> button to re-sort cards; the button pulses gold when a re-sort is available</li>
+            <li>Removed the 2-second auto-sort debounce — cards never jump on their own</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.0.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>Leaderboard progress bar taller and wider — easier to read at a glance</li><li>Hover tooltip shows one country per line</li></ul>
@@ -730,13 +748,18 @@ function setStatus(state,msg){
 
 async function loadAllData(){
   if(!sbClient)return;
-  // Load participants from settings
-  const{data:sData}=await sbClient.from('settings').select('*').eq('id','main').single();
-  if(sData&&sData.participants){
+  // Load participants from settings. maybeSingle() returns null (no error) for 0 rows,
+  // and errors for 2+ rows — which we surface instead of silently wiping to defaults.
+  const{data:sData,error:sErr}=await sbClient.from('settings').select('*').eq('id','main').maybeSingle();
+  if(sErr){
+    setStatus('offline','Settings read failed: '+(sErr.message||sErr.code)+' — keeping current list, NOT resetting');
+    console.error('[DB] loadAllData settings:',sErr);
+    // Do NOT overwrite the DB with defaults on a read error.
+  } else if(sData&&sData.participants){
     try{participants=JSON.parse(sData.participants);}catch(e){participants=defaultParticipants();}
   } else {
     participants=defaultParticipants();
-    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
+    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)},{onConflict:'id'});
   }
   // Load visits
   const{data:vData}=await sbClient.from('visits').select('*');
@@ -753,8 +776,17 @@ function defaultParticipants(){
 }
 
 async function saveParticipants(){
-  if(!sbClient)return;
-  await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
+  if(!sbClient){setStatus('offline','Not connected — participant not saved');return false;}
+  showSaving();
+  const{error}=await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)},{onConflict:'id'});
+  hideSaving();
+  if(error){
+    console.error('[DB] saveParticipants:',error);
+    setStatus('offline','Participant save failed: '+(error.message||error.code||'unknown'));
+    alert('Failed to save participant to the database:\n\n'+(error.message||error.code||JSON.stringify(error))+'\n\nThe change may not persist after reload.');
+    return false;
+  }
+  return true;
 }
 
 function subscribeRealtime(){
@@ -822,6 +854,14 @@ function closePersonModal(){document.getElementById('person-modal').classList.re
 async function savePersonModal(){
   const name=document.getElementById('modal-name').value.trim();
   if(!name)return;
+  // Enforce unique names (case-insensitive), ignoring the person being edited
+  const clash=participants.find(p=>p.id!==editingPersonId&&p.name.trim().toLowerCase()===name.toLowerCase());
+  if(clash){
+    alert('Someone is already named "'+clash.name+'". Please pick a different name.');
+    document.getElementById('modal-name').focus();
+    document.getElementById('modal-name').select();
+    return;
+  }
   const goalC=parseInt(document.getElementById('modal-goal-c').value)||50;
   const goalS=parseInt(document.getElementById('modal-goal-s').value)||50;
   const deadline=document.getElementById('modal-deadline').value.trim();
@@ -862,8 +902,7 @@ async function cycleStatus(type,place,who){
   const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
   renderTabNoSort(type); updateLeaderboard(type);
-  clearTimeout(sortDebounce);
-  sortDebounce=setTimeout(()=>renderTab(type),2000);
+  markSortPending(type);
   await saveVisit(type,place,who,ns,e.date);
 }
 async function setDate(type,place,who,date){
@@ -1048,7 +1087,11 @@ function renderTab(type){
   const places=filteredPlaces(type);
   if(!places.length){const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
   places.forEach(p=>grid.appendChild(makeCard(type,p)));
+  clearSortPending(type);
 }
+function sortNow(type){renderTab(type);}
+function markSortPending(type){const b=document.getElementById('sort-btn-'+type);if(b)b.classList.add('pending');}
+function clearSortPending(type){const b=document.getElementById('sort-btn-'+type);if(b)b.classList.remove('pending');}
 function renderTabNoSort(type){
   const grid=document.getElementById('grid-'+type);
   const places=filteredPlaces(type);
