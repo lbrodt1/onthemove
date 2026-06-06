@@ -162,6 +162,9 @@ select.add-inp{cursor:pointer;min-width:160px}
 .st-visited{color:white;border-color:var(--visited);background:var(--visited)}
 .st-planned{color:white;border-color:var(--planned);background:var(--planned)}
 .st-candidate{color:white;border-color:var(--candidate);background:var(--candidate)}
+.st-sel{font-family:'DM Mono',monospace;font-size:9px;font-weight:600;padding:1px 3px;border-radius:2px;border:1px solid;cursor:pointer;outline:none;max-width:80px;-webkit-appearance:none;appearance:none}
+.st-sel:focus{box-shadow:0 0 0 2px var(--gold-light)}
+.st-sel option{color:var(--ink);background:white;font-weight:500}
 .date-chip{font-size:9px;color:var(--muted);cursor:pointer;padding:1px 4px;border:1px dashed var(--border);border-radius:2px;white-space:nowrap}
 .date-chip:hover{border-color:var(--gold);color:var(--ink)}
 .date-chip.has-date{border-style:solid;color:var(--ink)}
@@ -215,7 +218,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.0</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -226,7 +229,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.1.1</span>
+  <span class="nav-version">v2.2.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -389,6 +392,13 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.2.0</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>Per-person status is now a dropdown (None / Candidate / Planned / Visited) instead of a click-to-cycle badge — defaults to the entry's current status</li>
+            <li>Selecting a country/state in the Add list now filters the grid below to that place; clearing the selection clears the filter</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.1.1</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>New participants must have a unique name — duplicate names (case-insensitive) are now blocked with a prompt to rename</li></ul>
@@ -696,8 +706,12 @@ function selectOption(type,name,code){
   document.getElementById('sel-dropdown-'+type).classList.remove('open');
   const tag=document.getElementById('sel-selected-'+type);
   tag.innerHTML=`<div class="sel-selected-tag">OK ${name} <span style="opacity:.6;font-size:9px">${code}</span><button onclick="clearSelection('${type}')">x</button></div>`;
+  // Filter the grid below to show the selected place
+  const searchEl=document.getElementById('search-'+type);
+  if(searchEl)searchEl.value=name;
+  filters[type]='all';buildFilterBtns(type);renderTab(type);
 }
-function clearSelection(type){selSelected[type]=null;document.getElementById('sel-search-'+type).value='';document.getElementById('sel-selected-'+type).innerHTML='';}
+function clearSelection(type){selSelected[type]=null;document.getElementById('sel-search-'+type).value='';document.getElementById('sel-selected-'+type).innerHTML='';const s=document.getElementById('search-'+type);if(s)s.value='';renderTab(type);}
 
 // ─── LOCAL STATE ─────────────────────────────────────────────────────────────
 // participants: [{id, name, color, goal_countries, goal_states, deadline_countries, deadline_states}]
@@ -905,6 +919,13 @@ async function cycleStatus(type,place,who){
   markSortPending(type);
   await saveVisit(type,place,who,ns,e.date);
 }
+async function changeStatus(type,place,who,status){
+  const e=getEntry(type,place,who);
+  visits[`${type}|${place}|${who}`]={status,date:e.date};
+  renderTabNoSort(type); updateLeaderboard(type); updatePeopleBar(type);
+  markSortPending(type);
+  await saveVisit(type,place,who,status,e.date);
+}
 async function setDate(type,place,who,date){
   const e=getEntry(type,place,who);
   visits[`${type}|${place}|${who}`]={status:e.status,date};
@@ -1059,9 +1080,12 @@ function makeCard(type,place){
     const wl=document.createElement('div');wl.className='person-who';
     wl.textContent=person.name;wl.style.color=person.color;
     row.appendChild(wl);
-    const stBtn=document.createElement('div');stBtn.className='st-btn st-'+st;
-    stBtn.textContent=ICON[st];stBtn.onclick=()=>cycleStatus(type,place,person.id);
-    row.appendChild(stBtn);
+    const stSel=document.createElement('select');stSel.className='st-sel st-'+st;
+    [['none','—'],['candidate','Candidate'],['planned','Planned'],['visited','Visited']].forEach(([val,label])=>{
+      const o=document.createElement('option');o.value=val;o.textContent=label;if(val===st)o.selected=true;stSel.appendChild(o);
+    });
+    stSel.onchange=ev=>{ev.stopPropagation();changeStatus(type,place,person.id,stSel.value);};
+    row.appendChild(stSel);
     if(st!=='none'){
       if(editing[k]){
         const de=document.createElement('div');de.className='date-edit';
