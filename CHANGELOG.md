@@ -3,25 +3,11 @@
 
 ---
 
-### v2.2.0 — Jun 06 2026
-**Feature: Status dropdown + select-to-filter**
-- Per-person status is now a dropdown (None / Candidate / Planned / Visited) instead of a click-to-cycle badge — defaults to the entry's current status
-- Selecting a country/state in the Add list now filters the grid below to that place; clearing the selection clears the filter
-
----
-
-### v2.1.1 — Jun 06 2026
-**Improve: Unique participant names**
-- New participants must have a unique name — duplicate names (case-insensitive) are blocked with a prompt to rename
-
----
-
-### v2.1.0 — Jun 06 2026
-**Fix + Improve: Add-participant reliability + manual sort**
-- Fixed add-participant silently resetting to Laura/Faron defaults — settings reads use maybeSingle() and surface errors instead of wiping the list
-- Participant saves now report DB failures instead of failing silently; upsert pinned to onConflict:'id'
-- Sorting is now manual — click the ↕ Sort button to re-sort cards; button pulses gold when a re-sort is available
-- Removed the 2-second auto-sort debounce
+### v2.0.8 — Jun 6 2026
+**Improve: Remove auto-sort on status change**
+- Cards no longer re-sort after clicking a status — they stay exactly in place
+- Removed the 2-second sort debounce entirely
+- Re-sort still happens on filter, search, add, or page reload
 
 ---
 

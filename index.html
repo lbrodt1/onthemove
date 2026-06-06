@@ -92,9 +92,6 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 .fbtn:hover{border-color:var(--gold);color:var(--ink)}
 .fbtn.fa{color:white;border-color:transparent}
 .fbtn.fv{background:var(--visited)}.fbtn.fp{background:var(--planned)}.fbtn.fc{background:var(--candidate)}.fbtn.fu{background:var(--ink)}.fbtn.fall{background:var(--ink)}
-.fbtn.sort-btn{border-color:var(--gold);color:var(--gold);font-weight:500}
-.fbtn.sort-btn:hover{background:var(--gold);color:white}
-.fbtn.sort-btn.pending{background:var(--gold);color:white;animation:pulse 1.2s infinite}
 
 /* ADD PANEL */
 .add-panel{background:var(--parchment);border:1px dashed var(--border);border-radius:4px;padding:12px 16px;margin-bottom:14px}
@@ -162,9 +159,6 @@ select.add-inp{cursor:pointer;min-width:160px}
 .st-visited{color:white;border-color:var(--visited);background:var(--visited)}
 .st-planned{color:white;border-color:var(--planned);background:var(--planned)}
 .st-candidate{color:white;border-color:var(--candidate);background:var(--candidate)}
-.st-sel{font-family:'DM Mono',monospace;font-size:9px;font-weight:600;padding:1px 3px;border-radius:2px;border:1px solid;cursor:pointer;outline:none;max-width:80px;-webkit-appearance:none;appearance:none}
-.st-sel:focus{box-shadow:0 0 0 2px var(--gold-light)}
-.st-sel option{color:var(--ink);background:white;font-weight:500}
 .date-chip{font-size:9px;color:var(--muted);cursor:pointer;padding:1px 4px;border:1px dashed var(--border);border-radius:2px;white-space:nowrap}
 .date-chip:hover{border-color:var(--gold);color:var(--ink)}
 .date-chip.has-date{border-style:solid;color:var(--ink)}
@@ -218,7 +212,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.0.8</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
@@ -229,7 +223,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.2.0</span>
+  <span class="nav-version">v2.0.8</span>
 </nav>
 <main>
   <div class="legend">
@@ -249,7 +243,6 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries..." oninput="renderTab('countries')"/></div>
       <div class="fbtns" id="fbtns-countries"></div>
-      <button class="fbtn sort-btn" id="sort-btn-countries" onclick="sortNow('countries')" title="Re-sort cards by status">↕ Sort</button>
     </div>
     <div class="add-panel">
       <h4>+ Add Entry</h4>
@@ -322,7 +315,6 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states..." oninput="renderTab('states')"/></div>
       <div class="fbtns" id="fbtns-states"></div>
-      <button class="fbtn sort-btn" id="sort-btn-states" onclick="sortNow('states')" title="Re-sort cards by status">↕ Sort</button>
     </div>
     <div class="add-panel">
       <h4>+ Add Entry</h4>
@@ -393,24 +385,8 @@ select.add-inp{cursor:pointer;min-width:160px}
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
         <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.2.0</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
-          <ul class="cl-list">
-            <li>Per-person status is now a dropdown (None / Candidate / Planned / Visited) instead of a click-to-cycle badge — defaults to the entry's current status</li>
-            <li>Selecting a country/state in the Add list now filters the grid below to that place; clearing the selection clears the filter</li>
-          </ul>
-        </div>
-        <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.1.1</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
-          <ul class="cl-list"><li>New participants must have a unique name — duplicate names (case-insensitive) are now blocked with a prompt to rename</li></ul>
-        </div>
-        <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.1.0</span><span class="cl-date">Jun 06 2026</span><span class="cl-badge cl-badge-fix">Fix</span><span class="cl-badge cl-badge-improve">Improve</span></div>
-          <ul class="cl-list">
-            <li>Fixed add-participant silently resetting to defaults — settings reads now use <code>maybeSingle()</code> and surface errors instead of wiping the list</li>
-            <li>Participant saves now report DB failures instead of failing silently; upsert pinned to <code>onConflict:'id'</code></li>
-            <li>Sorting is now manual — click the <code>↕ Sort</code> button to re-sort cards; the button pulses gold when a re-sort is available</li>
-            <li>Removed the 2-second auto-sort debounce — cards never jump on their own</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v2.0.8</span><span class="cl-date">Jun 6 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Auto-sort on status change removed — cards stay exactly where they are when you click through statuses</li><li>Re-sort still runs on filter, search, add, or reload</li></ul>
         </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.0.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
@@ -706,12 +682,8 @@ function selectOption(type,name,code){
   document.getElementById('sel-dropdown-'+type).classList.remove('open');
   const tag=document.getElementById('sel-selected-'+type);
   tag.innerHTML=`<div class="sel-selected-tag">OK ${name} <span style="opacity:.6;font-size:9px">${code}</span><button onclick="clearSelection('${type}')">x</button></div>`;
-  // Filter the grid below to show the selected place
-  const searchEl=document.getElementById('search-'+type);
-  if(searchEl)searchEl.value=name;
-  filters[type]='all';buildFilterBtns(type);renderTab(type);
 }
-function clearSelection(type){selSelected[type]=null;document.getElementById('sel-search-'+type).value='';document.getElementById('sel-selected-'+type).innerHTML='';const s=document.getElementById('search-'+type);if(s)s.value='';renderTab(type);}
+function clearSelection(type){selSelected[type]=null;document.getElementById('sel-search-'+type).value='';document.getElementById('sel-selected-'+type).innerHTML='';}
 
 // ─── LOCAL STATE ─────────────────────────────────────────────────────────────
 // participants: [{id, name, color, goal_countries, goal_states, deadline_countries, deadline_states}]
@@ -762,18 +734,13 @@ function setStatus(state,msg){
 
 async function loadAllData(){
   if(!sbClient)return;
-  // Load participants from settings. maybeSingle() returns null (no error) for 0 rows,
-  // and errors for 2+ rows — which we surface instead of silently wiping to defaults.
-  const{data:sData,error:sErr}=await sbClient.from('settings').select('*').eq('id','main').maybeSingle();
-  if(sErr){
-    setStatus('offline','Settings read failed: '+(sErr.message||sErr.code)+' — keeping current list, NOT resetting');
-    console.error('[DB] loadAllData settings:',sErr);
-    // Do NOT overwrite the DB with defaults on a read error.
-  } else if(sData&&sData.participants){
+  // Load participants from settings
+  const{data:sData}=await sbClient.from('settings').select('*').eq('id','main').single();
+  if(sData&&sData.participants){
     try{participants=JSON.parse(sData.participants);}catch(e){participants=defaultParticipants();}
   } else {
     participants=defaultParticipants();
-    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)},{onConflict:'id'});
+    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
   }
   // Load visits
   const{data:vData}=await sbClient.from('visits').select('*');
@@ -790,17 +757,8 @@ function defaultParticipants(){
 }
 
 async function saveParticipants(){
-  if(!sbClient){setStatus('offline','Not connected — participant not saved');return false;}
-  showSaving();
-  const{error}=await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)},{onConflict:'id'});
-  hideSaving();
-  if(error){
-    console.error('[DB] saveParticipants:',error);
-    setStatus('offline','Participant save failed: '+(error.message||error.code||'unknown'));
-    alert('Failed to save participant to the database:\n\n'+(error.message||error.code||JSON.stringify(error))+'\n\nThe change may not persist after reload.');
-    return false;
-  }
-  return true;
+  if(!sbClient)return;
+  await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
 }
 
 function subscribeRealtime(){
@@ -868,14 +826,6 @@ function closePersonModal(){document.getElementById('person-modal').classList.re
 async function savePersonModal(){
   const name=document.getElementById('modal-name').value.trim();
   if(!name)return;
-  // Enforce unique names (case-insensitive), ignoring the person being edited
-  const clash=participants.find(p=>p.id!==editingPersonId&&p.name.trim().toLowerCase()===name.toLowerCase());
-  if(clash){
-    alert('Someone is already named "'+clash.name+'". Please pick a different name.');
-    document.getElementById('modal-name').focus();
-    document.getElementById('modal-name').select();
-    return;
-  }
   const goalC=parseInt(document.getElementById('modal-goal-c').value)||50;
   const goalS=parseInt(document.getElementById('modal-goal-s').value)||50;
   const deadline=document.getElementById('modal-deadline').value.trim();
@@ -916,15 +866,7 @@ async function cycleStatus(type,place,who){
   const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
   renderTabNoSort(type); updateLeaderboard(type);
-  markSortPending(type);
   await saveVisit(type,place,who,ns,e.date);
-}
-async function changeStatus(type,place,who,status){
-  const e=getEntry(type,place,who);
-  visits[`${type}|${place}|${who}`]={status,date:e.date};
-  renderTabNoSort(type); updateLeaderboard(type); updatePeopleBar(type);
-  markSortPending(type);
-  await saveVisit(type,place,who,status,e.date);
 }
 async function setDate(type,place,who,date){
   const e=getEntry(type,place,who);
@@ -1080,12 +1022,9 @@ function makeCard(type,place){
     const wl=document.createElement('div');wl.className='person-who';
     wl.textContent=person.name;wl.style.color=person.color;
     row.appendChild(wl);
-    const stSel=document.createElement('select');stSel.className='st-sel st-'+st;
-    [['none','—'],['candidate','Candidate'],['planned','Planned'],['visited','Visited']].forEach(([val,label])=>{
-      const o=document.createElement('option');o.value=val;o.textContent=label;if(val===st)o.selected=true;stSel.appendChild(o);
-    });
-    stSel.onchange=ev=>{ev.stopPropagation();changeStatus(type,place,person.id,stSel.value);};
-    row.appendChild(stSel);
+    const stBtn=document.createElement('div');stBtn.className='st-btn st-'+st;
+    stBtn.textContent=ICON[st];stBtn.onclick=()=>cycleStatus(type,place,person.id);
+    row.appendChild(stBtn);
     if(st!=='none'){
       if(editing[k]){
         const de=document.createElement('div');de.className='date-edit';
@@ -1111,11 +1050,7 @@ function renderTab(type){
   const places=filteredPlaces(type);
   if(!places.length){const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
   places.forEach(p=>grid.appendChild(makeCard(type,p)));
-  clearSortPending(type);
 }
-function sortNow(type){renderTab(type);}
-function markSortPending(type){const b=document.getElementById('sort-btn-'+type);if(b)b.classList.add('pending');}
-function clearSortPending(type){const b=document.getElementById('sort-btn-'+type);if(b)b.classList.remove('pending');}
 function renderTabNoSort(type){
   const grid=document.getElementById('grid-'+type);
   const places=filteredPlaces(type);
