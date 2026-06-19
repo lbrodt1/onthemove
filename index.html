@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.all.min.js"></script>
 <style>
 :root{
   --ink:#1a1612;--parchment:#f5f0e8;--cream:#faf7f2;
@@ -230,7 +230,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.0</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -242,7 +242,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.1.0</span>
+  <span class="nav-version">v2.2.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -400,8 +400,8 @@ select.add-inp{cursor:pointer;min-width:160px}
 
   <!-- MAP -->
   <div id="panel-map" class="panel">
-    <div class="section-hdr"><h2>World Map</h2></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click a name to view their map. Colours match the tracker — <span style="color:var(--visited);font-weight:500">visited</span> · <span style="color:var(--planned);font-weight:500">planned</span> · <span style="color:var(--candidate);font-weight:500">candidate</span>.</div>
+    <div class="section-hdr" style="display:flex;align-items:center;gap:12px"><h2 id="map-title">World Map</h2><button id="map-back" class="btn-secondary" style="display:none" onclick="goToWorld()">← Back to world</button></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click a name to view their map. Click the <b>United States</b> to zoom into the states. Colours match the tracker — <span style="color:var(--visited);font-weight:500">visited</span> · <span style="color:var(--planned);font-weight:500">planned</span> · <span style="color:var(--candidate);font-weight:500">candidate</span>.</div>
     <div id="map-people" class="people-bar"></div>
     <div class="map-wrap"><div id="worldmap"></div></div>
     <div class="section-hdr"><h2>Continents</h2></div>
@@ -414,6 +414,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.2.0</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list"><li>Click the United States on the Map to zoom into a state-by-state view, coloured by visited / planned / candidate</li><li>"← Back to world" button returns from the state view</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.1.0</span><span class="cl-date">Jun 6 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list"><li>New Map tab — click a name to see that person's world map, coloured to match their visited / planned / candidate countries</li><li>Continents summary — each continent lights up once at least one of its countries is visited, with per-continent counts</li></ul>
@@ -741,7 +745,7 @@ let visits={}, participants=[];
 let editing={}, filters={countries:'all',states:'all'};
 let focusPerson=null; // null = show all, else personId
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
-let mapPerson=null, worldMap=null;
+let mapPerson=null, worldMap=null, mapScope='world';
 let bulkResolved={countries:[],states:[]};
 let removeResolved={countries:[],states:[]};
 
@@ -1184,6 +1188,17 @@ function worldFillData(){
   });
   return d;
 }
+// Build {postalAbbr:{fillKey,statusLabel}} for the selected person's US states
+function usaFillData(){
+  const d={};
+  if(!mapPerson)return d;
+  STATE_DATA.forEach(s=>{
+    const st=getEntry('states',s[0],mapPerson).status||'none';
+    if(st!=='none')d[s[1]]={fillKey:st,statusLabel:st.charAt(0).toUpperCase()+st.slice(1)};
+  });
+  return d;
+}
+let mapResizeBound=false;
 function renderWorldMap(){
   const el=document.getElementById('worldmap');
   if(!el)return;
@@ -1191,29 +1206,46 @@ function renderWorldMap(){
     el.innerHTML='<div class="map-fallback">Map library couldn\u2019t load (check your connection). The continent summary below still works.</div>';
     return;
   }
-  const data=worldFillData();
-  if(!worldMap){
-    if(!el.offsetWidth)return; // not visible yet — switchTab retries when shown
-    worldMap=new Datamap({
-      element:el,
-      responsive:true,
-      projection:'mercator',
-      fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a'},
-      data:data,
-      geographyConfig:{
-        popupOnHover:true,highlightOnHover:false,
-        borderColor:'#d4c9b8',borderWidth:0.3,
-        popupTemplate:function(geo,d){
-          const st=(d&&d.statusLabel)?d.statusLabel:'None';
-          return'<div class="hoverinfo"><b>'+geo.properties.name+'</b><br>'+st+'</div>';
-        }
+  if(!el.offsetWidth)return; // not visible yet — switchTab retries when shown
+  // Recreate the map each render so we can switch between world and US views
+  el.innerHTML='';
+  worldMap=null;
+  const isUsa=mapScope==='usa';
+  const data=isUsa?usaFillData():worldFillData();
+  worldMap=new Datamap({
+    element:el,
+    responsive:true,
+    scope:isUsa?'usa':'world',
+    projection:isUsa?'albersUsa':'mercator',
+    fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a'},
+    data:data,
+    geographyConfig:{
+      popupOnHover:true,highlightOnHover:false,
+      borderColor:'#d4c9b8',borderWidth:0.3,
+      popupTemplate:function(geo,d){
+        const st=(d&&d.statusLabel)?d.statusLabel:'None';
+        return'<div class="hoverinfo"><b>'+geo.properties.name+'</b><br>'+st+'</div>';
       }
-    });
+    },
+    done:function(dm){
+      if(!isUsa){
+        dm.svg.selectAll('.datamaps-subunit').on('click',function(geo){
+          if(geo&&geo.id==='USA'){mapScope='usa';renderMapTab();}
+        });
+        dm.svg.selectAll('.USA').style('cursor','pointer');
+      }
+    }
+  });
+  if(!mapResizeBound){
     window.addEventListener('resize',()=>{if(worldMap&&worldMap.resize)worldMap.resize();});
-  }else{
-    worldMap.updateChoropleth(data,{reset:true});
+    mapResizeBound=true;
   }
+  const back=document.getElementById('map-back');
+  const title=document.getElementById('map-title');
+  if(back)back.style.display=isUsa?'inline-block':'none';
+  if(title)title.textContent=isUsa?'United States — by state':'World Map';
 }
+function goToWorld(){mapScope='world';renderMapTab();}
 function renderContinents(){
   const wrap=document.getElementById('continent-tiles');
   if(!wrap)return;

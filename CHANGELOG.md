@@ -3,6 +3,14 @@
 
 ---
 
+### v2.2.0 — Jun 19 2026
+**Feature: Drill into US states from the map**
+- Click the United States on the Map tab to zoom into a state-by-state view
+- States coloured by the selected person's visited / planned / candidate status
+- "Back to world" button returns to the world map
+
+---
+
 ### v2.1.0 — Jun 6 2026
 **Feature: World map + continents**
 - New Map tab with a per-person world map (d3 + datamaps), coloured to match visited / planned / candidate
