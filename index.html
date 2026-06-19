@@ -6,11 +6,9 @@
 <title>On the Move — The Travel Tally</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Interactive maps (jsvectormap 1.7.0) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/css/jsvectormap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/js/jsvectormap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/maps/world.js"></script>
-<script src="us-states-map.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js"></script>
 <style>
 :root{
   --ink:#1a1612;--parchment:#f5f0e8;--cream:#faf7f2;
@@ -194,26 +192,22 @@ select.add-inp{cursor:pointer;min-width:160px}
 .cl-list li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.5}
 .cl-list li::before{content:'·';position:absolute;left:0;color:var(--gold);font-weight:700}
 .cl-list code{background:var(--parchment);padding:1px 4px;border-radius:2px;font-size:11px;color:var(--ink)}
-/* VIEW TOGGLE (Grid / Map) */
-.view-toggle{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.vt-tabs{display:inline-flex;border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.vt-tabs button{background:white;border:none;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;cursor:pointer;color:var(--muted);transition:all .15s}
-.vt-tabs button:last-child{border-right:none}
-.vt-tabs button.active{background:var(--ink);color:var(--parchment)}
-.map-view{display:none}
-.map-view.show{display:block}
-.grid-view{display:block}
-.grid-view.hide{display:none}
-.map-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:8px 12px}
-.map-controls label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.map-controls select{padding:5px 9px;border:1px solid var(--border);border-radius:4px;background:white;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);outline:none;cursor:pointer}
-.map-controls select:focus{border-color:var(--gold)}
-.map-controls .mc-dot{width:9px;height:9px;border-radius:50%;display:inline-block;vertical-align:middle}
-.map-hint{font-size:10px;color:var(--muted);letter-spacing:.04em}
-.map-box{position:relative;width:100%;height:560px;background:var(--cream);border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.map-box .jvm-container{background:var(--cream)}
-.map-box svg{cursor:pointer}
-@media(max-width:600px){header{padding:12px}.main{padding:12px 10px}nav{padding:0 8px}.place-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.map-box{height:380px}}
+/* MAP & CONTINENTS */
+.map-wrap{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:18px}
+#worldmap{position:relative;width:100%;height:520px}
+.map-fallback{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px;text-align:center;padding:20px}
+.continent-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:24px}
+.cont-tile{border:1px solid var(--border);border-left:4px solid var(--border);border-radius:4px;padding:9px 12px;background:white;display:flex;flex-direction:column;gap:2px}
+.cont-tile.ct-visited{border-left-color:var(--visited);background:#eef2ec}
+.cont-tile.ct-planned{border-left-color:var(--planned);background:#fdf6e7}
+.cont-tile.ct-candidate{border-left-color:var(--candidate);background:#f1eef6}
+.cont-tile.ct-none{border-left-color:var(--none-col)}
+.cont-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--ink)}
+.cont-count{font-size:13px;color:var(--ink)}
+.cont-sub{font-size:10px;color:var(--muted);min-height:12px;letter-spacing:.03em}
+.hoverinfo{background:var(--ink)!important;color:var(--parchment)!important;border:1px solid var(--gold)!important;border-radius:3px!important;font-family:'DM Mono',monospace!important;font-size:11px!important;padding:5px 9px!important;box-shadow:0 2px 8px rgba(0,0,0,.3)!important}
+.hoverinfo b{color:var(--gold-light)}
+@media(max-width:600px){#worldmap{height:340px}header{padding:12px}.main{padding:12px 10px}nav{padding:0 8px}.place-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 </style>
 </head>
 <body>
@@ -239,13 +233,14 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.0</span></div>
   </div>
   <div class="header-right">
-    <span id="conn-status" class="conn-status cs-connecting">Connecting...</span>
-    <div id="debug-panel" style="background:#1a1612;border:1px solid #333;border-radius:3px;padding:5px 9px;max-height:100px;overflow-y:auto;width:100%;max-width:500px;font-family:monospace;color:#e8c97a;font-size:10px;margin-top:3px"></div>
+    <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
+    <div id="debug-panel" style="display:none;background:#1a1612;border:1px solid #333;border-radius:3px;padding:5px 9px;max-height:100px;overflow-y:auto;width:100%;max-width:500px;font-family:monospace;color:#e8c97a;font-size:10px;margin-top:3px"></div>
   </div>
 </header>
 <nav>
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
+  <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
   <span class="nav-version">v2.1.0</span>
 </nav>
@@ -263,14 +258,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <div id="panel-countries" class="panel active">
     <div id="people-bar-countries" class="people-bar"></div>
     <div id="leaderboard-countries" class="leaderboard"></div>
-    <div class="view-toggle">
-      <div class="vt-tabs">
-        <button class="active" onclick="switchView('countries','grid',this)">▦ Grid</button>
-        <button onclick="switchView('countries','map',this)">🗺 Map</button>
-      </div>
-    </div>
     <div class="section-hdr"><h2>Countries of the World</h2></div>
-    <div class="grid-view" id="gridview-countries">
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-countries" placeholder="Search countries..." oninput="renderTab('countries')"/></div>
       <div class="fbtns" id="fbtns-countries"></div>
@@ -336,29 +324,13 @@ select.add-inp{cursor:pointer;min-width:160px}
       </div>
     </div>
     <div class="place-grid" id="grid-countries"></div>
-    </div><!-- /grid-view -->
-    <div class="map-view" id="mapview-countries">
-      <div class="map-controls">
-        <label>Click to set status for:</label>
-        <select id="mapsel-countries" onchange="onMapPersonChange('countries')"></select>
-        <span class="map-hint">Click a country to cycle None → Candidate → Planned → Visited.</span>
-      </div>
-      <div class="map-box" id="map-countries"></div>
-    </div>
   </div>
 
   <!-- STATES -->
   <div id="panel-states" class="panel">
     <div id="people-bar-states" class="people-bar"></div>
     <div id="leaderboard-states" class="leaderboard"></div>
-    <div class="view-toggle">
-      <div class="vt-tabs">
-        <button class="active" onclick="switchView('states','grid',this)">▦ Grid</button>
-        <button onclick="switchView('states','map',this)">🗺 Map</button>
-      </div>
-    </div>
     <div class="section-hdr"><h2>United States</h2></div>
-    <div class="grid-view" id="gridview-states">
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-states" placeholder="Search states..." oninput="renderTab('states')"/></div>
       <div class="fbtns" id="fbtns-states"></div>
@@ -424,15 +396,17 @@ select.add-inp{cursor:pointer;min-width:160px}
       </div>
     </div>
     <div class="place-grid" id="grid-states"></div>
-    </div><!-- /grid-view -->
-    <div class="map-view" id="mapview-states">
-      <div class="map-controls">
-        <label>Click to set status for:</label>
-        <select id="mapsel-states" onchange="onMapPersonChange('states')"></select>
-        <span class="map-hint">Click a state to cycle None → Candidate → Planned → Visited.</span>
-      </div>
-      <div class="map-box" id="map-states"></div>
-    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="panel-map" class="panel">
+    <div class="section-hdr"><h2>World Map</h2></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click a name to view their map. Colours match the tracker — <span style="color:var(--visited);font-weight:500">visited</span> · <span style="color:var(--planned);font-weight:500">planned</span> · <span style="color:var(--candidate);font-weight:500">candidate</span>.</div>
+    <div id="map-people" class="people-bar"></div>
+    <div class="map-wrap"><div id="worldmap"></div></div>
+    <div class="section-hdr"><h2>Continents</h2></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">A continent lights up once at least one of its countries is visited.</div>
+    <div id="continent-tiles" class="continent-strip"></div>
   </div>
 
   <!-- CHANGELOG -->
@@ -441,13 +415,16 @@ select.add-inp{cursor:pointer;min-width:160px}
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
         <div class="cl-entry">
-          <div class="cl-header"><span class="cl-version">v2.1.0</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
-          <ul class="cl-list">
-            <li>Interactive maps — a <code>🗺 Map</code> view on both Countries and US States</li>
-            <li>Click a region to cycle its status (None → Candidate → Planned → Visited)</li>
-            <li>Map colors by status and stays in sync with the grid, leaderboard, and live updates</li>
-            <li>Pick whose statuses the map shows and edits via the person selector</li>
-          </ul>
+          <div class="cl-header"><span class="cl-version">v2.1.0</span><span class="cl-date">Jun 6 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list"><li>New Map tab — click a name to see that person's world map, coloured to match their visited / planned / candidate countries</li><li>Continents summary — each continent lights up once at least one of its countries is visited, with per-continent counts</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.9</span><span class="cl-date">Jun 6 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Connection log hidden by default — click the status pill to expand it when needed</li><li>Connection test and saves now time out instead of hanging silently — a failed save shows "Offline / Save failed" instead of vanishing</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.0.8</span><span class="cl-date">Jun 6 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Auto-sort on status change removed — cards stay exactly where they are when you click through statuses</li><li>Re-sort still runs on filter, search, add, or reload</li></ul>
         </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.0.7</span><span class="cl-date">May 30 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
@@ -678,6 +655,17 @@ const COUNTRY_BY_ISO2 = Object.fromEntries(COUNTRY_DATA.map(d=>[d[1].toUpperCase
 const COUNTRY_BY_ISO3 = Object.fromEntries(COUNTRY_DATA.map(d=>[d[2].toUpperCase(),d[0]]));
 const STATE_BY_ABBR  = Object.fromEntries(STATE_DATA.map(d=>[d[1].toUpperCase(),d[0]]));
 
+// ─── CONTINENTS (verified: all 234 countries covered exactly once) ───────────
+const CONTINENT_ORDER=["Africa","Asia","Europe","North America","South America","Oceania"];
+const CONTINENTS={
+  "Africa":["DZ","AO","BJ","BW","BF","BI","CV","CM","CF","TD","KM","CG","CD","CI","DJ","EG","GQ","ER","SZ","ET","GA","GM","GH","GN","GW","KE","LS","LR","LY","MG","MW","ML","MR","MU","YT","MA","MZ","NA","NE","NG","RE","RW","ST","SN","SC","SL","SO","ZA","SS","SD","TZ","TG","TN","UG","EH","ZM","ZW"],
+  "Asia":["AF","AM","AZ","BH","BD","BT","BN","KH","CN","GE","HK","IN","ID","IR","IQ","IL","JP","JO","KZ","KP","KR","KW","KG","LA","LB","MO","MY","MV","MN","MM","NP","OM","PK","PS","PH","QA","SA","SG","LK","SY","TW","TJ","TH","TL","TR","TM","AE","UZ","VN","YE"],
+  "Europe":["AL","AD","AT","BY","BE","BA","BG","HR","CY","CZ","DK","EE","FO","FI","FR","DE","GI","GR","HU","IS","IE","IM","IT","XK","LV","LI","LT","LU","MT","MD","MC","ME","MK","NL","NO","PL","PT","RO","RU","SM","RS","SK","SI","ES","SE","CH","UA","GB","VA"],
+  "North America":["AI","AG","AW","BS","BB","BZ","BM","BQ","CA","KY","CR","CU","CW","DM","DO","SV","GL","GD","GP","GT","HT","HN","JM","MQ","MX","MS","NI","PA","PR","KN","LC","MF","VC","SX","TC","TT","US","VG","VI"],
+  "South America":["AR","BO","BR","CL","CO","EC","FK","GF","GY","PY","PE","GS","SR","UY","VE"],
+  "Oceania":["AS","AU","CK","FJ","PF","GU","KI","MH","FM","NC","NZ","NU","NF","MP","NR","PW","PG","WS","SB","TO","TV","UM","VU","WF"]
+};
+
 // ─── FUZZY RESOLVE ────────────────────────────────────────────────────────────
 function norm(s){
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
@@ -753,6 +741,7 @@ let visits={}, participants=[];
 let editing={}, filters={countries:'all',states:'all'};
 let focusPerson=null; // null = show all, else personId
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
+let mapPerson=null, worldMap=null;
 let bulkResolved={countries:[],states:[]};
 let removeResolved={countries:[],states:[]};
 
@@ -774,7 +763,7 @@ async function initSupabase(url,key){
     setStatus('connecting','Creating client...');
     sbClient=window.supabase.createClient(url,key);
     setStatus('connecting','Testing query...');
-    const{data,error}=await sbClient.from('settings').select('id').limit(1);
+    const{data,error}=await withTimeout(sbClient.from('settings').select('id').limit(1),6000,'Connection test');
     setStatus('connecting','Got: '+JSON.stringify(data)+' err:'+JSON.stringify(error));
     if(error)throw error;
     setStatus('online','Live OK');
@@ -782,15 +771,23 @@ async function initSupabase(url,key){
     subscribeRealtime();
   }catch(e){
     console.error('[DB] init failed:',e);
-    setStatus('offline','Failed: '+(e.message||e.code||JSON.stringify(e)));
+    setStatus('offline','Offline — DB unreachable','Init failed: '+(e.message||e.code||JSON.stringify(e)));
     sbClient=null;
   }
 }
-function setStatus(state,msg){
+function setStatus(state,msg,detail){
   const el=document.getElementById('conn-status');
   el.textContent=msg; el.className='conn-status cs-'+state;
   const dbg=document.getElementById('debug-panel');
-  if(dbg){const line=document.createElement('div');line.style.cssText='font-size:10px;padding:2px 0;border-bottom:1px solid #333;word-break:break-all';line.textContent=new Date().toISOString().substr(11,8)+' ['+state+'] '+msg;dbg.insertBefore(line,dbg.firstChild);}
+  if(dbg){const line=document.createElement('div');line.style.cssText='font-size:10px;padding:2px 0;border-bottom:1px solid #333;word-break:break-all';line.textContent=new Date().toISOString().substr(11,8)+' ['+state+'] '+(detail||msg);dbg.insertBefore(line,dbg.firstChild);}
+}
+function toggleDebug(){const d=document.getElementById('debug-panel');if(d)d.style.display=(d.style.display==='none'||!d.style.display)?'block':'none';}
+// Reject if a request hangs longer than ms — turns a silent hang into a clear offline state
+function withTimeout(promise,ms,label){
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error((label||'Request')+' timed out after '+(ms/1000)+'s — database unreachable')),ms))
+  ]);
 }
 
 async function loadAllData(){
@@ -830,6 +827,8 @@ function subscribeRealtime(){
       if(eventType==='DELETE'&&old){delete visits[`${old.type}|${old.place}|${old.who}`];}
       else if(row){visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};}
       ['countries','states'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
+      const mp=document.getElementById('panel-map');
+      if(mp&&mp.classList.contains('active'))renderMapTab();
     })
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},payload=>{
       if(payload.new&&payload.new.participants){
@@ -843,19 +842,27 @@ function subscribeRealtime(){
 }
 
 async function saveVisit(type,place,who,status,date){
-  if(!sbClient)return false;
+  if(!sbClient){setStatus('offline','Offline — not saved','saveVisit skipped: no DB connection');return false;}
   showSaving();
-  const{error}=await sbClient.from('visits').upsert(
-    {type,place,who,status,date_label:date||null,is_custom:false},
-    {onConflict:'type,place,who'}
-  );
-  hideSaving();
-  if(error){
-    console.error('[DB] saveVisit:',error);
-    setStatus('offline','Save failed: '+(error.message||error.code));
+  try{
+    const{error}=await withTimeout(sbClient.from('visits').upsert(
+      {type,place,who,status,date_label:date||null,is_custom:false},
+      {onConflict:'type,place,who'}
+    ),8000,'Save');
+    hideSaving();
+    if(error){
+      console.error('[DB] saveVisit:',error);
+      setStatus('offline','Save failed','Save failed: '+(error.message||error.code));
+      return false;
+    }
+    setStatus('online','Live OK');
+    return true;
+  }catch(e){
+    hideSaving();
+    console.error('[DB] saveVisit timeout:',e);
+    setStatus('offline','Save failed — DB unreachable',e.message||String(e));
     return false;
   }
-  return true;
 }
 function showSaving(){const el=document.getElementById('conn-status');if(!el.querySelector('.saving-dot')){const d=document.createElement('span');d.className='saving-dot';el.appendChild(d);}}
 function hideSaving(){const d=document.querySelector('.saving-dot');if(d)d.remove();}
@@ -927,8 +934,6 @@ async function cycleStatus(type,place,who){
   const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
   renderTabNoSort(type); updateLeaderboard(type);
-  clearTimeout(sortDebounce);
-  sortDebounce=setTimeout(()=>renderTab(type),2000);
   await saveVisit(type,place,who,ns,e.date);
 }
 async function setDate(type,place,who,date){
@@ -984,7 +989,6 @@ function updateLeaderboard(type){
     </div>`;
   });
   wrap.innerHTML=html;
-  if(mapInited[type])renderMap(type);
 }
 
 // ─── PEOPLE BAR ───────────────────────────────────────────────────────────────
@@ -1143,123 +1147,102 @@ function switchTab(tab,btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   btn.classList.add('active');
+  if(tab==='map')setTimeout(renderMapTab,0);
 }
 function refreshAll(){
   ['countries','states'].forEach(t=>{
     updatePeopleBar(t);
-    buildMapPersonSelect(t);
     updateLeaderboard(t);
     buildFilterBtns(t);
     buildPersonChecks(t);
     renderTab(t);
   });
+  const mp=document.getElementById('panel-map');
+  if(mp&&mp.classList.contains('active'))renderMapTab();
 }
 
-// ─── INTERACTIVE MAPS ─────────────────────────────────────────────────────────
-let jvmMaps={countries:null,states:null};
-let mapInited={countries:false,states:false};
-let mapPerson={countries:null,states:null};
-let currentView={countries:'grid',states:'grid'};
-const STATUS_MAP_COLORS={visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a',none:'#ded5c4'};
-
-// Map region code <-> place name
-function codeToPlace(type,code){
-  if(type==='countries')return COUNTRY_BY_ISO2[(code||'').toUpperCase()]||null;
-  const abbr=(code||'').replace(/^US-/,'').toUpperCase();
-  return STATE_BY_ABBR[abbr]||null;
+// ─── MAP TAB ──────────────────────────────────────────────────────────────────
+function setMapPerson(id){mapPerson=id;renderMapTab();}
+function buildMapPersonChips(){
+  const wrap=document.getElementById('map-people');
+  if(!wrap)return;
+  if((!mapPerson||!participants.find(p=>p.id===mapPerson))&&participants.length)
+    mapPerson=focusPerson||participants[0].id;
+  wrap.innerHTML=participants.map(p=>{
+    const active=mapPerson===p.id;
+    return`<div class="person-chip${active?' active':''}" onclick="setMapPerson('${p.id}')">
+      <div class="chip-dot" style="background:${active?'var(--gold-light)':p.color}"></div>${p.name}</div>`;
+  }).join('');
 }
-function placeToCode(type,name){
-  if(type==='countries'){const d=COUNTRY_DATA.find(d=>d[0]===name);return d?d[1]:null;}
-  const d=STATE_DATA.find(d=>d[0]===name);return d?'US-'+d[1]:null;
-}
-
-function buildMapPersonSelect(type){
-  const sel=document.getElementById('mapsel-'+type);
-  if(!sel)return;
-  // keep current selection if still valid, else fall back to focused/first person
-  let chosen=mapPerson[type];
-  if(!participants.some(p=>p.id===chosen))chosen=null;
-  if(!chosen)chosen=(focusPerson&&participants.some(p=>p.id===focusPerson))?focusPerson:(participants[0]?participants[0].id:null);
-  mapPerson[type]=chosen;
-  sel.innerHTML=participants.map(p=>`<option value="${p.id}"${p.id===chosen?' selected':''}>${p.name}</option>`).join('');
-}
-function onMapPersonChange(type){
-  mapPerson[type]=document.getElementById('mapsel-'+type).value;
-  renderMap(type);
-}
-
-function switchView(type,view,btn){
-  currentView[type]=view;
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const gv=document.getElementById('gridview-'+type);
-  const mv=document.getElementById('mapview-'+type);
-  if(view==='map'){
-    gv.classList.add('hide');mv.classList.add('show');
-    if(!mapInited[type]){initMap(type);}
-    else if(jvmMaps[type]){renderMap(type);jvmMaps[type].updateSize();}
-  } else {
-    mv.classList.remove('show');gv.classList.remove('hide');
-  }
-}
-
-function initMap(type){
-  if(mapInited[type]||!window.jsVectorMap)return;
-  const mapName=type==='countries'?'world':'us';
-  try{
-    jvmMaps[type]=new jsVectorMap({
-      selector:'#map-'+type,
-      map:mapName,
-      backgroundColor:'transparent',
-      zoomButtons:true,
-      zoomOnScroll:false,
-      regionsSelectable:false,
-      regionStyle:{
-        initial:{fill:STATUS_MAP_COLORS.none,stroke:'#faf7f2',strokeWidth:0.7,fillOpacity:1},
-        hover:{fillOpacity:0.7,cursor:'pointer'}
-      },
-      series:{regions:[{attribute:'fill',scale:STATUS_MAP_COLORS,values:{}}]},
-      onRegionClick(event,code){handleMapClick(type,code);}
-    });
-    mapInited[type]=true;
-    renderMap(type);
-  }catch(e){
-    console.error('[MAP] init failed:',e);
-    document.getElementById('map-'+type).innerHTML='<div class="empty" style="padding:40px">Map could not be loaded (check connection and reload).</div>';
-  }
-}
-
-// Recolor every region for the currently selected map person
-function renderMap(type){
-  const map=jvmMaps[type];
-  if(!map)return;
-  const who=mapPerson[type];
-  if(!who)return;
-  if(!map.series||!map.series.regions||!map.series.regions[0])return;
-  const data=type==='countries'?COUNTRY_DATA:STATE_DATA;
-  const values={};
-  data.forEach(d=>{
-    const code=type==='countries'?d[1]:'US-'+d[1];
-    values[code]=getEntry(type,d[0],who).status||'none';
+// Build {ISO3:{fillKey,statusLabel}} for the selected person — countries with no status stay default
+function worldFillData(){
+  const d={};
+  if(!mapPerson)return d;
+  COUNTRY_DATA.forEach(c=>{
+    const st=getEntry('countries',c[0],mapPerson).status||'none';
+    if(st!=='none')d[c[2]]={fillKey:st,statusLabel:st.charAt(0).toUpperCase()+st.slice(1)};
   });
-  map.series.regions[0].setValues(values);
+  return d;
+}
+function renderWorldMap(){
+  const el=document.getElementById('worldmap');
+  if(!el)return;
+  if(typeof Datamap==='undefined'){
+    el.innerHTML='<div class="map-fallback">Map library couldn\u2019t load (check your connection). The continent summary below still works.</div>';
+    return;
+  }
+  const data=worldFillData();
+  if(!worldMap){
+    if(!el.offsetWidth)return; // not visible yet — switchTab retries when shown
+    worldMap=new Datamap({
+      element:el,
+      responsive:true,
+      projection:'mercator',
+      fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a'},
+      data:data,
+      geographyConfig:{
+        popupOnHover:true,highlightOnHover:false,
+        borderColor:'#d4c9b8',borderWidth:0.3,
+        popupTemplate:function(geo,d){
+          const st=(d&&d.statusLabel)?d.statusLabel:'None';
+          return'<div class="hoverinfo"><b>'+geo.properties.name+'</b><br>'+st+'</div>';
+        }
+      }
+    });
+    window.addEventListener('resize',()=>{if(worldMap&&worldMap.resize)worldMap.resize();});
+  }else{
+    worldMap.updateChoropleth(data,{reset:true});
+  }
+}
+function renderContinents(){
+  const wrap=document.getElementById('continent-tiles');
+  if(!wrap)return;
+  wrap.innerHTML=CONTINENT_ORDER.map(cont=>{
+    const codes=CONTINENTS[cont];
+    let v=0,pl=0,c=0;
+    codes.forEach(iso2=>{
+      const name=COUNTRY_BY_ISO2[iso2];
+      if(!name)return;
+      const st=getEntry('countries',name,mapPerson).status||'none';
+      if(st==='visited')v++;else if(st==='planned')pl++;else if(st==='candidate')c++;
+    });
+    const cls=v>0?'visited':(pl>0?'planned':(c>0?'candidate':'none'));
+    const sub=[pl?pl+' planned':'',c?c+' candidate':''].filter(Boolean).join(' · ');
+    return`<div class="cont-tile ct-${cls}">
+      <div class="cont-name">${cont}</div>
+      <div class="cont-count">${v} / ${codes.length} visited</div>
+      <div class="cont-sub">${sub}</div>
+    </div>`;
+  }).join('');
+}
+function renderMapTab(){
+  if(!participants.length)return;
+  buildMapPersonChips();
+  renderContinents();
+  renderWorldMap();
 }
 
-// Click a region -> cycle that person's status, save, recolor
-async function handleMapClick(type,code){
-  const place=codeToPlace(type,code);
-  const who=mapPerson[type];
-  if(!place||!who)return;
-  const e=getEntry(type,place,who);
-  const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
-  visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
-  if(jvmMaps[type]&&jvmMaps[type].series&&jvmMaps[type].series.regions[0])jvmMaps[type].series.regions[0].setValues({[code]:ns});
-  updateLeaderboard(type);updatePeopleBar(type);
-  if(currentView[type]!=='map')renderTabNoSort(type);
-  await saveVisit(type,place,who,ns,e.date);
-}
-
-
+// ─── ADD / REMOVE ─────────────────────────────────────────────────────────────
 function getCheckedPeople(prefix,type){
   return participants.filter(p=>{
     const el=document.getElementById(prefix+'-ck-'+p.id+'-'+type);
@@ -1423,7 +1406,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(SB_KEY==='PASTE_ANON_KEY_HERE'){setStatus('offline','Key not set');return;}
   await initSupabase(SB_URL,SB_KEY);
 });
-window.addEventListener('resize',()=>['countries','states'].forEach(t=>{updateLeaderboard(t);if(mapInited[t]&&jvmMaps[t])jvmMaps[t].updateSize();}));
+window.addEventListener('resize',()=>['countries','states'].forEach(t=>updateLeaderboard(t)));
 </script>
 </body>
 </html>
