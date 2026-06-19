@@ -14,7 +14,7 @@
   --ink:#1a1612;--parchment:#f5f0e8;--cream:#faf7f2;
   --gold:#c9922a;--gold-light:#e8c97a;--rust:#9b3a1e;
   --muted:#7a726a;--border:#d4c9b8;
-  --visited:#2d4228;--planned:#c9922a;--candidate:#6b5b8a;--none-col:#c8c0b4;
+  --visited:#2e7d32;--planned:#c9922a;--candidate:#6b5b8a;--none-col:#c8c0b4;
   --shadow:0 2px 12px rgba(26,22,18,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -230,7 +230,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.1</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -242,7 +242,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.2.0</span>
+  <span class="nav-version">v2.2.1</span>
 </nav>
 <main>
   <div class="legend">
@@ -414,6 +414,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.2.1</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>State abbreviations now labelled in white (with a dark outline) on the US map</li><li>Brighter, more standard green for the visited status across the app</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.2.0</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list"><li>Click the United States on the Map to zoom into a state-by-state view, coloured by visited / planned / candidate</li><li>"← Back to world" button returns from the state view</li></ul>
@@ -1217,7 +1221,7 @@ function renderWorldMap(){
     responsive:true,
     scope:isUsa?'usa':'world',
     projection:isUsa?'albersUsa':'mercator',
-    fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a'},
+    fills:{defaultFill:'#c8c0b4',visited:'#2e7d32',planned:'#c9922a',candidate:'#6b5b8a'},
     data:data,
     geographyConfig:{
       popupOnHover:true,highlightOnHover:false,
@@ -1233,6 +1237,15 @@ function renderWorldMap(){
           if(geo&&geo.id==='USA'){mapScope='usa';renderMapTab();}
         });
         dm.svg.selectAll('.USA').style('cursor','pointer');
+      } else {
+        // White state-abbreviation labels with a dark outline so they read on any fill
+        dm.labels({labelColor:'#fff',fontSize:11,fontFamily:"'DM Mono',monospace",lineWidth:1});
+        dm.svg.selectAll('text')
+          .style('fill','#fff')
+          .style('font-weight','600')
+          .style('paint-order','stroke')
+          .style('stroke','rgba(26,22,18,.55)')
+          .style('stroke-width','2px');
       }
     }
   });

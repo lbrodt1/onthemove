@@ -3,6 +3,13 @@
 
 ---
 
+### v2.2.1 — Jun 19 2026
+**Improve: State labels + greener visited**
+- US map now labels each state abbreviation in white with a dark outline for legibility
+- Visited status uses a brighter, more standard green (#2e7d32) across the whole app
+
+---
+
 ### v2.2.0 — Jun 19 2026
 **Feature: Drill into US states from the map**
 - Click the United States on the Map tab to zoom into a state-by-state view
