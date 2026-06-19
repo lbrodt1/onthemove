@@ -3,6 +3,24 @@
 
 ---
 
+### v2.1.0 — Jun 6 2026
+**Feature: World map + continents**
+- New Map tab with a per-person world map (d3 + datamaps), coloured to match visited / planned / candidate
+- Click a participant's name to load their map
+- Continents summary: each continent lights up once ≥1 of its countries is visited, with per-continent counts
+- All 234 countries mapped to a continent (verified for full coverage)
+
+---
+
+### v2.0.9 — Jun 6 2026
+**Improve: Quieter status + real error handling**
+- Connection log hidden by default — click the status pill in the header to toggle it
+- Connection test times out after 6s instead of hanging indefinitely on an unreachable DB
+- Saves time out after 8s and surface a clear "Offline / Save failed" status instead of failing silently
+- Successful save flips status back to "Live OK"
+
+---
+
 ### v2.0.8 — Jun 6 2026
 **Improve: Remove auto-sort on status change**
 - Cards no longer re-sort after clicking a status — they stay exactly in place
