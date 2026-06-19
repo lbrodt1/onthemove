@@ -3,6 +3,29 @@
 
 ---
 
+### v2.3.0 — Jun 19 2026
+**Feature: Group views**
+- Save named groups of people (shared with everyone via Supabase) and switch the View bar to filter the leaderboard, country/state tables, and map all at once
+- New ✎ Groups editor to create, edit, and delete groups; pick members via checkbox chips or a multi-select listbox (both kept in sync)
+- Your selected view is remembered per browser
+
+---
+
+### v2.2.3 — Jun 19 2026
+**Improve: Goal label, status default, opt-in Who**
+- Leaderboard "Deadline" column renamed to "Goal"
+- Status picker in the Add / Bulk forms now defaults to Visited instead of None
+- "Who" checkboxes start unchecked so you select only the people you want to update; added All / None quick toggles
+
+---
+
+### v2.2.2 — Jun 19 2026
+**Improve: Consistent deadline formatting**
+- Leaderboard deadlines now render in one consistent format (e.g. Mar 10, 2036), no matter how they were entered
+- Month/year-only and year-only entries are preserved (no fabricated day); unrecognized text is left as typed
+
+---
+
 ### v2.2.1 — Jun 19 2026
 **Improve: State labels + greener visited**
 - US map now labels each state abbreviation in white with a dark outline for legibility

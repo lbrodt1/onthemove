@@ -143,6 +143,21 @@ select.add-inp{cursor:pointer;min-width:160px}
 .btn-secondary{padding:6px 11px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-secondary:hover{border-color:var(--gold);color:var(--ink)}
 .person-checks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.view-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.view-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
+.view-pill{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:14px;cursor:pointer;color:var(--ink);background:var(--cream);user-select:none;display:inline-flex;align-items:center;gap:5px}
+.view-pill.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.view-pill .vp-count{font-size:9px;opacity:.7}
+.view-manage{font-size:10px;color:var(--muted);background:none;border:1px dashed var(--border);border-radius:14px;padding:3px 9px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;font-family:inherit}
+.view-manage:hover{color:var(--gold);border-color:var(--gold)}
+.groups-list{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;max-height:170px;overflow:auto}
+.group-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:4px}
+.vp-count{font-size:9px;color:var(--muted)}
+.groups-editor{border-top:1px solid var(--border);padding-top:12px}
+.ge-listbox{width:100%;min-height:92px;font-family:'DM Mono',monospace;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px;background:white;color:var(--ink);outline:none}
+.ge-listbox:focus{border-color:var(--gold)}
+.pc-toggle{font-size:10px;color:var(--gold);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;user-select:none}
+.pc-toggle:hover{text-decoration:underline}
 .pcheck{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer}
 .pcheck input{cursor:pointer;accent-color:var(--gold)}
 
@@ -219,7 +234,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="modal-row"><label>Name</label><input id="modal-name" type="text" placeholder="e.g. Marcus" autocomplete="off"/></div>
     <div class="modal-row"><label>Country Goal</label><input id="modal-goal-c" type="number" value="50" min="1" max="300"/></div>
     <div class="modal-row"><label>State Goal</label><input id="modal-goal-s" type="number" value="50" min="1" max="56"/></div>
-    <div class="modal-row"><label>Challenge Deadline (optional)</label><input id="modal-deadline" type="text" placeholder="e.g. Dec 2027"/></div>
+    <div class="modal-row"><label>Goal (optional)</label><input id="modal-deadline" type="text" placeholder="e.g. Dec 2027"/></div>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closePersonModal()">Cancel</button>
       <button class="btn-primary" onclick="savePersonModal()">Save</button>
@@ -227,10 +242,28 @@ select.add-inp{cursor:pointer;min-width:160px}
   </div>
 </div>
 
+<div class="modal-overlay" id="groups-modal">
+  <div class="modal" style="width:440px">
+    <h3>Groups / Views</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Saved groups are shared with everyone. Pick a group from the View bar to filter the leaderboard, tables, and map.</div>
+    <div id="groups-list" class="groups-list"></div>
+    <div class="groups-editor">
+      <div class="modal-row"><label id="ge-title">New group</label><input id="ge-name" type="text" placeholder="e.g. Core 4" autocomplete="off"/></div>
+      <div class="modal-row"><label>Members — chips</label><div id="ge-chips" class="person-checks"></div></div>
+      <div class="modal-row"><label>Members — listbox</label><select id="ge-listbox" class="ge-listbox" multiple onchange="onListboxChange()"></select><div class="bulk-hint">Two ways to pick the same people, kept in sync. Tell me which you prefer and I'll keep just one.</div></div>
+      <div class="modal-btns">
+        <button class="btn-secondary" onclick="closeGroupsModal()">Close</button>
+        <button class="btn-secondary" id="ge-cancel" onclick="resetGroupEditor()" style="display:none">Cancel edit</button>
+        <button class="btn-primary" onclick="saveGroupEditor()">Save group</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.2.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.3.0</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -242,7 +275,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.2.1</span>
+  <span class="nav-version">v2.3.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -256,6 +289,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 
   <!-- COUNTRIES -->
   <div id="panel-countries" class="panel active">
+    <div id="view-bar-countries" class="view-bar"></div>
     <div id="people-bar-countries" class="people-bar"></div>
     <div id="leaderboard-countries" class="leaderboard"></div>
     <div class="section-hdr"><h2>Countries of the World</h2></div>
@@ -285,7 +319,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <div class="person-checks" id="si-who-countries"></div>
           <label>Status</label>
           <select class="add-inp" id="si-st-countries">
-            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
@@ -303,7 +337,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <div class="person-checks" id="bk-who-countries"></div>
           <label>Status</label>
           <select class="add-inp" id="bk-st-countries">
-            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
@@ -328,6 +362,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 
   <!-- STATES -->
   <div id="panel-states" class="panel">
+    <div id="view-bar-states" class="view-bar"></div>
     <div id="people-bar-states" class="people-bar"></div>
     <div id="leaderboard-states" class="leaderboard"></div>
     <div class="section-hdr"><h2>United States</h2></div>
@@ -357,7 +392,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <div class="person-checks" id="si-who-states"></div>
           <label>Status</label>
           <select class="add-inp" id="si-st-states">
-            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
@@ -375,7 +410,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <div class="person-checks" id="bk-who-states"></div>
           <label>Status</label>
           <select class="add-inp" id="bk-st-states">
-            <option value="none">None</option><option value="visited">Visited</option>
+            <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
           <label>Date</label>
@@ -402,6 +437,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <div id="panel-map" class="panel">
     <div class="section-hdr" style="display:flex;align-items:center;gap:12px"><h2 id="map-title">World Map</h2><button id="map-back" class="btn-secondary" style="display:none" onclick="goToWorld()">← Back to world</button></div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Click a name to view their map. Click the <b>United States</b> to zoom into the states. Colours match the tracker — <span style="color:var(--visited);font-weight:500">visited</span> · <span style="color:var(--planned);font-weight:500">planned</span> · <span style="color:var(--candidate);font-weight:500">candidate</span>.</div>
+    <div id="view-bar-map" class="view-bar"></div>
     <div id="map-people" class="people-bar"></div>
     <div class="map-wrap"><div id="worldmap"></div></div>
     <div class="section-hdr"><h2>Continents</h2></div>
@@ -414,6 +450,18 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.3.0</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list"><li>Group views: save named groups of people (shared with everyone) and switch the View bar to filter the leaderboard, tables, and map all at once</li><li>Manage groups from the new ✎ Groups editor, with member-picking by chips or listbox</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.2.3</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Renamed the leaderboard "Deadline" column to "Goal"</li><li>Status picker in the Add forms now defaults to Visited</li><li>"Who" checkboxes now start unchecked so you pick exactly who to update, with All / None quick toggles</li></ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.2.2</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Deadline dates now display in one consistent format (e.g. Mar 10, 2036) regardless of how they were typed</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.2.1</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>State abbreviations now labelled in white (with a dark outline) on the US map</li><li>Brighter, more standard green for the visited status across the app</li></ul>
@@ -748,6 +796,9 @@ function clearSelection(type){selSelected[type]=null;document.getElementById('se
 let visits={}, participants=[];
 let editing={}, filters={countries:'all',states:'all'};
 let focusPerson=null; // null = show all, else personId
+let groups=[];          // [{id,name,members:[personId,...]}] — saved views, shared via Supabase
+let activeView='all';   // 'all' or a group id
+let editingGroupId=null, groupDraftMembers=[]; // group editor state
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
 let mapPerson=null, worldMap=null, mapScope='world';
 let bulkResolved={countries:[],states:[]};
@@ -808,6 +859,12 @@ async function loadAllData(){
     participants=defaultParticipants();
     await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
   }
+  // Load saved groups (stored in a separate settings row, reusing the participants column)
+  try{
+    const{data:gData}=await sbClient.from('settings').select('*').eq('id','groups');
+    if(gData&&gData[0]&&gData[0].participants){groups=JSON.parse(gData[0].participants)||[];}
+  }catch(e){groups=[];}
+  try{const v=localStorage.getItem('otm-view');if(v&&(v==='all'||groups.find(g=>g.id===v)))activeView=v;}catch(e){}
   // Load visits
   const{data:vData}=await sbClient.from('visits').select('*');
   visits={};
@@ -839,7 +896,12 @@ function subscribeRealtime(){
       if(mp&&mp.classList.contains('active'))renderMapTab();
     })
     .on('postgres_changes',{event:'*',schema:'public',table:'settings'},payload=>{
-      if(payload.new&&payload.new.participants){
+      if(!payload.new)return;
+      if(payload.new.id==='groups'){
+        try{groups=JSON.parse(payload.new.participants)||[];}catch(e){}
+        if(activeView!=='all'&&!groups.find(g=>g.id===activeView))activeView='all';
+        renderViewBars(); refreshAll();
+      } else if(payload.new.participants){
         try{participants=JSON.parse(payload.new.participants);refreshAll();}catch(e){}
       }
     })
@@ -929,10 +991,18 @@ async function removePerson(id){
 // ─── DATA HELPERS ─────────────────────────────────────────────────────────────
 function getEntry(type,place,who){return visits[`${type}|${place}|${who}`]||{status:'none',date:''};}
 function getPlaces(type){return type==='countries'?COUNTRIES:STATES;}
-function visibleParticipants(){
-  if(focusPerson)return participants.filter(p=>p.id===focusPerson);
-  return participants;
+function viewParticipants(){
+  if(activeView==='all')return participants;
+  const g=groups.find(x=>x.id===activeView);
+  if(!g||!g.members||!g.members.length)return participants;
+  return participants.filter(p=>g.members.includes(p.id));
 }
+function visibleParticipants(){
+  const base=viewParticipants();
+  if(focusPerson){const f=base.find(p=>p.id===focusPerson);if(f)return[f];}
+  return base;
+}
+function escHtml(s){return(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 // ─── STATUS CYCLE ─────────────────────────────────────────────────────────────
 const CYCLE=['none','candidate','planned','visited'];
@@ -952,13 +1022,40 @@ async function setDate(type,place,who,date){
 }
 
 // ─── LEADERBOARD ─────────────────────────────────────────────────────────────
+// Normalize free-text deadlines to one consistent format (avoids fabricating a day
+// for month/year inputs, and leaves anything unrecognized untouched).
+var DL_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dlMonthIdx(t){return ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(t.toLowerCase().slice(0,3));}
+function fmtDeadline(s){
+  s=(s||'').trim();
+  if(!s)return '—';
+  var m;
+  // M/D/Y or M-D-Y (numeric)
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){var mo=+m[1],d=+m[2],y=+m[3];if(y<100)y+=2000;if(mo>=1&&mo<=12&&d>=1&&d<=31)return DL_MON[mo-1]+' '+d+', '+y;}
+  // ISO Y-M-D
+  m=s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if(m){var mo2=+m[2],d2=+m[3];if(mo2>=1&&mo2<=12&&d2>=1&&d2<=31)return DL_MON[mo2-1]+' '+d2+', '+(+m[1]);}
+  // Month name + day + year ("March 10, 2036", "Mar 10 2036")
+  m=s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})$/);
+  if(m){var mi=dlMonthIdx(m[1]);if(mi>=0)return DL_MON[mi]+' '+(+m[2])+', '+(+m[3]);}
+  // Day + month name + year ("10 March 2036")
+  m=s.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})$/);
+  if(m){var mi2=dlMonthIdx(m[2]);if(mi2>=0)return DL_MON[mi2]+' '+(+m[1])+', '+(+m[3]);}
+  // Month + year only ("Dec 2027", "December 2027")
+  m=s.match(/^([A-Za-z]{3,9})\.?,?\s+(\d{4})$/);
+  if(m){var mi3=dlMonthIdx(m[1]);if(mi3>=0)return DL_MON[mi3]+' '+(+m[2]);}
+  // Year only
+  if(/^\d{4}$/.test(s))return s;
+  return s;
+}
 function updateLeaderboard(type){
   const wrap=document.getElementById('leaderboard-'+type);
   if(!wrap||!participants.length){if(wrap)wrap.innerHTML='';return;}
   const places=getPlaces(type);
   const total=places.length;
   // Build rows with counts
-  const rows=participants.map(p=>{
+  const rows=viewParticipants().map(p=>{
     let v=0,pl=0,c=0;
     places.forEach(place=>{
       const st=getEntry(type,place,p.id).status||'none';
@@ -972,7 +1069,7 @@ function updateLeaderboard(type){
   }).sort((a,b)=>b.v-a.v||b.pl-a.pl||a.p.name.localeCompare(b.p.name));
 
   let html=`<div class="lb-row lb-header">
-    <div></div><div>Name</div><div>Progress</div><div>V · P · C / Goal</div><div>Total</div><div>Deadline</div><div></div>
+    <div></div><div>Name</div><div>Progress</div><div>V · P · C / Goal</div><div>Total</div><div>Goal</div><div></div>
   </div>`;
   rows.forEach((r,i)=>{
     const vPct=Math.min(100,(r.v/Math.max(r.goal,1))*100);
@@ -989,7 +1086,7 @@ function updateLeaderboard(type){
       <div class="lb-tooltip"><div class="lb-bar-wrap"><div class="lb-bar-seg bar-v" style="width:${vPct}%;background:var(--visited)"></div><div class="lb-bar-seg" style="width:${pPct}%;background:var(--planned)"></div><div class="lb-bar-seg" style="width:${cPct}%;background:var(--candidate)"></div></div>${ttHtml}</div>
       <div class="lb-count">${r.v}<span style="color:var(--planned);font-size:10px;opacity:.8;margin-left:2px">${r.pl?'+'+r.pl+'p':''}</span><span style="color:var(--candidate);font-size:10px;opacity:.8;margin-left:1px">${r.c?'+'+r.c+'c':''}</span><span style="color:var(--muted);font-size:10px;margin-left:3px">/ ${r.goal}</span></div>
       <div class="lb-goal">${total}</div>
-      <div class="lb-deadline${isSoon?' soon':''}">${r.deadline||'—'}</div>
+      <div class="lb-deadline${isSoon?' soon':''}">${fmtDeadline(r.deadline)}</div>
       <div class="lb-actions">
         <button class="lb-edit-btn" onclick="openEditPerson('${r.p.id}')" title="Edit">✎</button>
         <button class="lb-edit-btn" onclick="removePerson('${r.p.id}')" title="Remove" style="color:var(--rust)">×</button>
@@ -1005,7 +1102,7 @@ function updatePeopleBar(type){
   if(!wrap)return;
   const places=getPlaces(type);
   let html='';
-  participants.forEach(p=>{
+  viewParticipants().forEach(p=>{
     const v=places.filter(pl=>getEntry(type,pl,p.id).status==='visited').length;
     const isActive=focusPerson===p.id;
     html+=`<div class="person-chip${isActive?' active':''}" onclick="toggleFocus('${p.id}','${type}')">
@@ -1022,17 +1119,85 @@ function toggleFocus(id,type){
   renderTab(type);
 }
 
+// ─── VIEWS / GROUPS ───────────────────────────────────────────────────────────
+function viewBarHtml(){
+  let pills=`<span class="view-pill${activeView==='all'?' active':''}" onclick="setView('all')">All<span class="vp-count">${participants.length}</span></span>`;
+  groups.forEach(g=>{
+    pills+=`<span class="view-pill${activeView===g.id?' active':''}" onclick="setView('${g.id}')">${escHtml(g.name)}<span class="vp-count">${g.members.length}</span></span>`;
+  });
+  return `<span class="view-label">View</span>${pills}<button class="view-manage" onclick="openGroupsModal()">✎ Groups</button>`;
+}
+function renderViewBars(){
+  const html=viewBarHtml();
+  ['view-bar-countries','view-bar-states','view-bar-map'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+}
+function setView(v){
+  activeView=v; focusPerson=null;
+  try{localStorage.setItem('otm-view',v);}catch(e){}
+  renderViewBars(); refreshAll();
+}
+function openGroupsModal(){editingGroupId=null;groupDraftMembers=[];document.getElementById('ge-name').value='';renderGroupsList();renderGroupEditor();document.getElementById('groups-modal').classList.add('show');}
+function closeGroupsModal(){document.getElementById('groups-modal').classList.remove('show');}
+function renderGroupsList(){
+  const el=document.getElementById('groups-list');if(!el)return;
+  if(!groups.length){el.innerHTML='<div class="bulk-hint">No groups yet. Create one below.</div>';return;}
+  el.innerHTML=groups.map(g=>`<div class="group-item"><span>${escHtml(g.name)} <span class="vp-count">${g.members.length}</span></span><span><span class="pc-toggle" onclick="editGroup('${g.id}')">Edit</span><span class="pc-toggle" style="color:var(--rust);margin-left:10px" onclick="deleteGroup('${g.id}')">Delete</span></span></div>`).join('');
+}
+function renderGroupEditor(){
+  const t=document.getElementById('ge-title');if(t)t.textContent=editingGroupId?'Edit group':'New group';
+  const cb=document.getElementById('ge-cancel');if(cb)cb.style.display=editingGroupId?'inline-block':'none';
+  const chips=document.getElementById('ge-chips');
+  if(chips)chips.innerHTML=participants.map(p=>`<label class="pcheck"><input type="checkbox" ${groupDraftMembers.includes(p.id)?'checked':''} onchange="toggleDraftMember('${p.id}')"/><span style="color:${p.color}">${p.name}</span></label>`).join('');
+  const lb=document.getElementById('ge-listbox');
+  if(lb)lb.innerHTML=participants.map(p=>`<option value="${p.id}" ${groupDraftMembers.includes(p.id)?'selected':''}>${p.name}</option>`).join('');
+}
+function toggleDraftMember(id){
+  const i=groupDraftMembers.indexOf(id);
+  if(i>-1)groupDraftMembers.splice(i,1);else groupDraftMembers.push(id);
+  renderGroupEditor();
+}
+function onListboxChange(){
+  const sel=document.getElementById('ge-listbox');
+  groupDraftMembers=Array.from(sel.selectedOptions).map(o=>o.value);
+  renderGroupEditor();
+}
+function editGroup(id){const g=groups.find(x=>x.id===id);if(!g)return;editingGroupId=id;groupDraftMembers=g.members.slice();document.getElementById('ge-name').value=g.name;renderGroupEditor();}
+function resetGroupEditor(){editingGroupId=null;groupDraftMembers=[];document.getElementById('ge-name').value='';renderGroupEditor();}
+async function deleteGroup(id){
+  if(!confirm('Delete this group?'))return;
+  groups=groups.filter(g=>g.id!==id);
+  if(activeView===id){activeView='all';try{localStorage.setItem('otm-view','all');}catch(e){}}
+  await saveGroups(); renderGroupsList(); renderViewBars(); refreshAll();
+}
+async function saveGroupEditor(){
+  const name=document.getElementById('ge-name').value.trim();
+  if(!name){alert('Give the group a name.');return;}
+  if(!groupDraftMembers.length){alert('Pick at least one person.');return;}
+  if(editingGroupId){const g=groups.find(x=>x.id===editingGroupId);if(g){g.name=name;g.members=groupDraftMembers.slice();}}
+  else{groups.push({id:'g'+Date.now().toString(36),name:name,members:groupDraftMembers.slice()});}
+  await saveGroups(); resetGroupEditor(); renderGroupsList(); renderViewBars(); refreshAll();
+}
+async function saveGroups(){
+  if(!sbClient)return;
+  await sbClient.from('settings').upsert({id:'groups',participants:JSON.stringify(groups)});
+}
+
 // ─── PERSON CHECKBOXES (for add forms) ───────────────────────────────────────
 function buildPersonChecks(type){
   ['si','bk','rm'].forEach(prefix=>{
     const wrap=document.getElementById(prefix+'-who-'+type);
     if(!wrap)return;
-    wrap.innerHTML=participants.map(p=>`
+    wrap.innerHTML=
+      `<span class="pc-toggle" onclick="setAllChecks('${prefix}','${type}',true)">All</span><span class="pc-toggle" onclick="setAllChecks('${prefix}','${type}',false)">None</span>`+
+      participants.map(p=>`
       <label class="pcheck">
-        <input type="checkbox" id="${prefix}-ck-${p.id}-${type}" checked/>
+        <input type="checkbox" id="${prefix}-ck-${p.id}-${type}"/>
         <span style="color:${p.color}">${p.name}</span>
       </label>`).join('');
   });
+}
+function setAllChecks(prefix,type,val){
+  participants.forEach(p=>{const el=document.getElementById(prefix+'-ck-'+p.id+'-'+type);if(el)el.checked=val;});
 }
 
 // ─── SORT & FILTER ────────────────────────────────────────────────────────────
@@ -1158,6 +1323,7 @@ function switchTab(tab,btn){
   if(tab==='map')setTimeout(renderMapTab,0);
 }
 function refreshAll(){
+  renderViewBars();
   ['countries','states'].forEach(t=>{
     updatePeopleBar(t);
     updateLeaderboard(t);
@@ -1174,9 +1340,10 @@ function setMapPerson(id){mapPerson=id;renderMapTab();}
 function buildMapPersonChips(){
   const wrap=document.getElementById('map-people');
   if(!wrap)return;
-  if((!mapPerson||!participants.find(p=>p.id===mapPerson))&&participants.length)
-    mapPerson=focusPerson||participants[0].id;
-  wrap.innerHTML=participants.map(p=>{
+  const vp=viewParticipants();
+  if((!mapPerson||!vp.find(p=>p.id===mapPerson))&&vp.length)
+    mapPerson=(focusPerson&&vp.find(p=>p.id===focusPerson))?focusPerson:vp[0].id;
+  wrap.innerHTML=vp.map(p=>{
     const active=mapPerson===p.id;
     return`<div class="person-chip${active?' active':''}" onclick="setMapPerson('${p.id}')">
       <div class="chip-dot" style="background:${active?'var(--gold-light)':p.color}"></div>${p.name}</div>`;
