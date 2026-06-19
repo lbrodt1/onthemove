@@ -3,6 +3,14 @@
 
 ---
 
+### v2.3.1 — Jun 19 2026
+**Improve: Editor lint cleanup**
+- Added `-webkit-user-select` alongside `user-select` for older Safari
+- Added aria-labels to the status and group-member selects for accessibility
+- No behavior change; clears the Edge Tools warnings in VS Code (a `.hintrc` silences the single-file inline-style hints)
+
+---
+
 ### v2.3.0 — Jun 19 2026
 **Feature: Group views**
 - Save named groups of people (shared with everyone via Supabase) and switch the View bar to filter the leaderboard, country/state tables, and map all at once

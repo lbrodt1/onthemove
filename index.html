@@ -35,7 +35,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 
 /* PEOPLE / LEADERBOARD */
 .people-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--muted);transition:all .15s;user-select:none}
+.person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--muted);transition:all .15s;-webkit-user-select:none;user-select:none}
 .person-chip:hover{border-color:var(--gold);color:var(--ink)}
 .person-chip.active{background:var(--ink);color:var(--parchment);border-color:var(--ink)}
 .person-chip .chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -145,7 +145,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 .person-checks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .view-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .view-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
-.view-pill{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:14px;cursor:pointer;color:var(--ink);background:var(--cream);user-select:none;display:inline-flex;align-items:center;gap:5px}
+.view-pill{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:14px;cursor:pointer;color:var(--ink);background:var(--cream);-webkit-user-select:none;user-select:none;display:inline-flex;align-items:center;gap:5px}
 .view-pill.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
 .view-pill .vp-count{font-size:9px;opacity:.7}
 .view-manage{font-size:10px;color:var(--muted);background:none;border:1px dashed var(--border);border-radius:14px;padding:3px 9px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;font-family:inherit}
@@ -156,7 +156,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 .groups-editor{border-top:1px solid var(--border);padding-top:12px}
 .ge-listbox{width:100%;min-height:92px;font-family:'DM Mono',monospace;font-size:12px;border:1px solid var(--border);border-radius:4px;padding:4px;background:white;color:var(--ink);outline:none}
 .ge-listbox:focus{border-color:var(--gold)}
-.pc-toggle{font-size:10px;color:var(--gold);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;user-select:none}
+.pc-toggle{font-size:10px;color:var(--gold);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;-webkit-user-select:none;user-select:none}
 .pc-toggle:hover{text-decoration:underline}
 .pcheck{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer}
 .pcheck input{cursor:pointer;accent-color:var(--gold)}
@@ -172,7 +172,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 .place-badges{display:flex;flex-direction:column;gap:3px}
 .person-row{display:flex;align-items:center;gap:4px}
 .person-who{font-size:9px;width:42px;flex-shrink:0;color:var(--muted);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st-btn{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:1px 5px;border-radius:2px;cursor:pointer;border:1px solid;transition:all .15s;user-select:none;white-space:nowrap;min-width:18px;justify-content:center}
+.st-btn{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:1px 5px;border-radius:2px;cursor:pointer;border:1px solid;transition:all .15s;-webkit-user-select:none;user-select:none;white-space:nowrap;min-width:18px;justify-content:center}
 .st-none{color:var(--none-col);border-color:var(--none-col);background:transparent}
 .st-visited{color:white;border-color:var(--visited);background:var(--visited)}
 .st-planned{color:white;border-color:var(--planned);background:var(--planned)}
@@ -250,7 +250,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="groups-editor">
       <div class="modal-row"><label id="ge-title">New group</label><input id="ge-name" type="text" placeholder="e.g. Core 4" autocomplete="off"/></div>
       <div class="modal-row"><label>Members — chips</label><div id="ge-chips" class="person-checks"></div></div>
-      <div class="modal-row"><label>Members — listbox</label><select id="ge-listbox" class="ge-listbox" multiple onchange="onListboxChange()"></select><div class="bulk-hint">Two ways to pick the same people, kept in sync. Tell me which you prefer and I'll keep just one.</div></div>
+      <div class="modal-row"><label>Members — listbox</label><select id="ge-listbox" class="ge-listbox" aria-label="Group members" multiple onchange="onListboxChange()"></select><div class="bulk-hint">Two ways to pick the same people, kept in sync. Tell me which you prefer and I'll keep just one.</div></div>
       <div class="modal-btns">
         <button class="btn-secondary" onclick="closeGroupsModal()">Close</button>
         <button class="btn-secondary" id="ge-cancel" onclick="resetGroupEditor()" style="display:none">Cancel edit</button>
@@ -263,7 +263,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.3.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.3.1</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -275,7 +275,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.3.0</span>
+  <span class="nav-version">v2.3.1</span>
 </nav>
 <main>
   <div class="legend">
@@ -318,7 +318,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <label>Who</label>
           <div class="person-checks" id="si-who-countries"></div>
           <label>Status</label>
-          <select class="add-inp" id="si-st-countries">
+          <select class="add-inp" id="si-st-countries" aria-label="Status">
             <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
@@ -336,7 +336,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <label>Who:</label>
           <div class="person-checks" id="bk-who-countries"></div>
           <label>Status</label>
-          <select class="add-inp" id="bk-st-countries">
+          <select class="add-inp" id="bk-st-countries" aria-label="Status">
             <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
@@ -391,7 +391,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <label>Who</label>
           <div class="person-checks" id="si-who-states"></div>
           <label>Status</label>
-          <select class="add-inp" id="si-st-states">
+          <select class="add-inp" id="si-st-states" aria-label="Status">
             <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
@@ -409,7 +409,7 @@ select.add-inp{cursor:pointer;min-width:160px}
           <label>Who:</label>
           <div class="person-checks" id="bk-who-states"></div>
           <label>Status</label>
-          <select class="add-inp" id="bk-st-states">
+          <select class="add-inp" id="bk-st-states" aria-label="Status">
             <option value="none">None</option><option value="visited" selected>Visited</option>
             <option value="planned">Planned</option><option value="candidate">Candidate</option>
           </select>
@@ -450,6 +450,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.3.1</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Added -webkit-user-select for older Safari and aria-labels on the status/group selects (clears editor lint warnings; no behavior change)</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.3.0</span><span class="cl-date">Jun 19 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list"><li>Group views: save named groups of people (shared with everyone) and switch the View bar to filter the leaderboard, tables, and map all at once</li><li>Manage groups from the new ✎ Groups editor, with member-picking by chips or listbox</li></ul>
