@@ -3,53 +3,15 @@
 
 ---
 
-### v2.3.1 — Jun 19 2026
-**Improve: Editor lint cleanup**
-- Added `-webkit-user-select` alongside `user-select` for older Safari
-- Added aria-labels to the status and group-member selects for accessibility
-- No behavior change; clears the Edge Tools warnings in VS Code (a `.hintrc` silences the single-file inline-style hints)
+### v2.1.1 — Jun 27 2026
+**Improve: ISO codes on the map**
+- 2-letter ISO code rendered at each country's centre on the world map
+- Hover popup now shows ISO2 · ISO3 alongside the country name and status
+- "Show ISO codes" toggle to declutter when needed (labels can get dense in Europe)
 
 ---
 
-### v2.3.0 — Jun 19 2026
-**Feature: Group views**
-- Save named groups of people (shared with everyone via Supabase) and switch the View bar to filter the leaderboard, country/state tables, and map all at once
-- New ✎ Groups editor to create, edit, and delete groups; pick members via checkbox chips or a multi-select listbox (both kept in sync)
-- Your selected view is remembered per browser
-
----
-
-### v2.2.3 — Jun 19 2026
-**Improve: Goal label, status default, opt-in Who**
-- Leaderboard "Deadline" column renamed to "Goal"
-- Status picker in the Add / Bulk forms now defaults to Visited instead of None
-- "Who" checkboxes start unchecked so you select only the people you want to update; added All / None quick toggles
-
----
-
-### v2.2.2 — Jun 19 2026
-**Improve: Consistent deadline formatting**
-- Leaderboard deadlines now render in one consistent format (e.g. Mar 10, 2036), no matter how they were entered
-- Month/year-only and year-only entries are preserved (no fabricated day); unrecognized text is left as typed
-
----
-
-### v2.2.1 — Jun 19 2026
-**Improve: State labels + greener visited**
-- US map now labels each state abbreviation in white with a dark outline for legibility
-- Visited status uses a brighter, more standard green (#2e7d32) across the whole app
-
----
-
-### v2.2.0 — Jun 19 2026
-**Feature: Drill into US states from the map**
-- Click the United States on the Map tab to zoom into a state-by-state view
-- States coloured by the selected person's visited / planned / candidate status
-- "Back to world" button returns to the world map
-
----
-
-### v2.1.0 — Jun 6 2026
+### v2.1.0 — Jun 27 2026
 **Feature: World map + continents**
 - New Map tab with a per-person world map (d3 + datamaps), coloured to match visited / planned / candidate
 - Click a participant's name to load their map
@@ -58,7 +20,7 @@
 
 ---
 
-### v2.0.9 — Jun 6 2026
+### v2.0.9 — Jun 27 2026
 **Improve: Quieter status + real error handling**
 - Connection log hidden by default — click the status pill in the header to toggle it
 - Connection test times out after 6s instead of hanging indefinitely on an unreachable DB
@@ -67,7 +29,7 @@
 
 ---
 
-### v2.0.8 — Jun 6 2026
+### v2.0.8 — Jun 27 2026
 **Improve: Remove auto-sort on status change**
 - Cards no longer re-sort after clicking a status — they stay exactly in place
 - Removed the 2-second sort debounce entirely
