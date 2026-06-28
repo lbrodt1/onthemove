@@ -194,7 +194,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 .cl-list code{background:var(--parchment);padding:1px 4px;border-radius:2px;font-size:11px;color:var(--ink)}
 /* MAP & CONTINENTS */
 .map-wrap{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:18px}
-#worldmap{position:relative;width:100%;height:520px}
+#worldmap{position:relative;width:100%;max-width:1000px;height:560px;margin:0 auto}
 .map-fallback{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px;text-align:center;padding:20px}
 .continent-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:24px}
 .cont-tile{border:1px solid var(--border);border-left:4px solid var(--border);border-radius:4px;padding:9px 12px;background:white;display:flex;flex-direction:column;gap:2px}
@@ -230,7 +230,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.2</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -242,7 +242,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.1.1</span>
+  <span class="nav-version">v2.1.2</span>
 </nav>
 <main>
   <div class="legend">
@@ -417,6 +417,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.1.2</span><span class="cl-date">Jun 27 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list"><li>Click a country on the map to cycle its status (None → Candidate → Planned → Visited) for the selected person — no need to find it in the list</li><li>Map width capped and centred so it reads as a proper world map on wide screens instead of a stretched band</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.1.1</span><span class="cl-date">Jun 27 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
           <ul class="cl-list"><li>ISO codes now shown on the world map — 2-letter code at each country, plus code in the hover popup</li><li>"Show ISO codes" toggle to hide them when the map gets busy</li></ul>
@@ -1218,6 +1222,11 @@ function renderWorldMap(){
           const codes=[iso2,geo.id].filter(Boolean).join(' · ');
           return'<div class="hoverinfo"><b>'+geo.properties.name+'</b> <span style="opacity:.7">'+codes+'</span><br>'+st+'</div>';
         }
+      },
+      done:function(dm){
+        dm.svg.selectAll('.datamaps-subunit')
+          .style('cursor','pointer')
+          .on('click.edit',function(geo){cycleFromMap(geo.id);});
       }
     });
     window.addEventListener('resize',()=>{if(worldMap&&worldMap.resize)worldMap.resize();});
@@ -1249,6 +1258,23 @@ function toggleIsoLabels(){
   const el=document.getElementById('iso-toggle');
   showIsoLabels=el?el.checked:!showIsoLabels;
   drawIsoLabels();
+}
+// Click a country on the map → cycle status for the person whose map is showing
+async function cycleFromMap(iso3){
+  if(!mapPerson)return;
+  const name=COUNTRY_BY_ISO3[(iso3||'').toUpperCase()];
+  if(!name)return; // territory not in our country list — ignore
+  const e=getEntry('countries',name,mapPerson);
+  const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
+  visits[`countries|${name}|${mapPerson}`]={status:ns,date:e.date||''};
+  if(worldMap)worldMap.updateChoropleth(worldFillData(),{reset:true});
+  renderContinents();updateLeaderboard('countries');updatePeopleBar('countries');renderTabNoSort('countries');
+  const ok=await saveVisit('countries',name,mapPerson,ns,e.date||'');
+  if(!ok){ // save failed — roll the optimistic change back so the map never lies
+    visits[`countries|${name}|${mapPerson}`]={status:e.status||'none',date:e.date||''};
+    if(worldMap)worldMap.updateChoropleth(worldFillData(),{reset:true});
+    renderContinents();updateLeaderboard('countries');updatePeopleBar('countries');renderTabNoSort('countries');
+  }
 }
 function renderContinents(){
   const wrap=document.getElementById('continent-tiles');

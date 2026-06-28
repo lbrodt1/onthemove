@@ -3,6 +3,14 @@
 
 ---
 
+### v2.1.2 — Jun 27 2026
+**Feature: Click-to-edit map + framing**
+- Click a country on the world map to cycle its status (None → Candidate → Planned → Visited) for the selected person
+- Optimistic update rolls back if the save fails, so the map never shows a status that didn't persist
+- Map width capped and centred — reads as a proper world map on wide screens instead of a stretched band
+
+---
+
 ### v2.1.1 — Jun 27 2026
 **Improve: ISO codes on the map**
 - 2-letter ISO code rendered at each country's centre on the world map
