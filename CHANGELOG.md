@@ -3,6 +3,14 @@
 
 ---
 
+### v2.1.3 — Jun 28 2026
+**Fix: Map fills its box + stays aligned**
+- World map now fills its container as a proper map instead of drawing in the top half with empty parchment below
+- Switched the map to a viewBox so fills and ISO labels scale together and stay locked on window resize
+- Removed the width cap — the map uses a fixed world aspect ratio and scales to any screen width
+
+---
+
 ### v2.1.2 — Jun 27 2026
 **Feature: Click-to-edit map + framing**
 - Click a country on the world map to cycle its status (None → Candidate → Planned → Visited) for the selected person
