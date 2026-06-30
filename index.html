@@ -230,7 +230,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.3</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.1.4</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -242,7 +242,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.1.3</span>
+  <span class="nav-version">v2.1.4</span>
 </nav>
 <main>
   <div class="legend">
@@ -417,6 +417,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.1.4</span><span class="cl-date">Jun 30 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list"><li>ISO labels now sit on each country's largest landmass — US, Canada, Norway and others no longer have their code dragged off into Alaska / arctic islands / Svalbard</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.1.3</span><span class="cl-date">Jun 28 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
           <ul class="cl-list"><li>World map now fills its box as a proper map instead of sitting in the top half with empty space below — switched to a viewBox so it scales cleanly at any width</li><li>ISO labels stay locked to their countries when the window resizes</li></ul>
@@ -1253,6 +1257,21 @@ function fitWorldSvg(){
   svg.setAttribute('height','100%');
   svg.style.position='absolute';svg.style.top='0';svg.style.left='0';
 }
+// Centroid of a country's LARGEST landmass, so outlying territory (US→Alaska/Hawaii,
+// Canada→arctic islands, Norway→Svalbard) doesn't drag the label off the mainland.
+function bestLabelPoint(geo){
+  const g=geo.geometry;
+  if(g&&g.type==='MultiPolygon'&&g.coordinates.length>1){
+    let best=null,bestArea=-1;
+    g.coordinates.forEach(coords=>{
+      const poly={type:'Feature',geometry:{type:'Polygon',coordinates:coords}};
+      const a=d3.geo.area(poly); // true (unprojected) area — avoids mercator inflation
+      if(a>bestArea){bestArea=a;best=poly;}
+    });
+    if(best)return worldMap.path.centroid(best);
+  }
+  return worldMap.path.centroid(geo);
+}
 // Place ISO2 codes at each country's centroid; same viewBox space as the paths so they stay aligned
 function drawIsoLabels(){
   if(!worldMap||!worldMap.svg||!worldMap.path)return;
@@ -1261,7 +1280,7 @@ function drawIsoLabels(){
   const g=worldMap.svg.append('g').attr('class','iso-labels').style('pointer-events','none');
   worldMap.svg.selectAll('.datamaps-subunit').each(function(geo){
     let c;
-    try{c=worldMap.path.centroid(geo);}catch(e){return;}
+    try{c=bestLabelPoint(geo);}catch(e){return;}
     if(!c||isNaN(c[0])||isNaN(c[1]))return;
     const label=ISO3_TO_ISO2[geo.id]||geo.id;
     g.append('text')

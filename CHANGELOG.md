@@ -3,6 +3,13 @@
 
 ---
 
+### v2.1.4 — Jun 30 2026
+**Fix: ISO labels on the right landmass**
+- Labels now sit on each country's largest landmass instead of the centroid of all its territory
+- Fixes US (was dragged toward Alaska/Hawaii), Canada (arctic islands), and Norway (Svalbard)
+
+---
+
 ### v2.1.3 — Jun 28 2026
 **Fix: Map fills its box + stays aligned**
 - World map now fills its container as a proper map instead of drawing in the top half with empty parchment below
