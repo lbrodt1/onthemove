@@ -3,6 +3,53 @@
 
 ---
 
+### v2.4.1 — Jul 3 2026
+**Fix: Bulk add/remove keeps its list (mobile) + group-save errors surfaced**
+- Bulk add/remove no longer hides the recognized / not-recognized list behind a blocking pop-up — the list stays on screen with an inline summary, so a misspelled country is easy to spot and fix
+- What you typed stays in the box after adding; a manual "Clear list" button dismisses the results when you're done
+- Group saves now show a visible error if they fail instead of failing silently
+
+---
+
+### v2.4.0 — Jul 3 2026
+**Feature: Groups restored + shareable group links**
+- Restored Group views (lost when the map update overwrote v2.3.1) and merged it with every map fix shipped since — nothing lost either way
+- Share link per group — the share icon on a View pill (or Share in the Groups editor) copies a ?view= URL that opens the app pre-filtered to that group
+- Also back with v2.3: the View bar, Groups editor (chips + listbox), consistent deadline formatting, the Goal column, and unchecked Who boxes with All/None
+
+---
+
+### v2.3.1 — Jun 19 2026
+**Improve: Editor lint cleanup**
+- Added `-webkit-user-select` alongside `user-select` for older Safari
+- Added aria-labels to the status and group-member selects for accessibility
+- No behavior change; clears the Edge Tools warnings in VS Code (a `.hintrc` silences the single-file inline-style hints)
+
+---
+
+### v2.3.0 — Jun 19 2026
+**Feature: Group views**
+- Save named groups of people (shared with everyone via Supabase) and switch the View bar to filter the leaderboard, country/state tables, and map all at once
+- New ✎ Groups editor to create, edit, and delete groups; pick members via checkbox chips or a multi-select listbox (both kept in sync)
+- Your selected view is remembered per browser
+
+---
+
+### v2.2.3 — Jun 19 2026
+**Improve: Goal label, status default, opt-in Who**
+- Leaderboard "Deadline" column renamed to "Goal"
+- Status picker in the Add / Bulk forms now defaults to Visited instead of None
+- "Who" checkboxes start unchecked so you select only the people you want to update; added All / None quick toggles
+
+---
+
+### v2.2.2 — Jun 19 2026
+**Improve: Consistent deadline formatting**
+- Leaderboard deadlines now render in one consistent format (e.g. Mar 10, 2036), no matter how they were entered
+- Month/year-only and year-only entries are preserved (no fabricated day); unrecognized text is left as typed
+
+---
+
 ### v2.1.4 — Jun 30 2026
 **Fix: ISO labels on the right landmass**
 - Labels now sit on each country's largest landmass instead of the centroid of all its territory
@@ -154,3 +201,5 @@
 
 ### v1.0.0–v1.8.0 — May 24–28 2026
 - Initial build, Supabase migration, ISO country list, fuzzy matching, status tiers, bulk add/remove, sort debounce
+
+---
