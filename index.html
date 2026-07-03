@@ -275,7 +275,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.4.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.4.2</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -287,7 +287,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.4.1</span>
+  <span class="nav-version">v2.4.2</span>
 </nav>
 <main>
   <div class="legend">
@@ -465,6 +465,10 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.4.2</span><span class="cl-date">Jul 3 2026</span><span class="cl-badge cl-badge-improve">Improve</span></div>
+          <ul class="cl-list"><li>Share links now carry the group's name (e.g. ?view=europe-crew) instead of an opaque id</li><li>Older id-based links still resolve, so nothing you've already shared breaks</li></ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.4.1</span><span class="cl-date">Jul 3 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
           <ul class="cl-list"><li>Bulk add/remove no longer wipes the list behind a pop-up — the recognized / not-recognized entries stay on screen with an inline summary, so a misspelled country is easy to spot and fix (esp. on mobile)</li><li>What you typed stays in the box after adding; a manual "Clear list" button dismisses the results when you're done</li><li>Group saves now surface a visible error if they fail instead of failing silently</li></ul>
@@ -904,7 +908,7 @@ async function loadAllData(){
   }catch(e){groups=[];}
   try{const v=localStorage.getItem('otm-view');if(v&&(v==='all'||groups.find(g=>g.id===v)))activeView=v;}catch(e){}
   // A shared link (?view= or ?group=) wins over the remembered view
-  try{const p=new URLSearchParams(location.search);const q=p.get('view')||p.get('group');if(q&&groups.find(g=>g.id===q))activeView=q;}catch(e){}
+  try{const p=new URLSearchParams(location.search);const q=p.get('view')||p.get('group');const g=groupByViewKey(q);if(g)activeView=g.id;}catch(e){}
   // Load visits
   const{data:vData}=await sbClient.from('visits').select('*');
   visits={};
@@ -1177,7 +1181,18 @@ function setView(v){
   renderViewBars(); refreshAll();
 }
 // Share links — open the app pre-filtered to a group. ?view=<id> (matches activeView); ?group= also accepted.
-function viewShareURL(id){return location.origin+location.pathname+'?view='+encodeURIComponent(id);}
+function slugifyName(s){return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+// Resolve a ?view= value to a group: try the readable name-slug first, then fall back to the internal id (older links)
+function groupByViewKey(k){
+  if(!k)return null;
+  const kl=String(k).toLowerCase();
+  return groups.find(g=>slugifyName(g.name)===kl) || groups.find(g=>g.id===k) || null;
+}
+// Share links carry the group's name, e.g. ?view=europe-crew
+function viewShareURL(id){
+  const g=groups.find(x=>x.id===id);
+  return location.origin+location.pathname+'?view='+encodeURIComponent(g?slugifyName(g.name):id);
+}
 function shareView(id){
   const g=groups.find(x=>x.id===id);if(!g)return;
   const url=viewShareURL(id);

@@ -3,6 +3,13 @@
 
 ---
 
+### v2.4.2 — Jul 3 2026
+**Improve: Share links carry the group name**
+- Share links now use the group's name (e.g. ?view=europe-crew) instead of an opaque id
+- Older id-based links still resolve, so anything already shared keeps working
+
+---
+
 ### v2.4.1 — Jul 3 2026
 **Fix: Bulk add/remove keeps its list (mobile) + group-save errors surfaced**
 - Bulk add/remove no longer hides the recognized / not-recognized list behind a blocking pop-up — the list stays on screen with an inline summary, so a misspelled country is easy to spot and fix
