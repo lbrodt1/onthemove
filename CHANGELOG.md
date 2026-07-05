@@ -3,6 +3,16 @@
 
 ---
 
+### v2.5.0 — Jul 5 2026
+**Feature: National Parks tracker + parks map**
+- New "Nat'l Parks" tab tracks all 63 designated U.S. national parks, mirroring the States tab: leaderboard, cards, status cycling, filters, and bulk add/remove
+- Per-person National Park goal added to the participant editor (defaults to 20)
+- Map tab gains a national-parks map — every park plotted as a status-coloured dot on a US map; click a dot to cycle its status
+- Fuzzy park matching: short names (Smokies, Tetons, Wrangell), state codes, and an optional "National Park" suffix all resolve
+- American Samoa and Virgin Islands parks are tracked in the list but sit outside the US map frame
+
+---
+
 ### v2.4.2 — Jul 3 2026
 **Improve: Share links carry the group name**
 - Share links now use the group's name (e.g. ?view=europe-crew) instead of an opaque id
