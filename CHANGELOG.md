@@ -3,6 +3,31 @@
 
 ---
 
+### v2.6.1 — Jul 9 2026
+**Feature: Landmarks layer on the world map**
+- Landmarks now plot as a layer on the world map — each one is a dot coloured by the selected person's status (visited / planned / candidate / none)
+- Click a dot to cycle its status, just like the parks map and the country fills
+- New "Show landmarks" toggle on the Map tab turns the layer on or off
+
+---
+
+### v2.6.0 — Jul 9 2026
+**Feature: Landmarks tab (forests, monuments & wonders)**
+- New "Landmarks" tab: one combined tracker for 80 curated forests, monuments, and wonders spanning the U.S. and the rest of the world (30 wonders, 25 monuments, 25 forests)
+- Each card is tagged by type and country — FOR (forest), MON (monument), WON (wonder)
+- Mirrors the other tabs: leaderboard, cards, status cycling, filters, and bulk add/remove, plus a per-person Landmark goal (defaults to 25) in the participant editor
+- Fuzzy matching for landmarks: full names, common short names (Eiffel, Everest, Ayers Rock), and accented spellings all resolve
+- Nav bar now scrolls horizontally so every tab stays reachable on a phone
+
+---
+
+### v2.5.1 — Jul 9 2026
+**Fix: Leaderboard fits on mobile**
+- Leaderboard no longer runs off the screen on phones — each row reflows to two lines (rank, name, and count on top; full-width progress bar below)
+- Counts are left-aligned into a clean column; Total and Deadline columns are hidden on narrow screens to make room
+
+---
+
 ### v2.5.0 — Jul 5 2026
 **Feature: National Parks tracker + parks map**
 - New "Nat'l Parks" tab tracks all 63 designated U.S. national parks, mirroring the States tab: leaderboard, cards, status cycling, filters, and bulk add/remove

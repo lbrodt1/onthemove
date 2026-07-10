@@ -26,7 +26,7 @@ header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;
 header h1 span{color:var(--gold-light);font-style:italic}
 .subtitle{color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
 .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-nav{background:var(--ink);border-top:1px solid #2e2a26;display:flex;padding:0 28px}
+nav{background:var(--ink);border-top:1px solid #2e2a26;display:flex;padding:0 28px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 nav button{background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 nav button:hover{color:var(--parchment)}
 nav button.active{color:var(--gold-light);border-bottom-color:var(--gold)}
@@ -235,7 +235,19 @@ select.add-inp{cursor:pointer;min-width:160px}
 .cont-sub{font-size:10px;color:var(--muted);min-height:12px;letter-spacing:.03em}
 .hoverinfo{background:var(--ink)!important;color:var(--parchment)!important;border:1px solid var(--gold)!important;border-radius:3px!important;font-family:'DM Mono',monospace!important;font-size:11px!important;padding:5px 9px!important;box-shadow:0 2px 8px rgba(0,0,0,.3)!important}
 .hoverinfo b{color:var(--gold-light)}
-@media(max-width:600px){header{padding:12px}.main{padding:12px 10px}nav{padding:0 8px}.place-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+@media(max-width:600px){
+  header{padding:12px}.main{padding:12px 10px}nav{padding:0 8px}
+  .place-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  /* Leaderboard reflows to two lines per row so nothing runs off a phone screen */
+  .lb-row.lb-header{display:none}
+  .lb-row{grid-template-columns:18px 88px 1fr auto;grid-template-rows:auto auto;column-gap:8px;row-gap:6px;padding:9px 12px}
+  .lb-rank{grid-column:1;grid-row:1}
+  .lb-name{grid-column:2;grid-row:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lb-count{grid-column:3;grid-row:1;text-align:left;white-space:nowrap;align-self:center}
+  .lb-actions{grid-column:4;grid-row:1;justify-self:end}
+  .lb-tooltip{grid-column:1 / -1;grid-row:2}
+  .lb-goal,.lb-deadline{display:none}
+}
 </style>
 </head>
 <body>
@@ -248,6 +260,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="modal-row"><label>Country Goal</label><input id="modal-goal-c" type="number" value="50" min="1" max="300"/></div>
     <div class="modal-row"><label>State Goal</label><input id="modal-goal-s" type="number" value="50" min="1" max="56"/></div>
     <div class="modal-row"><label>National Park Goal</label><input id="modal-goal-p" type="number" value="20" min="1" max="63"/></div>
+    <div class="modal-row"><label>Landmark Goal</label><input id="modal-goal-l" type="number" value="25" min="1" max="80"/></div>
     <div class="modal-row"><label>Goal (optional)</label><input id="modal-deadline" type="text" placeholder="e.g. Dec 2027"/></div>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closePersonModal()">Cancel</button>
@@ -279,7 +292,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.5.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.6.1</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -290,9 +303,10 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
   <button onclick="switchTab('parks',this)">Nat'l Parks</button>
+  <button onclick="switchTab('landmarks',this)">Landmarks</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.5.0</span>
+  <span class="nav-version">v2.6.1</span>
 </nav>
 <main>
   <div class="legend">
@@ -523,6 +537,80 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="place-grid" id="grid-parks"></div>
   </div>
 
+  <!-- LANDMARKS -->
+  <div id="panel-landmarks" class="panel">
+    <div id="view-bar-landmarks" class="view-bar"></div>
+    <div id="people-bar-landmarks" class="people-bar"></div>
+    <div id="leaderboard-landmarks" class="leaderboard"></div>
+    <div class="section-hdr"><h2>Landmarks of the World</h2></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">A curated mix of forests, monuments, and wonders across the U.S. and the wider world. Each card shows its type and country \u2014 <b>FOR</b> forest \u00b7 <b>MON</b> monument \u00b7 <b>WON</b> wonder.</div>
+    <div class="controls">
+      <div class="search-wrap"><span class="search-icon">\u2325</span><input type="text" id="search-landmarks" placeholder="Search landmarks..." oninput="renderTab('landmarks')"/></div>
+      <div class="fbtns" id="fbtns-landmarks"></div>
+    </div>
+    <div class="add-panel">
+      <h4>+ Add Entry</h4>
+      <div class="add-mode-tabs">
+        <button class="amt active" onclick="switchAddMode('landmarks','single',this)">Single</button>
+        <button class="amt" onclick="switchAddMode('landmarks','bulk',this)">Bulk Paste</button>
+        <button class="amt" onclick="switchAddMode('landmarks','remove',this)">Bulk Remove</button>
+      </div>
+      <div class="add-form show" id="af-single-landmarks">
+        <div class="add-row">
+          <label>Landmark</label>
+          <div class="sel-wrap" id="selwrap-landmarks">
+            <span class="sel-search-icon">\u2325</span>
+            <input class="sel-search" id="sel-search-landmarks" placeholder="Type to search..." autocomplete="off" oninput="filterSelDropdown('landmarks')" onfocus="openSelDropdown('landmarks')" onblur="scheduleCloseDropdown('landmarks')"/>
+            <div class="sel-dropdown" id="sel-dropdown-landmarks"></div>
+          </div>
+          <div id="sel-selected-landmarks"></div>
+        </div>
+        <div class="add-row">
+          <label>Who</label>
+          <div class="person-checks" id="si-who-landmarks"></div>
+          <label>Status</label>
+          <select class="add-inp" id="si-st-landmarks" aria-label="Status">
+            <option value="none">None</option><option value="visited" selected>Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="si-dt-landmarks" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddSingle('landmarks')">Add</button>
+        </div>
+      </div>
+      <div class="add-form" id="af-bulk-landmarks">
+        <textarea class="bulk-ta" id="bk-ta-landmarks" placeholder="Paste one per line or comma-separated&#10;Eiffel Tower, Machu Picchu, Black Forest, Devils Tower"></textarea>
+        <div class="bulk-hint">Fuzzy matching: full names and common short names (Eiffel, Everest, Ayers Rock) all work.</div>
+        <div id="bulk-results-landmarks" class="bulk-results"></div>
+        <div class="bulk-status-row">
+          <button class="btn-secondary" onclick="previewBulk('landmarks')">Preview</button>
+          <label>Who:</label>
+          <div class="person-checks" id="bk-who-landmarks"></div>
+          <label>Status</label>
+          <select class="add-inp" id="bk-st-landmarks" aria-label="Status">
+            <option value="none">None</option><option value="visited" selected>Visited</option>
+            <option value="planned">Planned</option><option value="candidate">Candidate</option>
+          </select>
+          <label>Date</label>
+          <input class="add-inp dt" type="text" id="bk-dt-landmarks" placeholder="e.g. Aug 2026"/>
+          <button class="btn-primary" onclick="doAddBulk('landmarks')">Add All Matched</button>
+        </div>
+      </div>
+      <div class="add-form" id="af-remove-landmarks">
+        <textarea class="bulk-ta" id="rm-ta-landmarks" placeholder="Paste landmarks to remove, one per line or comma-separated"></textarea>
+        <div class="bulk-hint">Fuzzy matched. Removes status and date for selected people.</div>
+        <div id="rm-results-landmarks" class="bulk-results"></div>
+        <div class="bulk-status-row">
+          <button class="btn-secondary" onclick="previewRemove('landmarks')">Preview</button>
+          <label>Remove for:</label>
+          <div class="person-checks" id="rm-who-landmarks"></div>
+          <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('landmarks')">Remove All</button>
+        </div>
+      </div>
+    </div>
+    <div class="place-grid" id="grid-landmarks"></div>
+  </div>
+
   <!-- MAP -->
   <div id="panel-map" class="panel">
     <div class="section-hdr"><h2>World Map</h2></div>
@@ -531,6 +619,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div id="map-people" class="people-bar"></div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
       <label class="pcheck" style="font-size:11px"><input type="checkbox" id="iso-toggle" checked onchange="toggleIsoLabels()"/> <span>Show ISO codes</span></label>
+      <label class="pcheck" style="font-size:11px;margin-left:14px"><input type="checkbox" id="lm-toggle" checked onchange="toggleLandmarks()"/> <span>Show landmarks</span></label>
     </div>
     <div class="map-wrap"><div id="worldmap"></div></div>
     <div class="section-hdr"><h2>Continents</h2></div>
@@ -548,6 +637,29 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.6.1</span><span class="cl-date">Jul 9 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>Landmarks now appear as a layer on the world map — every landmark is a dot coloured by the selected person's status; click a dot to cycle it</li>
+            <li>New "Show landmarks" toggle on the Map tab turns the layer on or off</li>
+          </ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.6.0</span><span class="cl-date">Jul 9 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>New <b>Landmarks</b> tab — one combined tracker for 80 curated forests, monuments, and wonders across the U.S. and the world</li>
+            <li>Each card is tagged by type and country (FOR forest · MON monument · WON wonder)</li>
+            <li>Same leaderboard, cards, filters, and bulk add/remove as the other tabs, with a per-person Landmark goal in the participant editor</li>
+            <li>Nav bar now scrolls sideways so every tab stays reachable on a phone</li>
+          </ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.5.1</span><span class="cl-date">Jul 9 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list">
+            <li>Leaderboard no longer runs off the screen on mobile — each row reflows to two lines (rank, name, and count on top; progress bar below)</li>
+            <li>Counts are left-aligned in a clean column; Total and Deadline columns are hidden on narrow screens to make room</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.5.0</span><span class="cl-date">Jul 5 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list">
@@ -881,6 +993,80 @@ const STATE_BY_ABBR  = Object.fromEntries(STATE_DATA.map(d=>[d[1].toUpperCase(),
 const PARKS = PARK_DATA.map(d=>d[0]);
 const PARK_OFFMAP = new Set(["AS","VI"]); // territories outside the U.S. map projection
 
+// [name, ISO2 country, category] \u2014 curated forests / monuments / wonders, US + world
+const LANDMARK_DATA=[
+  ["Great Wall of China","CN","Wonder"],["Petra","JO","Wonder"],
+  ["Christ the Redeemer","BR","Wonder"],["Machu Picchu","PE","Wonder"],
+  ["Chich\u00e9n Itz\u00e1","MX","Wonder"],["Colosseum","IT","Wonder"],
+  ["Taj Mahal","IN","Wonder"],["Great Pyramid of Giza","EG","Wonder"],
+  ["Angkor Wat","KH","Wonder"],["Eiffel Tower","FR","Wonder"],
+  ["Statue of Liberty","US","Wonder"],["Stonehenge","GB","Wonder"],
+  ["Acropolis of Athens","GR","Wonder"],["Sydney Opera House","AU","Wonder"],
+  ["Moai of Rapa Nui","CL","Wonder"],["Sagrada Fam\u00edlia","ES","Wonder"],
+  ["Hagia Sophia","TR","Wonder"],["Mont-Saint-Michel","FR","Wonder"],
+  ["Borobudur","ID","Wonder"],["Great Barrier Reef","AU","Wonder"],
+  ["Mount Everest","NP","Wonder"],["Victoria Falls","ZW","Wonder"],
+  ["Iguaz\u00fa Falls","AR","Wonder"],["Ha Long Bay","VN","Wonder"],
+  ["Table Mountain","ZA","Wonder"],["Uluru","AU","Wonder"],
+  ["Neuschwanstein Castle","DE","Wonder"],["Alhambra","ES","Wonder"],
+  ["Salar de Uyuni","BO","Wonder"],["Bagan","MM","Wonder"],
+  ["Devils Tower","US","Monument"],["Muir Woods","US","Monument"],
+  ["Grand Staircase-Escalante","US","Monument"],["Bears Ears","US","Monument"],
+  ["Craters of the Moon","US","Monument"],["Dinosaur","US","Monument"],
+  ["Rainbow Bridge","US","Monument"],["Cabrillo","US","Monument"],
+  ["Chiricahua","US","Monument"],["Natural Bridges","US","Monument"],
+  ["Montezuma Castle","US","Monument"],["Bandelier","US","Monument"],
+  ["Canyon de Chelly","US","Monument"],["Organ Pipe Cactus","US","Monument"],
+  ["Aztec Ruins","US","Monument"],["Hovenweep","US","Monument"],
+  ["Casa Grande Ruins","US","Monument"],["Gila Cliff Dwellings","US","Monument"],
+  ["Brandenburg Gate","DE","Monument"],["Arc de Triomphe","FR","Monument"],
+  ["Leaning Tower of Pisa","IT","Monument"],["Gateway of India","IN","Monument"],
+  ["The Little Mermaid","DK","Monument"],["The Motherland Calls","RU","Monument"],
+  ["Merlion","SG","Monument"],
+  ["Tongass","US","Forest"],["Chugach","US","Forest"],
+  ["White Mountain","US","Forest"],["Green Mountain","US","Forest"],
+  ["Pisgah","US","Forest"],["Coconino","US","Forest"],
+  ["Kaibab","US","Forest"],["Angeles","US","Forest"],
+  ["Inyo","US","Forest"],["Bridger-Teton","US","Forest"],
+  ["Shoshone","US","Forest"],["Superior","US","Forest"],
+  ["White River","US","Forest"],["San Juan","US","Forest"],
+  ["Mount Hood","US","Forest"],["Gifford Pinchot","US","Forest"],
+  ["Black Forest","DE","Forest"],["Bia\u0142owie\u017ca Forest","PL","Forest"],
+  ["Daintree Rainforest","AU","Forest"],["Sherwood Forest","GB","Forest"],
+  ["Aokigahara","JP","Forest"],["Sagano Bamboo Grove","JP","Forest"],
+  ["Fontainebleau Forest","FR","Forest"],["Crooked Forest","PL","Forest"],
+  ["Amazon Rainforest","BR","Forest"]
+];
+const LANDMARKS = LANDMARK_DATA.map(d=>d[0]);
+const LANDMARK_CAT_ABBR={Forest:"FOR",Monument:"MON",Wonder:"WON"};
+const LANDMARK_ALIASES={
+  "great wall":"Great Wall of China","the great wall":"Great Wall of China",
+  "everest":"Mount Everest","mt everest":"Mount Everest","mount everest":"Mount Everest",
+  "eiffel":"Eiffel Tower","machu":"Machu Picchu","taj":"Taj Mahal","angkor":"Angkor Wat",
+  "giza":"Great Pyramid of Giza","great pyramid":"Great Pyramid of Giza","pyramids":"Great Pyramid of Giza","pyramids of giza":"Great Pyramid of Giza",
+  "christ redeemer":"Christ the Redeemer","cristo redentor":"Christ the Redeemer",
+  "ayers rock":"Uluru","easter island":"Moai of Rapa Nui","rapa nui":"Moai of Rapa Nui","moai":"Moai of Rapa Nui",
+  "opera house":"Sydney Opera House","barrier reef":"Great Barrier Reef",
+  "iguazu":"Iguaz\u00fa Falls","halong":"Ha Long Bay","halong bay":"Ha Long Bay",
+  "neuschwanstein":"Neuschwanstein Castle","uyuni":"Salar de Uyuni",
+  "bialowieza":"Bia\u0142owie\u017ca Forest","amazon":"Amazon Rainforest","daintree":"Daintree Rainforest","sherwood":"Sherwood Forest",
+  "pisa":"Leaning Tower of Pisa","leaning tower":"Leaning Tower of Pisa",
+  "brandenburg":"Brandenburg Gate","little mermaid":"The Little Mermaid","motherland calls":"The Motherland Calls"
+};
+function resolveLandmark(raw){
+  let s=(raw||'').replace(/[\u201C\u201D\u2018\u2019]/g,'').trim();
+  if(!s)return null;
+  s=s.replace(/\s+national (forest|monument|park)$/i,'').trim();
+  const nfd=x=>x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const lo=nfd(s);
+  const exact=LANDMARK_DATA.find(d=>nfd(d[0])===lo);
+  if(exact)return{name:exact[0],abbr:exact[1],method:'exact'};
+  if(LANDMARK_ALIASES[lo]){const nm=LANDMARK_ALIASES[lo];const d=LANDMARK_DATA.find(x=>x[0]===nm);if(d)return{name:d[0],abbr:d[1],method:'alias'};}
+  if(lo.length>=3){const sw=LANDMARK_DATA.find(d=>nfd(d[0]).startsWith(lo));if(sw)return{name:sw[0],abbr:sw[1],method:'fuzzy'};}
+  if(lo.length>=4){const inc=LANDMARK_DATA.find(d=>nfd(d[0]).includes(lo));if(inc)return{name:inc[0],abbr:inc[1],method:'fuzzy'};}
+  return null;
+}
+
 // ─── CONTINENTS (verified: all 234 countries covered exactly once) ───────────
 const CONTINENT_ORDER=["Africa","Asia","Europe","North America","South America","Oceania"];
 const CONTINENTS={
@@ -963,13 +1149,13 @@ function resolvePark(raw){
 }
 
 // ─── SEARCHABLE DROPDOWN ─────────────────────────────────────────────────────
-const selSelected={countries:null,states:null,parks:null};
-let dropCloseTimer={countries:null,states:null,parks:null};
+const selSelected={countries:null,states:null,parks:null,landmarks:null};
+let dropCloseTimer={countries:null,states:null,parks:null,landmarks:null};
 function openSelDropdown(type){clearTimeout(dropCloseTimer[type]);filterSelDropdown(type);document.getElementById('sel-dropdown-'+type).classList.add('open');}
 function scheduleCloseDropdown(type){dropCloseTimer[type]=setTimeout(()=>{document.getElementById('sel-dropdown-'+type).classList.remove('open');},200);}
 function filterSelDropdown(type){
   const q=document.getElementById('sel-search-'+type).value.toLowerCase();
-  const data=type==='parks'?PARK_DATA:(type==='countries'?COUNTRY_DATA:STATE_DATA);
+  const data=type==='landmarks'?LANDMARK_DATA:(type==='parks'?PARK_DATA:(type==='countries'?COUNTRY_DATA:STATE_DATA));
   const drop=document.getElementById('sel-dropdown-'+type);
   const matches=data.filter(d=>{const name=d[0].toLowerCase();const code=(d[1]||'').toLowerCase();return name.includes(q)||code.startsWith(q)||code===q;}).slice(0,80);
   if(!matches.length){drop.innerHTML='<div class="sel-none">No matches</div>';drop.classList.add('open');return;}
@@ -997,14 +1183,14 @@ let visits={}, participants=[];
 let groups=[];          // [{id,name,members:[personId,...]}] — saved views, shared via Supabase
 let activeView='all';   // 'all' or a group id
 let editingGroupId=null, groupDraftMembers=[]; // group editor state
-let editing={}, filters={countries:'all',states:'all',parks:'all'};
+let editing={}, filters={countries:'all',states:'all',parks:'all',landmarks:'all'};
 let focusPerson=null; // null = show all, else personId
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
 let mapPerson=null, worldMap=null, parksMap=null;
-let showIsoLabels=true;
-let bulkResolved={countries:[],states:[],parks:[]};
-let bulkAllResults={countries:[],states:[],parks:[]}; // full preview incl. unrecognized, for the post-add summary
-let removeResolved={countries:[],states:[],parks:[]};
+let showIsoLabels=true, showLandmarks=true;
+let bulkResolved={countries:[],states:[],parks:[],landmarks:[]};
+let bulkAllResults={countries:[],states:[],parks:[],landmarks:[]}; // full preview incl. unrecognized, for the post-add summary
+let removeResolved={countries:[],states:[],parks:[],landmarks:[]};
 
 // Person colors (cycles for unlimited people)
 const PERSON_COLORS=['#9b3a1e','#3d4a5c','#2d6b4a','#6b3d8a','#8a6b2d','#2d5c8a','#8a2d5c','#4a7c2d'];
@@ -1078,8 +1264,8 @@ async function loadAllData(){
 
 function defaultParticipants(){
   return[
-    {id:'laura',name:'Laura',color:PERSON_COLORS[0],goal_countries:50,goal_states:50,goal_parks:20,deadline_countries:'',deadline_states:'',deadline_parks:''},
-    {id:'faron',name:'Faron',color:PERSON_COLORS[1],goal_countries:50,goal_states:50,goal_parks:20,deadline_countries:'',deadline_states:'',deadline_parks:''}
+    {id:'laura',name:'Laura',color:PERSON_COLORS[0],goal_countries:50,goal_states:50,goal_parks:20,goal_landmarks:25,deadline_countries:'',deadline_states:'',deadline_parks:'',deadline_landmarks:''},
+    {id:'faron',name:'Faron',color:PERSON_COLORS[1],goal_countries:50,goal_states:50,goal_parks:20,goal_landmarks:25,deadline_countries:'',deadline_states:'',deadline_parks:'',deadline_landmarks:''}
   ];
 }
 
@@ -1095,7 +1281,7 @@ function subscribeRealtime(){
       const{eventType,new:row,old}=payload;
       if(eventType==='DELETE'&&old){delete visits[`${old.type}|${old.place}|${old.who}`];}
       else if(row){visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};}
-      ['countries','states','parks'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
+      ['countries','states','parks','landmarks'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
       const mp=document.getElementById('panel-map');
       if(mp&&mp.classList.contains('active'))renderMapTab();
     })
@@ -1150,6 +1336,7 @@ function openAddPerson(){
   document.getElementById('modal-goal-c').value=50;
   document.getElementById('modal-goal-s').value=50;
   document.getElementById('modal-goal-p').value=20;
+  document.getElementById('modal-goal-l').value=25;
   document.getElementById('modal-deadline').value='';
   document.getElementById('person-modal').classList.add('show');
   setTimeout(()=>document.getElementById('modal-name').focus(),50);
@@ -1163,6 +1350,7 @@ function openEditPerson(id){
   document.getElementById('modal-goal-c').value=p.goal_countries||50;
   document.getElementById('modal-goal-s').value=p.goal_states||50;
   document.getElementById('modal-goal-p').value=p.goal_parks||20;
+  document.getElementById('modal-goal-l').value=p.goal_landmarks||25;
   document.getElementById('modal-deadline').value=p.deadline_countries||p.deadline_states||p.deadline_parks||'';
   document.getElementById('person-modal').classList.add('show');
 }
@@ -1173,14 +1361,15 @@ async function savePersonModal(){
   const goalC=parseInt(document.getElementById('modal-goal-c').value)||50;
   const goalS=parseInt(document.getElementById('modal-goal-s').value)||50;
   const goalP=parseInt(document.getElementById('modal-goal-p').value)||20;
+  const goalL=parseInt(document.getElementById('modal-goal-l').value)||25;
   const deadline=document.getElementById('modal-deadline').value.trim();
   if(editingPersonId){
     const p=participants.find(x=>x.id===editingPersonId);
-    if(p){p.name=name;p.goal_countries=goalC;p.goal_states=goalS;p.goal_parks=goalP;p.deadline_countries=deadline;p.deadline_states=deadline;p.deadline_parks=deadline;}
+    if(p){p.name=name;p.goal_countries=goalC;p.goal_states=goalS;p.goal_parks=goalP;p.goal_landmarks=goalL;p.deadline_countries=deadline;p.deadline_states=deadline;p.deadline_parks=deadline;p.deadline_landmarks=deadline;}
   } else {
     const id=name.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+Date.now();
     const color=personColor(participants.length);
-    participants.push({id,name,color,goal_countries:goalC,goal_states:goalS,goal_parks:goalP,deadline_countries:deadline,deadline_states:deadline,deadline_parks:deadline});
+    participants.push({id,name,color,goal_countries:goalC,goal_states:goalS,goal_parks:goalP,goal_landmarks:goalL,deadline_countries:deadline,deadline_states:deadline,deadline_parks:deadline,deadline_landmarks:deadline});
   }
   await saveParticipants();
   closePersonModal();
@@ -1197,7 +1386,7 @@ async function removePerson(id){
 
 // ─── DATA HELPERS ─────────────────────────────────────────────────────────────
 function getEntry(type,place,who){return visits[`${type}|${place}|${who}`]||{status:'none',date:''};}
-function getPlaces(type){return type==='parks'?PARKS:(type==='countries'?COUNTRIES:STATES);}
+function getPlaces(type){return type==='landmarks'?LANDMARKS:(type==='parks'?PARKS:(type==='countries'?COUNTRIES:STATES));}
 function viewParticipants(){
   if(activeView==='all')return participants;
   const g=groups.find(x=>x.id===activeView);
@@ -1270,8 +1459,8 @@ function updateLeaderboard(type){
       else if(st==='planned')pl++;
       else if(st==='candidate')c++;
     });
-    const goal=type==='parks'?(p.goal_parks||20):(type==='countries'?p.goal_countries:p.goal_states);
-    const deadline=type==='parks'?p.deadline_parks:(type==='countries'?p.deadline_countries:p.deadline_states);
+    const goal=type==='landmarks'?(p.goal_landmarks||25):(type==='parks'?(p.goal_parks||20):(type==='countries'?p.goal_countries:p.goal_states));
+    const deadline=type==='landmarks'?p.deadline_landmarks:(type==='parks'?p.deadline_parks:(type==='countries'?p.deadline_countries:p.deadline_states));
     return{p,v,pl,c,goal,deadline};
   }).sort((a,b)=>b.v-a.v||b.pl-a.pl||a.p.name.localeCompare(b.p.name));
 
@@ -1322,7 +1511,7 @@ function updatePeopleBar(type){
 }
 function toggleFocus(id,type){
   focusPerson=focusPerson===id?null:id;
-  ['countries','states','parks'].forEach(t=>{updatePeopleBar(t);buildPersonChecks(t);});
+  ['countries','states','parks','landmarks'].forEach(t=>{updatePeopleBar(t);buildPersonChecks(t);});
   renderTab(type);
 }
 
@@ -1336,7 +1525,7 @@ function viewBarHtml(){
 }
 function renderViewBars(){
   const html=viewBarHtml();
-  ['view-bar-countries','view-bar-states','view-bar-parks','view-bar-map'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+  ['view-bar-countries','view-bar-states','view-bar-parks','view-bar-landmarks','view-bar-map'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
 }
 function setView(v){
   activeView=v; focusPerson=null;
@@ -1498,6 +1687,7 @@ function filteredPlaces(type){
 function getIsoCode(type,name){
   if(type==='countries'){const d=COUNTRY_DATA.find(d=>d[0]===name);return d?d[1]:'';}
   if(type==='parks'){const d=PARK_DATA.find(d=>d[0]===name);return d?d[1]:'';}
+  if(type==='landmarks'){const d=LANDMARK_DATA.find(d=>d[0]===name);return d?((LANDMARK_CAT_ABBR[d[2]]||'')+'\u00b7'+d[1]):'';}
   const d=STATE_DATA.find(d=>d[0]===name);return d?d[1]:'';
 }
 function makeCard(type,place){
@@ -1583,7 +1773,7 @@ function switchTab(tab,btn){
 }
 function refreshAll(){
   renderViewBars();
-  ['countries','states','parks'].forEach(t=>{
+  ['countries','states','parks','landmarks'].forEach(t=>{
     updatePeopleBar(t);
     updateLeaderboard(t);
     buildFilterBtns(t);
@@ -1618,6 +1808,88 @@ function worldFillData(){
   });
   return d;
 }
+const LANDMARK_COORDS={
+  "Great Wall of China":[40.4319,116.5704],"Petra":[30.3285,35.4444],
+  "Christ the Redeemer":[-22.9519,-43.2105],"Machu Picchu":[-13.1631,-72.5450],
+  "Chich\u00e9n Itz\u00e1":[20.6843,-88.5678],"Colosseum":[41.8902,12.4922],
+  "Taj Mahal":[27.1751,78.0421],"Great Pyramid of Giza":[29.9792,31.1342],
+  "Angkor Wat":[13.4125,103.8670],"Eiffel Tower":[48.8584,2.2945],
+  "Statue of Liberty":[40.6892,-74.0445],"Stonehenge":[51.1789,-1.8262],
+  "Acropolis of Athens":[37.9715,23.7267],"Sydney Opera House":[-33.8568,151.2153],
+  "Moai of Rapa Nui":[-27.1127,-109.3497],"Sagrada Fam\u00edlia":[41.4036,2.1744],
+  "Hagia Sophia":[41.0086,28.9802],"Mont-Saint-Michel":[48.6361,-1.5115],
+  "Borobudur":[-7.6079,110.2038],"Great Barrier Reef":[-18.2871,147.6992],
+  "Mount Everest":[27.9881,86.9250],"Victoria Falls":[-17.9243,25.8572],
+  "Iguaz\u00fa Falls":[-25.6953,-54.4367],"Ha Long Bay":[20.9101,107.1839],
+  "Table Mountain":[-33.9628,18.4098],"Uluru":[-25.3444,131.0369],
+  "Neuschwanstein Castle":[47.5576,10.7498],"Alhambra":[37.1761,-3.5881],
+  "Salar de Uyuni":[-20.1338,-67.4891],"Bagan":[21.1717,94.8585],
+  "Devils Tower":[44.5902,-104.7146],"Muir Woods":[37.8970,-122.5811],
+  "Grand Staircase-Escalante":[37.4310,-111.6900],"Bears Ears":[37.6300,-109.8600],
+  "Craters of the Moon":[43.4166,-113.5165],"Dinosaur":[40.5240,-108.9840],
+  "Rainbow Bridge":[37.0774,-110.9642],"Cabrillo":[32.6722,-117.2416],
+  "Chiricahua":[32.0069,-109.3559],"Natural Bridges":[37.6088,-110.0137],
+  "Montezuma Castle":[34.6115,-111.8350],"Bandelier":[35.7783,-106.2706],
+  "Canyon de Chelly":[36.1322,-109.4695],"Organ Pipe Cactus":[31.9550,-112.8010],
+  "Aztec Ruins":[36.8356,-107.9986],"Hovenweep":[37.3843,-109.0742],
+  "Casa Grande Ruins":[32.9958,-111.5375],"Gila Cliff Dwellings":[33.2277,-108.2618],
+  "Brandenburg Gate":[52.5163,13.3777],"Arc de Triomphe":[48.8738,2.2950],
+  "Leaning Tower of Pisa":[43.7230,10.3966],"Gateway of India":[18.9220,72.8347],
+  "The Little Mermaid":[55.6929,12.5993],"The Motherland Calls":[48.7420,44.5370],
+  "Merlion":[1.2868,103.8545],"Tongass":[57.0500,-133.9000],
+  "Chugach":[60.9000,-145.5000],"White Mountain":[44.1000,-71.4000],
+  "Green Mountain":[43.7000,-72.9000],"Pisgah":[35.3500,-82.8000],
+  "Coconino":[34.8000,-111.5000],"Kaibab":[36.5000,-112.2000],
+  "Angeles":[34.3000,-118.0000],"Inyo":[37.3000,-118.5000],
+  "Bridger-Teton":[43.2000,-110.2000],"Shoshone":[44.0000,-109.5000],
+  "Superior":[47.8000,-91.0000],"White River":[39.5000,-106.8000],
+  "San Juan":[37.6000,-107.6000],"Mount Hood":[45.3000,-121.7000],
+  "Gifford Pinchot":[46.2000,-121.8000],"Black Forest":[48.0000,8.2000],
+  "Bia\u0142owie\u017ca Forest":[52.7000,23.8700],"Daintree Rainforest":[-16.1700,145.4000],
+  "Sherwood Forest":[53.2000,-1.0700],"Aokigahara":[35.4700,138.6200],
+  "Sagano Bamboo Grove":[35.0170,135.6710],"Fontainebleau Forest":[48.4000,2.6700],
+  "Crooked Forest":[53.2150,14.4770],"Amazon Rainforest":[-3.4653,-62.2159]
+};
+function toggleLandmarks(){
+  const el=document.getElementById('lm-toggle');
+  showLandmarks=el?el.checked:!showLandmarks;
+  drawLandmarkBubbles();
+}
+function landmarkBubbleArray(){
+  const arr=[];
+  if(!mapPerson||!showLandmarks)return arr;
+  LANDMARK_DATA.forEach(d=>{
+    const co=LANDMARK_COORDS[d[0]];
+    if(!co)return;
+    const st=getEntry('landmarks',d[0],mapPerson).status||'none';
+    arr.push({name:d[0],latitude:co[0],longitude:co[1],radius:st==='none'?2.6:5.5,
+      fillKey:st,statusLabel:st.charAt(0).toUpperCase()+st.slice(1),
+      cat:(LANDMARK_CAT_ABBR[d[2]]||''),cc:d[1]});
+  });
+  return arr;
+}
+function drawLandmarkBubbles(){
+  if(!worldMap)return;
+  worldMap.bubbles(landmarkBubbleArray(),{
+    borderColor:'#faf7f2',borderWidth:0.7,highlightOnHover:false,fillOpacity:0.95,
+    popupTemplate:function(geo,d){return'<div class="hoverinfo"><b>'+d.name+'</b> <span style="opacity:.7">'+d.cat+'\u00b7'+d.cc+'</span><br>'+d.statusLabel+'</div>';}
+  });
+  worldMap.svg.selectAll('.datamaps-bubble')
+    .style('cursor','pointer')
+    .on('click.lm',function(d){cycleLandmarkFromMap(d.name);});
+}
+async function cycleLandmarkFromMap(name){
+  if(!mapPerson)return;
+  const e=getEntry('landmarks',name,mapPerson);
+  const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
+  visits[`landmarks|${name}|${mapPerson}`]={status:ns,date:e.date||''};
+  drawLandmarkBubbles();updateLeaderboard('landmarks');updatePeopleBar('landmarks');renderTabNoSort('landmarks');
+  const ok=await saveVisit('landmarks',name,mapPerson,ns,e.date||'');
+  if(!ok){
+    visits[`landmarks|${name}|${mapPerson}`]={status:e.status||'none',date:e.date||''};
+    drawLandmarkBubbles();updateLeaderboard('landmarks');updatePeopleBar('landmarks');renderTabNoSort('landmarks');
+  }
+}
 function renderWorldMap(){
   const el=document.getElementById('worldmap');
   if(!el)return;
@@ -1632,7 +1904,7 @@ function renderWorldMap(){
       element:el,
       responsive:false,
       projection:'mercator',
-      fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a'},
+      fills:{defaultFill:'#c8c0b4',visited:'#2d4228',planned:'#c9922a',candidate:'#6b5b8a',none:'#b3aa9c'},
       data:data,
       geographyConfig:{
         popupOnHover:true,highlightOnHover:false,
@@ -1652,8 +1924,10 @@ function renderWorldMap(){
     });
     fitWorldSvg();
     drawIsoLabels();
+    drawLandmarkBubbles();
   }else{
     worldMap.updateChoropleth(data,{reset:true});
+    drawLandmarkBubbles();
   }
 }
 // Make the map scale to its container: give the SVG a viewBox so fills + labels
@@ -1848,7 +2122,7 @@ async function removePlace(type,place){
 }
 async function doAddSingle(type){
   const sel=selSelected[type];
-  if(!sel){alert('Please select a '+(type==='countries'?'country':(type==='parks'?'park':'state'))+' first.');return;}
+  if(!sel){alert('Please select a '+(type==='countries'?'country':(type==='parks'?'park':(type==='landmarks'?'landmark':'state')))+' first.');return;}
   const place=sel.name;
   const status=document.getElementById('si-st-'+type).value;
   const date=document.getElementById('si-dt-'+type).value.trim();
@@ -1870,7 +2144,7 @@ function previewBulk(type){
   const items=raw.split(/[\r\n,]+/).map(s=>s.trim()).filter(Boolean);
   const results=[];const seen=new Set();
   for(const item of items){
-    const r=type==='parks'?resolvePark(item):(type==='countries'?resolveCountry(item):resolveState(item));
+    const r=type==='landmarks'?resolveLandmark(item):(type==='parks'?resolvePark(item):(type==='countries'?resolveCountry(item):resolveState(item)));
     if(!r){results.push({input:item,status:'unknown'});continue;}
     const key=r.name.toLowerCase();
     if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
@@ -1933,7 +2207,7 @@ function previewRemove(type){
   const results=[];const seen=new Set();
   const vps=visibleParticipants();
   for(const item of items){
-    const r=type==='parks'?resolvePark(item):(type==='countries'?resolveCountry(item):resolveState(item));
+    const r=type==='landmarks'?resolveLandmark(item):(type==='parks'?resolvePark(item):(type==='countries'?resolveCountry(item):resolveState(item)));
     if(!r){results.push({input:item,status:'unknown'});continue;}
     const key=r.name.toLowerCase();
     if(seen.has(key)){results.push({input:item,name:r.name,status:'dup'});continue;}
@@ -2009,7 +2283,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(SB_KEY==='PASTE_ANON_KEY_HERE'){setStatus('offline','Key not set');return;}
   await initSupabase(SB_URL,SB_KEY);
 });
-window.addEventListener('resize',()=>['countries','states','parks'].forEach(t=>updateLeaderboard(t)));
+window.addEventListener('resize',()=>['countries','states','parks','landmarks'].forEach(t=>updateLeaderboard(t)));
 </script>
 </body>
 </html>
