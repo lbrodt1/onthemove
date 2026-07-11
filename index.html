@@ -57,6 +57,7 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px}
 .lb-goal{font-size:10px;color:var(--muted);text-align:right}
 .lb-deadline{font-size:10px;color:var(--muted);text-align:center}
 .lb-deadline.soon{color:var(--rust)}
+.lb-empty{padding:14px;text-align:center;font-size:11px;color:var(--muted);letter-spacing:.04em}
 .lb-actions{display:flex;gap:4px;justify-content:flex-end}
 .lb-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px}
 .lb-edit-btn:hover{background:var(--border);color:var(--ink)}
@@ -291,7 +292,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.8.0</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.8.2</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -304,7 +305,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('landmarks',this)">Landmarks</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.8.0</span>
+  <span class="nav-version">v2.8.2</span>
 </nav>
 <main>
   <div class="legend">
@@ -559,6 +560,23 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.8.2</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list">
+            <li>Removed the hardcoded Laura + Faron placeholders — the page no longer flashes made-up people while it connects</li>
+            <li>An empty board now shows a &ldquo;tap + Add&rdquo; prompt instead of inventing participants, and a first-time setup no longer writes placeholder people into the database</li>
+            <li>If the participants data can’t be read, the app now says so instead of quietly swapping in placeholder names</li>
+          </ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.8.1</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-fix">Fix</span></div>
+          <ul class="cl-list">
+            <li>Cards no longer jump when you click them — clicking a status re-sorted the grid immediately, so the card moved out from under you</li>
+            <li>The grid now holds its order while you're clicking and re-sorts 2 seconds after your last click</li>
+            <li>A card you just clicked stays put even if the active filter would hide it, until the re-sort</li>
+            <li>If a save fails or you're offline, the click now visibly reverts instead of showing a status that was never saved</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.8.0</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list">
@@ -1239,6 +1257,10 @@ let editing={}, filters={countries:'all',states:'all',parks:'all',landmarks:'all
 let landmarkCat='all';
 let focusPerson=null; // null = show all, else personId
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
+// Order currently painted on screen, per tab, so cards don't jump while you click.
+let renderOrder={countries:[],states:[],landmarks:[]};
+// Places just clicked: kept on screen (in place) even if the active filter would drop them, until the re-sort.
+let holdPlaces={countries:new Set(),states:new Set(),landmarks:new Set()};
 let mapPerson=null, worldMap=null, parksMap=null;
 let showIsoLabels=true, showLandmarks=true;
 let bulkResolved={countries:[],states:[],parks:[],landmarks:[]};
@@ -1316,10 +1338,18 @@ async function loadAllData(){
   // Load participants from settings
   const{data:sData}=await sbClient.from('settings').select('*').eq('id','main').single();
   if(sData&&sData.participants){
-    try{participants=JSON.parse(sData.participants);}catch(e){participants=defaultParticipants();}
+    try{
+      const parsed=JSON.parse(sData.participants);
+      participants=Array.isArray(parsed)?parsed:[];
+    }catch(e){
+      // Never quietly substitute made-up people for real data — say so instead.
+      participants=[];
+      console.error('[DB] participants JSON unreadable:',e);
+      setStatus('offline','Could not read participants','participants JSON parse failed: '+(e.message||e));
+    }
   } else {
-    participants=defaultParticipants();
-    await sbClient.from('settings').upsert({id:'main',participants:JSON.stringify(participants)});
+    // No settings row yet: start empty rather than inventing anyone.
+    participants=[];
   }
   // Load saved groups (stored in a separate settings row, reusing the participants column)
   try{
@@ -1337,12 +1367,8 @@ async function loadAllData(){
   refreshAll();
 }
 
-function defaultParticipants(){
-  return[
-    {id:'laura',name:'Laura',color:PERSON_COLORS[0],goal_countries:50,goal_states:50,goal_parks:20,goal_landmarks:25,deadline_countries:'',deadline_states:'',deadline_parks:'',deadline_landmarks:''},
-    {id:'faron',name:'Faron',color:PERSON_COLORS[1],goal_countries:50,goal_states:50,goal_parks:20,goal_landmarks:25,deadline_countries:'',deadline_states:'',deadline_parks:'',deadline_landmarks:''}
-  ];
-}
+// No hardcoded people. Participants come from the database; an empty list shows the "add someone" prompt.
+function defaultParticipants(){return[];}
 
 async function saveParticipants(){
   if(!sbClient)return;
@@ -1479,13 +1505,21 @@ async function cycleStatus(type,place,who){
   const e=getEntry(type,place,who);
   const ns=CYCLE[(CYCLE.indexOf(e.status||'none')+1)%CYCLE.length];
   visits[`${type}|${place}|${who}`]={status:ns,date:e.date};
-  renderTabNoSort(type); updateLeaderboard(type);
-  await saveVisit(type,place,who,ns,e.date);
+  if(holdPlaces[type])holdPlaces[type].add(place);
+  renderTabNoSort(type); updateLeaderboard(type); updatePeopleBar(type);
+  scheduleResort(type);
+  const ok=await saveVisit(type,place,who,ns,e.date);
+  if(!ok){
+    visits[`${type}|${place}|${who}`]={status:e.status||'none',date:e.date};
+    renderTabNoSort(type); updateLeaderboard(type); updatePeopleBar(type);
+  }
 }
 async function setDate(type,place,who,date){
   const e=getEntry(type,place,who);
   visits[`${type}|${place}|${who}`]={status:e.status,date};
+  if(holdPlaces[type])holdPlaces[type].add(place);
   renderTabNoSort(type);
+  scheduleResort(type);
   await saveVisit(type,place,who,e.status,date);
 }
 
@@ -1519,7 +1553,11 @@ function fmtDeadline(s){
 }
 function updateLeaderboard(type){
   const wrap=document.getElementById('leaderboard-'+type);
-  if(!wrap||!participants.length){if(wrap)wrap.innerHTML='';return;}
+  if(!wrap)return;
+  if(!participants.length){
+    wrap.innerHTML='<div class="lb-empty">'+(sbClient?'No one\u2019s on the board yet \u2014 tap <b>+ Add</b> to add a traveller.':'Loading\u2026')+'</div>';
+    return;
+  }
   const places=getPlaces(type);
   const total=places.length;
   // Build rows with counts
@@ -1811,22 +1849,44 @@ function makeCard(type,place){
   }
   card.appendChild(badges);return card;
 }
+function displayPlacesStable(type){
+  const want=new Set(filteredPlaces(type));            // membership per current filter/search
+  (holdPlaces[type]||new Set()).forEach(p=>want.add(p)); // keep just-clicked cards visible
+  const prev=renderOrder[type]||[];
+  const out=[];
+  prev.forEach(p=>{if(want.has(p)){out.push(p);want.delete(p);}});  // keep existing positions
+  [...want].sort((a,b)=>a.localeCompare(b)).forEach(p=>out.push(p)); // anything new goes after
+  return out;
+}
+function scheduleResort(type){
+  clearTimeout(sortDebounce);
+  sortDebounce=setTimeout(()=>{
+    holdPlaces[type]=new Set();
+    renderTab(type);
+  },2000);
+}
 function renderTab(type){
   const grid=document.getElementById('grid-'+type);grid.innerHTML='';
   const places=filteredPlaces(type);
+  renderOrder[type]=places.slice();
   if(!places.length){const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
   places.forEach(p=>grid.appendChild(makeCard(type,p)));
 }
 function renderTabNoSort(type){
   const grid=document.getElementById('grid-'+type);
-  const places=filteredPlaces(type);
+  const places=displayPlacesStable(type);
+  renderOrder[type]=places.slice();
   if(!places.length){grid.innerHTML='';const e=document.createElement('div');e.className='empty';e.textContent='No places match your filter.';grid.appendChild(e);return;}
   const existing=[...grid.querySelectorAll('.place-card')];
   const existingNames=existing.map(c=>c.querySelector('.place-name')?.textContent);
-  const newNames=places.map(p=>p);
-  if(JSON.stringify(existingNames)===JSON.stringify(newNames)){
+  if(JSON.stringify(existingNames)===JSON.stringify(places)){
+    // same cards on screen: swap them in place, no reflow
     existing.forEach((card,i)=>{grid.replaceChild(makeCard(type,places[i]),card);});
-  } else {renderTab(type);}
+  } else {
+    // membership changed: repaint in the stable order (still no re-sort)
+    grid.innerHTML='';
+    places.forEach(p=>grid.appendChild(makeCard(type,p)));
+  }
 }
 function buildFilterBtns(type){
   const defs=[{k:'all',label:'All',fc:'fall'},{k:'visited',label:'Visited',fc:'fv'},{k:'planned',label:'Planned',fc:'fp'},{k:'candidate',label:'Candidate',fc:'fc'},{k:'unvisited',label:'None',fc:'fu'}];
@@ -2443,8 +2503,8 @@ function clearBulkList(type,kind){
 
 // ─── BOOT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',async()=>{
-  // Show default UI while connecting
-  participants=defaultParticipants();
+  // Start empty and let the database fill this in — no placeholder people.
+  participants=[];
   refreshAll();
   if(SB_KEY==='PASTE_ANON_KEY_HERE'){setStatus('offline','Key not set');return;}
   await initSupabase(SB_URL,SB_KEY);

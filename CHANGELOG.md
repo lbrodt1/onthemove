@@ -3,6 +3,23 @@
 
 ---
 
+### v2.8.2 — Jul 11 2026
+**Fix: No more hardcoded Laura + Faron**
+- The app booted by painting hardcoded "Laura" and "Faron" participants before the database loaded, so they flashed on screen every time the page opened. Boot now starts empty and fills in from the database
+- If no settings row existed, the app used to write those two placeholder people into the database. It now starts empty and shows a "tap + Add to add a traveller" prompt instead
+- If the participants payload can't be parsed, the app now surfaces an error rather than silently substituting placeholder names for real data
+
+---
+
+### v2.8.1 — Jul 11 2026
+**Fix: Cards no longer jump when clicked**
+- Clicking a status badge re-sorted the grid immediately, so the card moved out from under you mid-click. renderTabNoSort was calling the sorting filter and falling through to a full re-render on every click; the 2-second sort debounce had also been dropped
+- The grid now keeps its on-screen order while you click and re-sorts only after a 2-second pause
+- A card you just clicked stays in place even if the current filter would hide it, until that re-sort
+- If a save fails or you're offline, the click now reverts visibly (with the status pill explaining why) instead of showing a status that never saved
+
+---
+
 ### v2.8.0 — Jul 11 2026
 **Feature: UNESCO sites + one-click Visited**
 - Fixed the status cycle: it ran none → candidate → planned → visited, which meant three clicks to mark somewhere visited. It now runs none → visited → planned → candidate → none, so a single click logs a visit
