@@ -291,7 +291,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.7.2</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.8.0</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -304,7 +304,7 @@ select.add-inp{cursor:pointer;min-width:160px}
   <button onclick="switchTab('landmarks',this)">Landmarks</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.7.2</span>
+  <span class="nav-version">v2.8.0</span>
 </nav>
 <main>
   <div class="legend">
@@ -468,7 +468,7 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div id="people-bar-landmarks" class="people-bar"></div>
     <div id="leaderboard-landmarks" class="leaderboard"></div>
     <div class="section-hdr"><h2>Landmarks, Parks &amp; Wonders</h2></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Everything in one place: national parks from the U.S., Canada, and beyond, plus forests, monuments, and wonders around the world. Each card is tagged by type and place — <b>PRK</b> park · <b>FOR</b> forest · <b>MON</b> monument · <b>WON</b> wonder.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Everything in one place: national parks from the U.S., Canada, and beyond, plus forests, monuments, wonders, and UNESCO World Heritage Sites around the world. Each card is tagged by type and place — <b>PRK</b> park · <b>FOR</b> forest · <b>MON</b> monument · <b>WON</b> wonder.</div>
     <div class="fbtns" id="catbtns-landmarks" style="margin-bottom:10px"></div>
     <div class="controls">
       <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-landmarks" placeholder="Search landmarks..." oninput="renderTab('landmarks')"/></div>
@@ -559,6 +559,15 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.8.0</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li><b>One click now marks a place Visited.</b> The status cycle was none → candidate → planned → visited, so it took three clicks to log a visit; it now runs none → visited → planned → candidate → none</li>
+            <li>Added 129 UNESCO World Heritage Sites (Pompeii, Versailles, Petra, Angkor, Machu Picchu, Kyoto, Samarkand, Tikal, and many more)</li>
+            <li>New <b>UNESCO</b> filter chip — it spans every category, so places already listed that are World Heritage (Yellowstone, Banff, Taj Mahal, Butrint…) show up under it too: 193 UNESCO sites in all</li>
+            <li>365 places now on the Landmarks tab</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.7.2</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list">
@@ -1014,13 +1023,68 @@ const LANDMARK_DATA=[
   ["Parc Ela","CH","Park"],["Val M\u00fcstair","CH","Park"],["Beverin","CH","Park"],
   ["Jura Vaudois","CH","Park"],["Gruy\u00e8re Pays-d'Enhaut","CH","Park"],["Gantrisch","CH","Park"],
   ["Chasseral","CH","Park"],["Pfyn-Finges","CH","Park"],["Binntal","CH","Park"],
-  ["Diemtigtal","CH","Park"],["Thal","CH","Park"],["Doubs","CH","Park"]
+  ["Diemtigtal","CH","Park"],["Thal","CH","Park"],["Doubs","CH","Park"],
+  ["Pompeii","IT","UNESCO"],["Venice","IT","UNESCO"],["Historic Centre of Florence","IT","UNESCO"],
+  ["Vatican City","VA","UNESCO"],["Mosque-Cathedral of C\u00f3rdoba","ES","UNESCO"],["Santiago de Compostela","ES","UNESCO"],
+  ["Historic City of Toledo","ES","UNESCO"],["Aqueduct of Segovia","ES","UNESCO"],["Palace of Versailles","FR","UNESCO"],
+  ["Chartres Cathedral","FR","UNESCO"],["Carcassonne","FR","UNESCO"],["Pont du Gard","FR","UNESCO"],
+  ["Loire Valley","FR","UNESCO"],["Tower of London","GB","UNESCO"],["City of Bath","GB","UNESCO"],
+  ["Edinburgh Old and New Towns","GB","UNESCO"],["Giant's Causeway","GB","UNESCO"],["Cologne Cathedral","DE","UNESCO"],
+  ["Bamberg","DE","UNESCO"],["Wartburg Castle","DE","UNESCO"],["Aachen Cathedral","DE","UNESCO"],
+  ["Historic Centre of Salzburg","AT","UNESCO"],["Sch\u00f6nbrunn Palace","AT","UNESCO"],["Hallstatt","AT","UNESCO"],
+  ["Historic Centre of Prague","CZ","UNESCO"],["\u010cesk\u00fd Krumlov","CZ","UNESCO"],["Krak\u00f3w Old Town","PL","UNESCO"],
+  ["Auschwitz-Birkenau","PL","UNESCO"],["Wieliczka Salt Mine","PL","UNESCO"],["Budapest Danube Panorama","HU","UNESCO"],
+  ["Dubrovnik Old City","HR","UNESCO"],["Diocletian's Palace, Split","HR","UNESCO"],["Ohrid","MK","UNESCO"],
+  ["Meteora","GR","UNESCO"],["Delphi","GR","UNESCO"],["Olympia","GR","UNESCO"],
+  ["Ephesus","TR","UNESCO"],["G\u00f6reme and Cappadocia","TR","UNESCO"],["Pamukkale-Hierapolis","TR","UNESCO"],
+  ["Troy","TR","UNESCO"],["Berat","AL","UNESCO"],["Gjirokast\u00ebr","AL","UNESCO"],
+  ["Kotor","ME","UNESCO"],["Mostar Old Bridge","BA","UNESCO"],["Rila Monastery","BG","UNESCO"],
+  ["Sighi\u0219oara","RO","UNESCO"],["Historic Centre of Bruges","BE","UNESCO"],["Amsterdam Canal Ring","NL","UNESCO"],
+  ["Kinderdijk Windmills","NL","UNESCO"],["Bryggen, Bergen","NO","UNESCO"],["Geirangerfjord","NO","UNESCO"],
+  ["Historic Centre of Saint Petersburg","RU","UNESCO"],["\u00deingvellir","IS","UNESCO"],
+  ["Abu Simbel","EG","UNESCO"],["Ancient Thebes (Luxor)","EG","UNESCO"],["Medina of Marrakesh","MA","UNESCO"],
+  ["Medina of Fez","MA","UNESCO"],["A\u00eft Benhaddou","MA","UNESCO"],["Carthage","TN","UNESCO"],
+  ["Timbuktu","ML","UNESCO"],["Lalibela","ET","UNESCO"],["Aksum","ET","UNESCO"],
+  ["Stone Town of Zanzibar","TZ","UNESCO"],["Robben Island","ZA","UNESCO"],["Okavango Delta","BW","UNESCO"],
+  ["Great Zimbabwe","ZW","UNESCO"],["Ngorongoro","TZ","UNESCO"],["Kilimanjaro","TZ","UNESCO"],
+  ["Persepolis","IR","UNESCO"],["Naqsh-e Jahan Square, Isfahan","IR","UNESCO"],["Samarkand","UZ","UNESCO"],
+  ["Bukhara","UZ","UNESCO"],["Khiva","UZ","UNESCO"],["Ajanta Caves","IN","UNESCO"],
+  ["Ellora Caves","IN","UNESCO"],["Hampi","IN","UNESCO"],["Khajuraho","IN","UNESCO"],
+  ["Qutub Minar","IN","UNESCO"],["Konark Sun Temple","IN","UNESCO"],["Sigiriya","LK","UNESCO"],
+  ["Sacred City of Kandy","LK","UNESCO"],["Ayutthaya","TH","UNESCO"],["Sukhothai","TH","UNESCO"],
+  ["Luang Prabang","LA","UNESCO"],["Hoi An","VN","UNESCO"],["Hu\u1ebf","VN","UNESCO"],
+  ["Prambanan","ID","UNESCO"],["Forbidden City","CN","UNESCO"],["Terracotta Army","CN","UNESCO"],
+  ["Potala Palace","CN","UNESCO"],["Mogao Caves","CN","UNESCO"],["Zhangjiajie","CN","UNESCO"],
+  ["Jiuzhaigou","CN","UNESCO"],["Mount Fuji","JP","UNESCO"],["Himeji Castle","JP","UNESCO"],
+  ["Historic Kyoto","JP","UNESCO"],["Historic Nara","JP","UNESCO"],["Hiroshima Peace Memorial","JP","UNESCO"],
+  ["Itsukushima Shrine","JP","UNESCO"],["Shirakawa-go","JP","UNESCO"],["Gyeongju","KR","UNESCO"],
+  ["Jeju Island","KR","UNESCO"],["Tasmanian Wilderness","AU","UNESCO"],["Purnululu","AU","UNESCO"],
+  ["K'gari (Fraser Island)","AU","UNESCO"],["Nazca Lines","PE","UNESCO"],["Cusco","PE","UNESCO"],
+  ["Chan Chan","PE","UNESCO"],["Los Glaciares","AR","UNESCO"],["Tikal","GT","UNESCO"],
+  ["Antigua Guatemala","GT","UNESCO"],["Teotihuac\u00e1n","MX","UNESCO"],["Palenque","MX","UNESCO"],
+  ["Guanajuato","MX","UNESCO"],["Monte Alb\u00e1n","MX","UNESCO"],["Old Havana","CU","UNESCO"],
+  ["Colonial Santo Domingo","DO","UNESCO"],["Bras\u00edlia","BR","UNESCO"],["Ouro Preto","BR","UNESCO"],
+  ["Salvador de Bahia","BR","UNESCO"],["Quito Old Town","EC","UNESCO"],["Cartagena","CO","UNESCO"],
+  ["Independence Hall","US","UNESCO"],["Cahokia Mounds","US","UNESCO"],["Monticello","US","UNESCO"],
+  ["Old Quebec","CA","UNESCO"],["Old Town Lunenburg","CA","UNESCO"],["L'Anse aux Meadows","CA","UNESCO"],
+  ["Head-Smashed-In Buffalo Jump","CA","UNESCO"]
 ];
 // Fold the 63 national parks into the unified landmark set (category "Park")
 PARK_DATA.forEach(d=>LANDMARK_DATA.push([d[0],d[1],"Park"]));
 const LANDMARKS = LANDMARK_DATA.map(d=>d[0]);
 const LANDMARK_CAT=Object.fromEntries(LANDMARK_DATA.map(d=>[d[0],d[2]]));
-const LANDMARK_CAT_ABBR={Forest:"FOR",Monument:"MON",Wonder:"WON",Park:"PRK"};
+const LANDMARK_CAT_ABBR={Forest:"FOR",Monument:"MON",Wonder:"WON",Park:"PRK",UNESCO:"UNE"};
+// Entries already in the list that are also UNESCO World Heritage Sites
+const UNESCO_ALSO=["Great Wall of China","Petra","Machu Picchu","Chich\u00e9n Itz\u00e1","Colosseum","Taj Mahal",
+  "Great Pyramid of Giza","Angkor Wat","Statue of Liberty","Stonehenge","Acropolis of Athens","Sydney Opera House",
+  "Moai of Rapa Nui","Sagrada Fam\u00edlia","Hagia Sophia","Mont-Saint-Michel","Borobudur","Great Barrier Reef",
+  "Mount Everest","Victoria Falls","Iguaz\u00fa Falls","Ha Long Bay","Table Mountain","Uluru","Alhambra","Bagan",
+  "Bia\u0142owie\u017ca Forest","Daintree Rainforest","Yellowstone","Grand Canyon","Everglades","Yosemite","Redwood",
+  "Olympic","Great Smoky Mountains","Mammoth Cave","Carlsbad Caverns","Hawaii Volcanoes","Mesa Verde","Glacier Bay",
+  "Wrangell-St. Elias","Kluane","Waterton Lakes","Wood Buffalo","Gros Morne","Nahanni","Banff","Jasper","Yoho",
+  "Kootenay","Serengeti","Gal\u00e1pagos","Fiordland","Tongariro","Plitvice Lakes","Kakadu","Komodo","Sagarmatha",
+  "Vatnaj\u00f6kull","Dolomiti Bellunesi","Cinque Terre","Butrint","Glacier (BC)","Mount Revelstoke"];
+const UNESCO_SET=new Set([...LANDMARK_DATA.filter(d=>d[2]==="UNESCO").map(d=>d[0]),...UNESCO_ALSO]);
 const LANDMARK_ALIASES={
   "great wall":"Great Wall of China","the great wall":"Great Wall of China",
   "everest":"Mount Everest","mt everest":"Mount Everest","mount everest":"Mount Everest",
@@ -1409,7 +1473,7 @@ function visibleParticipants(){
 function escHtml(s){return(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 // ─── STATUS CYCLE ─────────────────────────────────────────────────────────────
-const CYCLE=['none','candidate','planned','visited'];
+const CYCLE=['none','visited','planned','candidate'];
 const ICON={none:'○',visited:'V',planned:'P',candidate:'C'};
 async function cycleStatus(type,place,who){
   const e=getEntry(type,place,who);
@@ -1675,7 +1739,10 @@ function filteredPlaces(type){
   const q=(document.getElementById('search-'+type)||{value:''}).value.toLowerCase();
   const vps=visibleParticipants();
   const places=getPlaces(type).filter(p=>{
-    if(type==='landmarks'&&landmarkCat!=='all'&&LANDMARK_CAT[p]!==landmarkCat)return false;
+    if(type==='landmarks'&&landmarkCat!=='all'){
+      if(landmarkCat==='UNESCO'){if(!UNESCO_SET.has(p))return false;}
+      else if(LANDMARK_CAT[p]!==landmarkCat)return false;
+    }
     const statuses=vps.map(person=>getEntry(type,p,person.id).status||'none');
     let show=true;
     if(f==='visited')show=statuses.some(s=>s==='visited');
@@ -1784,9 +1851,9 @@ function setLandmarkCat(k){landmarkCat=k;buildLandmarkCatBtns();renderTab('landm
 function buildLandmarkCatBtns(){
   const wrap=document.getElementById('catbtns-landmarks');
   if(!wrap)return;
-  const defs=[{k:'all',label:'All'},{k:'Park',label:'Parks'},{k:'Forest',label:'Forests'},{k:'Monument',label:'Monuments'},{k:'Wonder',label:'Wonders'}];
+  const defs=[{k:'all',label:'All'},{k:'Park',label:'Parks'},{k:'Forest',label:'Forests'},{k:'Monument',label:'Monuments'},{k:'Wonder',label:'Wonders'},{k:'UNESCO',label:'UNESCO'}];
   wrap.innerHTML=defs.map(d=>{
-    const n=d.k==='all'?LANDMARK_DATA.length:LANDMARK_DATA.filter(x=>x[2]===d.k).length;
+    const n=d.k==='all'?LANDMARK_DATA.length:(d.k==='UNESCO'?UNESCO_SET.size:LANDMARK_DATA.filter(x=>x[2]===d.k).length);
     const active=landmarkCat===d.k;
     return'<button class="fbtn'+(active?' fa fall':'')+'" onclick="setLandmarkCat(\''+d.k+'\')">'+d.label+' <span style="opacity:.55">'+n+'</span></button>';
   }).join('');
@@ -1902,7 +1969,51 @@ const LANDMARK_COORDS={
   "Parc Ela":[46.6000,9.6500],"Val M\u00fcstair":[46.6000,10.3500],"Beverin":[46.6500,9.3500],
   "Jura Vaudois":[46.5500,6.2500],"Gruy\u00e8re Pays-d'Enhaut":[46.5000,7.2000],"Gantrisch":[46.7200,7.4200],
   "Chasseral":[47.1300,7.0600],"Pfyn-Finges":[46.3000,7.6000],"Binntal":[46.3500,8.2000],
-  "Diemtigtal":[46.6200,7.5500],"Thal":[47.3200,7.6200],"Doubs":[47.2500,6.9500]
+  "Diemtigtal":[46.6200,7.5500],"Thal":[47.3200,7.6200],"Doubs":[47.2500,6.9500],
+  "Pompeii":[40.7497,14.4869],"Venice":[45.4408,12.3155],"Historic Centre of Florence":[43.7696,11.2558],
+  "Vatican City":[41.9029,12.4534],"Mosque-Cathedral of C\u00f3rdoba":[37.8790,-4.7794],"Santiago de Compostela":[42.8806,-8.5449],
+  "Historic City of Toledo":[39.8628,-4.0273],"Aqueduct of Segovia":[40.9481,-4.1184],"Palace of Versailles":[48.8049,2.1204],
+  "Chartres Cathedral":[48.4477,1.4878],"Carcassonne":[43.2061,2.3639],"Pont du Gard":[43.9475,4.5354],
+  "Loire Valley":[47.3900,0.6890],"Tower of London":[51.5081,-0.0759],"City of Bath":[51.3811,-2.3590],
+  "Edinburgh Old and New Towns":[55.9500,-3.1900],"Giant's Causeway":[55.2408,-6.5116],"Cologne Cathedral":[50.9413,6.9583],
+  "Bamberg":[49.8917,10.8917],"Wartburg Castle":[50.9664,10.3067],"Aachen Cathedral":[50.7746,6.0839],
+  "Historic Centre of Salzburg":[47.8005,13.0450],"Sch\u00f6nbrunn Palace":[48.1845,16.3122],"Hallstatt":[47.5622,13.6493],
+  "Historic Centre of Prague":[50.0875,14.4213],"\u010cesk\u00fd Krumlov":[48.8109,14.3150],"Krak\u00f3w Old Town":[50.0619,19.9369],
+  "Auschwitz-Birkenau":[50.0270,19.2030],"Wieliczka Salt Mine":[49.9831,20.0544],"Budapest Danube Panorama":[47.4979,19.0402],
+  "Dubrovnik Old City":[42.6407,18.1077],"Diocletian's Palace, Split":[43.5081,16.4402],"Ohrid":[41.1231,20.8016],
+  "Meteora":[39.7217,21.6306],"Delphi":[38.4824,22.5010],"Olympia":[37.6380,21.6300],
+  "Ephesus":[37.9410,27.3419],"G\u00f6reme and Cappadocia":[38.6431,34.8289],"Pamukkale-Hierapolis":[37.9203,29.1244],
+  "Troy":[39.9575,26.2389],"Berat":[40.7058,19.9522],"Gjirokast\u00ebr":[40.0758,20.1389],
+  "Kotor":[42.4247,18.7712],"Mostar Old Bridge":[43.3370,17.8150],"Rila Monastery":[42.1333,23.3400],
+  "Sighi\u0219oara":[46.2197,24.7925],"Historic Centre of Bruges":[51.2093,3.2247],"Amsterdam Canal Ring":[52.3676,4.9041],
+  "Kinderdijk Windmills":[51.8836,4.6403],"Bryggen, Bergen":[60.3971,5.3245],"Geirangerfjord":[62.1049,7.0952],
+  "Historic Centre of Saint Petersburg":[59.9343,30.3351],"\u00deingvellir":[64.2559,-21.1298],
+  "Abu Simbel":[22.3372,31.6258],"Ancient Thebes (Luxor)":[25.7188,32.6573],"Medina of Marrakesh":[31.6295,-7.9811],
+  "Medina of Fez":[34.0640,-4.9800],"A\u00eft Benhaddou":[31.0470,-7.1310],"Carthage":[36.8528,10.3233],
+  "Timbuktu":[16.7735,-3.0074],"Lalibela":[12.0317,39.0473],"Aksum":[14.1300,38.7200],
+  "Stone Town of Zanzibar":[-6.1626,39.1897],"Robben Island":[-33.8067,18.3667],"Okavango Delta":[-19.2833,22.9000],
+  "Great Zimbabwe":[-20.2675,30.9339],"Ngorongoro":[-3.2000,35.5000],"Kilimanjaro":[-3.0674,37.3556],
+  "Persepolis":[29.9356,52.8916],"Naqsh-e Jahan Square, Isfahan":[32.6575,51.6776],"Samarkand":[39.6547,66.9758],
+  "Bukhara":[39.7747,64.4286],"Khiva":[41.3783,60.3639],"Ajanta Caves":[20.5519,75.7033],
+  "Ellora Caves":[20.0268,75.1790],"Hampi":[15.3350,76.4600],"Khajuraho":[24.8318,79.9199],
+  "Qutub Minar":[28.5245,77.1855],"Konark Sun Temple":[19.8876,86.0945],"Sigiriya":[7.9570,80.7603],
+  "Sacred City of Kandy":[7.2936,80.6413],"Ayutthaya":[14.3532,100.5689],"Sukhothai":[17.0206,99.7031],
+  "Luang Prabang":[19.8867,102.1350],"Hoi An":[15.8801,108.3380],"Hu\u1ebf":[16.4637,107.5909],
+  "Prambanan":[-7.7520,110.4915],"Forbidden City":[39.9163,116.3972],"Terracotta Army":[34.3841,109.2785],
+  "Potala Palace":[29.6558,91.1170],"Mogao Caves":[40.0417,94.8094],"Zhangjiajie":[29.3150,110.4340],
+  "Jiuzhaigou":[33.2600,103.9200],"Mount Fuji":[35.3606,138.7274],"Himeji Castle":[34.8394,134.6939],
+  "Historic Kyoto":[35.0116,135.7681],"Historic Nara":[34.6851,135.8048],"Hiroshima Peace Memorial":[34.3955,132.4536],
+  "Itsukushima Shrine":[34.2959,132.3197],"Shirakawa-go":[36.2578,136.9063],"Gyeongju":[35.8562,129.2247],
+  "Jeju Island":[33.3617,126.5292],"Tasmanian Wilderness":[-42.4000,146.3000],"Purnululu":[-17.5000,128.5000],
+  "K'gari (Fraser Island)":[-25.2500,153.1300],"Nazca Lines":[-14.7390,-75.1300],"Cusco":[-13.5167,-71.9789],
+  "Chan Chan":[-8.1050,-79.0750],"Los Glaciares":[-50.3300,-73.2000],"Tikal":[17.2220,-89.6237],
+  "Antigua Guatemala":[14.5586,-90.7339],"Teotihuac\u00e1n":[19.6925,-98.8438],"Palenque":[17.4840,-92.0460],
+  "Guanajuato":[21.0190,-101.2574],"Monte Alb\u00e1n":[17.0436,-96.7678],"Old Havana":[23.1400,-82.3500],
+  "Colonial Santo Domingo":[18.4730,-69.8830],"Bras\u00edlia":[-15.7939,-47.8828],"Ouro Preto":[-20.3856,-43.5035],
+  "Salvador de Bahia":[-12.9714,-38.5014],"Quito Old Town":[-0.2202,-78.5123],"Cartagena":[10.4236,-75.5518],
+  "Independence Hall":[39.9489,-75.1500],"Cahokia Mounds":[38.6572,-90.0615],"Monticello":[38.0080,-78.4530],
+  "Old Quebec":[46.8131,-71.2075],"Old Town Lunenburg":[44.3776,-64.3167],"L'Anse aux Meadows":[51.5964,-55.5319],
+  "Head-Smashed-In Buffalo Jump":[49.6975,-113.6250]
 };
 PARK_DATA.forEach(d=>{LANDMARK_COORDS[d[0]]=[d[2],d[3]];});
 function toggleLandmarks(){

@@ -3,6 +3,15 @@
 
 ---
 
+### v2.8.0 — Jul 11 2026
+**Feature: UNESCO sites + one-click Visited**
+- Fixed the status cycle: it ran none → candidate → planned → visited, which meant three clicks to mark somewhere visited. It now runs none → visited → planned → candidate → none, so a single click logs a visit
+- Added 129 UNESCO World Heritage Sites across the world (Pompeii, Venice, Versailles, Cologne Cathedral, Kraków, Ephesus, Abu Simbel, Lalibela, Samarkand, Ajanta, Kyoto, Forbidden City, Tikal, Teotihuacán, Old Quebec, and more)
+- New "UNESCO" filter chip. It works across categories, so entries already in the list that are World Heritage Sites (Yellowstone, Grand Canyon, Banff, Taj Mahal, Machu Picchu, Butrint…) are included — 193 UNESCO sites in total
+- The Landmarks tab now holds 365 places
+
+---
+
 ### v2.7.2 — Jul 11 2026
 **Feature: Canada, Italy, Albania & Switzerland park coverage**
 - Canada: added 32 more national parks (Kootenay, Glacier BC, Mount Revelstoke, Riding Mountain, Prince Albert, Cape Breton Highlands, Fundy, Bruce Peninsula, Point Pelee, La Mauricie, Kluane, Nahanni, Auyuittuq, Elk Island, Terra Nova, Georgian Bay Islands, Thousand Islands, Grasslands, Forillon, Kejimkujik, Prince Edward Island, Torngat Mountains, Gwaii Haanas) — 39 in total
