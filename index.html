@@ -259,7 +259,6 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="modal-row"><label>Name</label><input id="modal-name" type="text" placeholder="e.g. Marcus" autocomplete="off"/></div>
     <div class="modal-row"><label>Country Goal</label><input id="modal-goal-c" type="number" value="50" min="1" max="300"/></div>
     <div class="modal-row"><label>State Goal</label><input id="modal-goal-s" type="number" value="50" min="1" max="56"/></div>
-    <div class="modal-row"><label>National Park Goal</label><input id="modal-goal-p" type="number" value="20" min="1" max="63"/></div>
     <div class="modal-row"><label>Landmark Goal</label><input id="modal-goal-l" type="number" value="25" min="1" max="80"/></div>
     <div class="modal-row"><label>Goal (optional)</label><input id="modal-deadline" type="text" placeholder="e.g. Dec 2027"/></div>
     <div class="modal-btns">
@@ -292,7 +291,7 @@ select.add-inp{cursor:pointer;min-width:160px}
 <header>
   <div>
     <h1>On the <span>Move</span></h1>
-    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.6.1</span></div>
+    <div class="subtitle">The Travel Tally <span style="font-size:9px;letter-spacing:.12em;color:var(--gold-light);margin-left:10px;opacity:.7">v2.7.2</span></div>
   </div>
   <div class="header-right">
     <span id="conn-status" class="conn-status cs-connecting" onclick="toggleDebug()" title="Click for connection log" style="cursor:pointer">Connecting...</span>
@@ -302,11 +301,10 @@ select.add-inp{cursor:pointer;min-width:160px}
 <nav>
   <button class="active" onclick="switchTab('countries',this)">Countries</button>
   <button onclick="switchTab('states',this)">US States</button>
-  <button onclick="switchTab('parks',this)">Nat'l Parks</button>
   <button onclick="switchTab('landmarks',this)">Landmarks</button>
   <button onclick="switchTab('map',this)">Map</button>
   <button onclick="switchTab('changelog',this)">Changelog</button>
-  <span class="nav-version">v2.6.1</span>
+  <span class="nav-version">v2.7.2</span>
 </nav>
 <main>
   <div class="legend">
@@ -464,88 +462,16 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="place-grid" id="grid-states"></div>
   </div>
 
-  <!-- NATIONAL PARKS -->
-  <div id="panel-parks" class="panel">
-    <div id="view-bar-parks" class="view-bar"></div>
-    <div id="people-bar-parks" class="people-bar"></div>
-    <div id="leaderboard-parks" class="leaderboard"></div>
-    <div class="section-hdr"><h2>U.S. National Parks</h2></div>
-    <div class="controls">
-      <div class="search-wrap"><span class="search-icon">⌥</span><input type="text" id="search-parks" placeholder="Search parks..." oninput="renderTab('parks')"/></div>
-      <div class="fbtns" id="fbtns-parks"></div>
-    </div>
-    <div class="add-panel">
-      <h4>+ Add Entry</h4>
-      <div class="add-mode-tabs">
-        <button class="amt active" onclick="switchAddMode('parks','single',this)">Single</button>
-        <button class="amt" onclick="switchAddMode('parks','bulk',this)">Bulk Paste</button>
-        <button class="amt" onclick="switchAddMode('parks','remove',this)">Bulk Remove</button>
-      </div>
-      <div class="add-form show" id="af-single-parks">
-        <div class="add-row">
-          <label>Park</label>
-          <div class="sel-wrap" id="selwrap-parks">
-            <span class="sel-search-icon">⌥</span>
-            <input class="sel-search" id="sel-search-parks" placeholder="Type to search..." autocomplete="off" oninput="filterSelDropdown('parks')" onfocus="openSelDropdown('parks')" onblur="scheduleCloseDropdown('parks')"/>
-            <div class="sel-dropdown" id="sel-dropdown-parks"></div>
-          </div>
-          <div id="sel-selected-parks"></div>
-        </div>
-        <div class="add-row">
-          <label>Who</label>
-          <div class="person-checks" id="si-who-parks"></div>
-          <label>Status</label>
-          <select class="add-inp" id="si-st-parks" aria-label="Status">
-            <option value="none">None</option><option value="visited" selected>Visited</option>
-            <option value="planned">Planned</option><option value="candidate">Candidate</option>
-          </select>
-          <label>Date</label>
-          <input class="add-inp dt" type="text" id="si-dt-parks" placeholder="e.g. Aug 2026"/>
-          <button class="btn-primary" onclick="doAddSingle('parks')">Add</button>
-        </div>
-      </div>
-      <div class="add-form" id="af-bulk-parks">
-        <textarea class="bulk-ta" id="bk-ta-parks" placeholder="Paste one per line or comma-separated&#10;Yosemite, Zion, Grand Canyon, Acadia, Smokies"></textarea>
-        <div class="bulk-hint">Fuzzy matching: full names, common short names (Smokies, Tetons), &quot;National Park&quot; suffix optional.</div>
-        <div id="bulk-results-parks" class="bulk-results"></div>
-        <div class="bulk-status-row">
-          <button class="btn-secondary" onclick="previewBulk('parks')">Preview</button>
-          <label>Who:</label>
-          <div class="person-checks" id="bk-who-parks"></div>
-          <label>Status</label>
-          <select class="add-inp" id="bk-st-parks" aria-label="Status">
-            <option value="none">None</option><option value="visited" selected>Visited</option>
-            <option value="planned">Planned</option><option value="candidate">Candidate</option>
-          </select>
-          <label>Date</label>
-          <input class="add-inp dt" type="text" id="bk-dt-parks" placeholder="e.g. Aug 2026"/>
-          <button class="btn-primary" onclick="doAddBulk('parks')">Add All Matched</button>
-        </div>
-      </div>
-      <div class="add-form" id="af-remove-parks">
-        <textarea class="bulk-ta" id="rm-ta-parks" placeholder="Paste parks to remove, one per line or comma-separated"></textarea>
-        <div class="bulk-hint">Fuzzy matched. Removes status and date for selected people.</div>
-        <div id="rm-results-parks" class="bulk-results"></div>
-        <div class="bulk-status-row">
-          <button class="btn-secondary" onclick="previewRemove('parks')">Preview</button>
-          <label>Remove for:</label>
-          <div class="person-checks" id="rm-who-parks"></div>
-          <button class="btn-primary" style="background:var(--rust)" onclick="doRemoveBulk('parks')">Remove All</button>
-        </div>
-      </div>
-    </div>
-    <div class="place-grid" id="grid-parks"></div>
-  </div>
-
   <!-- LANDMARKS -->
   <div id="panel-landmarks" class="panel">
     <div id="view-bar-landmarks" class="view-bar"></div>
     <div id="people-bar-landmarks" class="people-bar"></div>
     <div id="leaderboard-landmarks" class="leaderboard"></div>
-    <div class="section-hdr"><h2>Landmarks of the World</h2></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">A curated mix of forests, monuments, and wonders across the U.S. and the wider world. Each card shows its type and country \u2014 <b>FOR</b> forest \u00b7 <b>MON</b> monument \u00b7 <b>WON</b> wonder.</div>
+    <div class="section-hdr"><h2>Landmarks, Parks &amp; Wonders</h2></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Everything in one place: national parks from the U.S., Canada, and beyond, plus forests, monuments, and wonders around the world. Each card is tagged by type and place — <b>PRK</b> park · <b>FOR</b> forest · <b>MON</b> monument · <b>WON</b> wonder.</div>
+    <div class="fbtns" id="catbtns-landmarks" style="margin-bottom:10px"></div>
     <div class="controls">
-      <div class="search-wrap"><span class="search-icon">\u2325</span><input type="text" id="search-landmarks" placeholder="Search landmarks..." oninput="renderTab('landmarks')"/></div>
+      <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="search-landmarks" placeholder="Search landmarks..." oninput="renderTab('landmarks')"/></div>
       <div class="fbtns" id="fbtns-landmarks"></div>
     </div>
     <div class="add-panel">
@@ -559,7 +485,7 @@ select.add-inp{cursor:pointer;min-width:160px}
         <div class="add-row">
           <label>Landmark</label>
           <div class="sel-wrap" id="selwrap-landmarks">
-            <span class="sel-search-icon">\u2325</span>
+            <span class="sel-search-icon">⌕</span>
             <input class="sel-search" id="sel-search-landmarks" placeholder="Type to search..." autocomplete="off" oninput="filterSelDropdown('landmarks')" onfocus="openSelDropdown('landmarks')" onblur="scheduleCloseDropdown('landmarks')"/>
             <div class="sel-dropdown" id="sel-dropdown-landmarks"></div>
           </div>
@@ -626,10 +552,6 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div style="font-size:11px;color:var(--muted);margin-bottom:8px">A continent lights up once at least one of its countries is visited.</div>
     <div id="continent-tiles" class="continent-strip"></div>
 
-    <div class="section-hdr"><h2>National Parks</h2></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Every U.S. national park, coloured by status for the person selected above. Click a dot to cycle its status.</div>
-    <div class="map-wrap"><div id="parksmap"></div></div>
-    <div class="parks-offmap-note">Not shown on the map (outside the U.S. frame) but tracked in the list: National Park of American Samoa &amp; Virgin Islands.</div>
   </div>
 
   <!-- CHANGELOG -->
@@ -637,6 +559,30 @@ select.add-inp{cursor:pointer;min-width:160px}
     <div class="changelog-wrap">
       <h2 class="cl-title">Our World — Changelog</h2>
       <div class="cl-entries">
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.7.2</span><span class="cl-date">Jul 11 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>Deeper park coverage for Canada (32 more, incl. Kootenay, Kluane, Nahanni, Cape Breton Highlands, Gwaii Haanas), Italy (22, incl. Gran Paradiso, Stelvio, Cinque Terre, Vesuvius), and Albania (14, incl. Butrint, Theth, Valbona Valley, Llogara)</li>
+            <li>Switzerland: added its 12 regional nature parks (Parc Ela, Val Müstair, Gruyère Pays-d'Enhaut, and more) — the country has just one official national park, already listed</li>
+            <li>The Parks category now holds 156 entries; 236 places in total across the Landmarks tab</li>
+          </ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.7.1</span><span class="cl-date">Jul 10 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>Added international national parks to the Landmarks tab — Canada (Banff, Jasper, Yoho, Pacific Rim, Waterton Lakes, Gros Morne, Wood Buffalo) plus worldwide favourites (Serengeti, Kruger, Torres del Paine, Fiordland, Tongariro, Plitvice, Galápagos, Kakadu, Komodo, and more)</li>
+            <li>Parks now span 85 entries across 16 countries; international ones show their country code (e.g. PRK·CA) while U.S. parks keep their state</li>
+          </ul>
+        </div>
+        <div class="cl-entry">
+          <div class="cl-header"><span class="cl-version">v2.7.0</span><span class="cl-date">Jul 10 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
+          <ul class="cl-list">
+            <li>National parks, forests, monuments, and wonders are now all on one <b>Landmarks</b> tab — 143 places in a single view</li>
+            <li>New category chips (Parks · Forests · Monuments · Wonders) filter the list; each card is tagged PRK / FOR / MON / WON</li>
+            <li>Parks appear as dots on the world map alongside the other landmarks; the separate Parks tab and US parks map were retired</li>
+            <li>Any national-park progress you'd already logged is carried over automatically</li>
+          </ul>
+        </div>
         <div class="cl-entry">
           <div class="cl-header"><span class="cl-version">v2.6.1</span><span class="cl-date">Jul 9 2026</span><span class="cl-badge cl-badge-feat">Feature</span></div>
           <ul class="cl-list">
@@ -1035,10 +981,46 @@ const LANDMARK_DATA=[
   ["Daintree Rainforest","AU","Forest"],["Sherwood Forest","GB","Forest"],
   ["Aokigahara","JP","Forest"],["Sagano Bamboo Grove","JP","Forest"],
   ["Fontainebleau Forest","FR","Forest"],["Crooked Forest","PL","Forest"],
-  ["Amazon Rainforest","BR","Forest"]
+  ["Amazon Rainforest","BR","Forest"],
+  ["Banff","CA","Park"],["Jasper","CA","Park"],["Yoho","CA","Park"],
+  ["Pacific Rim","CA","Park"],["Waterton Lakes","CA","Park"],["Gros Morne","CA","Park"],
+  ["Wood Buffalo","CA","Park"],["Serengeti","TZ","Park"],["Kruger","ZA","Park"],
+  ["Torres del Paine","CL","Park"],["Fiordland","NZ","Park"],["Tongariro","NZ","Park"],
+  ["Plitvice Lakes","HR","Park"],["Swiss National Park","CH","Park"],["Sagarmatha","NP","Park"],
+  ["Kakadu","AU","Park"],["Gal\u00e1pagos","EC","Park"],["Etosha","NA","Park"],
+  ["Snowdonia","GB","Park"],["Vatnaj\u00f6kull","IS","Park"],["Jim Corbett","IN","Park"],
+  ["Komodo","ID","Park"],
+  ["Kootenay","CA","Park"],["Glacier (BC)","CA","Park"],["Mount Revelstoke","CA","Park"],
+  ["Riding Mountain","CA","Park"],["Prince Albert","CA","Park"],["Cape Breton Highlands","CA","Park"],
+  ["Fundy","CA","Park"],["Bruce Peninsula","CA","Park"],["Point Pelee","CA","Park"],
+  ["La Mauricie","CA","Park"],["Kluane","CA","Park"],["Nahanni","CA","Park"],
+  ["Auyuittuq","CA","Park"],["Elk Island","CA","Park"],["Terra Nova","CA","Park"],
+  ["Georgian Bay Islands","CA","Park"],["Thousand Islands","CA","Park"],["Grasslands","CA","Park"],
+  ["Forillon","CA","Park"],["Kejimkujik","CA","Park"],["Prince Edward Island","CA","Park"],
+  ["Torngat Mountains","CA","Park"],["Gwaii Haanas","CA","Park"],
+  ["Gran Paradiso","IT","Park"],["Stelvio","IT","Park"],["Cinque Terre","IT","Park"],
+  ["Dolomiti Bellunesi","IT","Park"],["Abruzzo, Lazio and Molise","IT","Park"],["Vesuvius","IT","Park"],
+  ["Gargano","IT","Park"],["Pollino","IT","Park"],["Sila","IT","Park"],
+  ["Aspromonte","IT","Park"],["Cilento","IT","Park"],["Gran Sasso","IT","Park"],
+  ["Monti Sibillini","IT","Park"],["Circeo","IT","Park"],["Val Grande","IT","Park"],
+  ["Foreste Casentinesi","IT","Park"],["Majella","IT","Park"],["Asinara","IT","Park"],
+  ["La Maddalena","IT","Park"],["Tuscan Archipelago","IT","Park"],["Appennino Tosco-Emiliano","IT","Park"],
+  ["Alta Murgia","IT","Park"],
+  ["Butrint","AL","Park"],["Llogara","AL","Park"],["Theth","AL","Park"],
+  ["Valbona Valley","AL","Park"],["Divjak\u00eb-Karavasta","AL","Park"],["Dajti","AL","Park"],
+  ["Shebenik-Jabllanic\u00eb","AL","Park"],["Prespa","AL","Park"],["Tomorr","AL","Park"],
+  ["Lur\u00eb-Mount Dej\u00eb","AL","Park"],["Hotova-Dang\u00eblli","AL","Park"],["Karaburun-Sazan","AL","Park"],
+  ["Bredhi i Drenov\u00ebs","AL","Park"],["Qaf\u00eb Shtama","AL","Park"],
+  ["Parc Ela","CH","Park"],["Val M\u00fcstair","CH","Park"],["Beverin","CH","Park"],
+  ["Jura Vaudois","CH","Park"],["Gruy\u00e8re Pays-d'Enhaut","CH","Park"],["Gantrisch","CH","Park"],
+  ["Chasseral","CH","Park"],["Pfyn-Finges","CH","Park"],["Binntal","CH","Park"],
+  ["Diemtigtal","CH","Park"],["Thal","CH","Park"],["Doubs","CH","Park"]
 ];
+// Fold the 63 national parks into the unified landmark set (category "Park")
+PARK_DATA.forEach(d=>LANDMARK_DATA.push([d[0],d[1],"Park"]));
 const LANDMARKS = LANDMARK_DATA.map(d=>d[0]);
-const LANDMARK_CAT_ABBR={Forest:"FOR",Monument:"MON",Wonder:"WON"};
+const LANDMARK_CAT=Object.fromEntries(LANDMARK_DATA.map(d=>[d[0],d[2]]));
+const LANDMARK_CAT_ABBR={Forest:"FOR",Monument:"MON",Wonder:"WON",Park:"PRK"};
 const LANDMARK_ALIASES={
   "great wall":"Great Wall of China","the great wall":"Great Wall of China",
   "everest":"Mount Everest","mt everest":"Mount Everest","mount everest":"Mount Everest",
@@ -1051,7 +1033,13 @@ const LANDMARK_ALIASES={
   "neuschwanstein":"Neuschwanstein Castle","uyuni":"Salar de Uyuni",
   "bialowieza":"Bia\u0142owie\u017ca Forest","amazon":"Amazon Rainforest","daintree":"Daintree Rainforest","sherwood":"Sherwood Forest",
   "pisa":"Leaning Tower of Pisa","leaning tower":"Leaning Tower of Pisa",
-  "brandenburg":"Brandenburg Gate","little mermaid":"The Little Mermaid","motherland calls":"The Motherland Calls"
+  "brandenburg":"Brandenburg Gate","little mermaid":"The Little Mermaid","motherland calls":"The Motherland Calls",
+  "smokies":"Great Smoky Mountains","great smokies":"Great Smoky Mountains","smoky mountains":"Great Smoky Mountains","teton":"Grand Teton","tetons":"Grand Teton","grand tetons":"Grand Teton","wrangell":"Wrangell-St. Elias","gates of the arctic":"Gates of the Arctic","black canyon":"Black Canyon of the Gunnison",
+  "banff national park":"Banff","jasper national park":"Jasper","galapagos":"Gal\u00e1pagos","serengeti national park":"Serengeti","torres del paine national park":"Torres del Paine",
+  "valbona":"Valbona Valley","divjake-karavasta":"Divjak\u00eb-Karavasta","shebenik":"Shebenik-Jabllanic\u00eb",
+  "lure":"Lur\u00eb-Mount Dej\u00eb","hotova":"Hotova-Dang\u00eblli","qafe shtama":"Qaf\u00eb Shtama","bredhi i drenoves":"Bredhi i Drenov\u00ebs",
+  "val mustair":"Val M\u00fcstair","gruyere pays-denhaut":"Gruy\u00e8re Pays-d\'Enhaut","abruzzo":"Abruzzo, Lazio and Molise",
+  "vesuvio":"Vesuvius","mount vesuvius":"Vesuvius","glacier bc":"Glacier (BC)","glacier canada":"Glacier (BC)","pei":"Prince Edward Island"
 };
 function resolveLandmark(raw){
   let s=(raw||'').replace(/[\u201C\u201D\u2018\u2019]/g,'').trim();
@@ -1184,6 +1172,7 @@ let groups=[];          // [{id,name,members:[personId,...]}] — saved views, s
 let activeView='all';   // 'all' or a group id
 let editingGroupId=null, groupDraftMembers=[]; // group editor state
 let editing={}, filters={countries:'all',states:'all',parks:'all',landmarks:'all'};
+let landmarkCat='all';
 let focusPerson=null; // null = show all, else personId
 let sbClient=null, saveDebounce=null, realtimeChannel=null, sortDebounce=null;
 let mapPerson=null, worldMap=null, parksMap=null;
@@ -1237,6 +1226,27 @@ function withTimeout(promise,ms,label){
   ]);
 }
 
+async function migrateParksToLandmarks(){
+  if(!sbClient)return;
+  const parkNames=new Set(LANDMARK_DATA.filter(d=>d[2]==='Park').map(d=>d[0]));
+  const parkKeys=Object.keys(visits).filter(k=>k.slice(0,6)==='parks|');
+  if(!parkKeys.length)return;
+  for(const k of parkKeys){
+    const rest=k.slice(6);
+    const i=rest.lastIndexOf('|');
+    const place=rest.slice(0,i), who=rest.slice(i+1);
+    const src=visits[k];
+    if(parkNames.has(place)){
+      const lk='landmarks|'+place+'|'+who;
+      if((!visits[lk]||visits[lk].status==='none') && src && src.status && src.status!=='none'){
+        visits[lk]={status:src.status,date:src.date||''};
+        await saveVisit('landmarks',place,who,src.status,src.date||'');
+      }
+    }
+    try{await sbClient.from('visits').delete().eq('type','parks').eq('place',place).eq('who',who);}catch(e){}
+    delete visits[k];
+  }
+}
 async function loadAllData(){
   if(!sbClient)return;
   // Load participants from settings
@@ -1259,6 +1269,7 @@ async function loadAllData(){
   const{data:vData}=await sbClient.from('visits').select('*');
   visits={};
   if(vData)vData.forEach(row=>{visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};});
+  await migrateParksToLandmarks();
   refreshAll();
 }
 
@@ -1281,7 +1292,7 @@ function subscribeRealtime(){
       const{eventType,new:row,old}=payload;
       if(eventType==='DELETE'&&old){delete visits[`${old.type}|${old.place}|${old.who}`];}
       else if(row){visits[`${row.type}|${row.place}|${row.who}`]={status:row.status,date:row.date_label||''};}
-      ['countries','states','parks','landmarks'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
+      ['countries','states','landmarks'].forEach(t=>{renderTab(t);updateLeaderboard(t);});
       const mp=document.getElementById('panel-map');
       if(mp&&mp.classList.contains('active'))renderMapTab();
     })
@@ -1335,7 +1346,6 @@ function openAddPerson(){
   document.getElementById('modal-name').value='';
   document.getElementById('modal-goal-c').value=50;
   document.getElementById('modal-goal-s').value=50;
-  document.getElementById('modal-goal-p').value=20;
   document.getElementById('modal-goal-l').value=25;
   document.getElementById('modal-deadline').value='';
   document.getElementById('person-modal').classList.add('show');
@@ -1349,7 +1359,6 @@ function openEditPerson(id){
   document.getElementById('modal-name').value=p.name;
   document.getElementById('modal-goal-c').value=p.goal_countries||50;
   document.getElementById('modal-goal-s').value=p.goal_states||50;
-  document.getElementById('modal-goal-p').value=p.goal_parks||20;
   document.getElementById('modal-goal-l').value=p.goal_landmarks||25;
   document.getElementById('modal-deadline').value=p.deadline_countries||p.deadline_states||p.deadline_parks||'';
   document.getElementById('person-modal').classList.add('show');
@@ -1360,16 +1369,15 @@ async function savePersonModal(){
   if(!name)return;
   const goalC=parseInt(document.getElementById('modal-goal-c').value)||50;
   const goalS=parseInt(document.getElementById('modal-goal-s').value)||50;
-  const goalP=parseInt(document.getElementById('modal-goal-p').value)||20;
   const goalL=parseInt(document.getElementById('modal-goal-l').value)||25;
   const deadline=document.getElementById('modal-deadline').value.trim();
   if(editingPersonId){
     const p=participants.find(x=>x.id===editingPersonId);
-    if(p){p.name=name;p.goal_countries=goalC;p.goal_states=goalS;p.goal_parks=goalP;p.goal_landmarks=goalL;p.deadline_countries=deadline;p.deadline_states=deadline;p.deadline_parks=deadline;p.deadline_landmarks=deadline;}
+    if(p){p.name=name;p.goal_countries=goalC;p.goal_states=goalS;p.goal_landmarks=goalL;p.deadline_countries=deadline;p.deadline_states=deadline;p.deadline_parks=deadline;p.deadline_landmarks=deadline;}
   } else {
     const id=name.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+Date.now();
     const color=personColor(participants.length);
-    participants.push({id,name,color,goal_countries:goalC,goal_states:goalS,goal_parks:goalP,goal_landmarks:goalL,deadline_countries:deadline,deadline_states:deadline,deadline_parks:deadline,deadline_landmarks:deadline});
+    participants.push({id,name,color,goal_countries:goalC,goal_states:goalS,goal_landmarks:goalL,deadline_countries:deadline,deadline_states:deadline,deadline_parks:deadline,deadline_landmarks:deadline});
   }
   await saveParticipants();
   closePersonModal();
@@ -1511,7 +1519,7 @@ function updatePeopleBar(type){
 }
 function toggleFocus(id,type){
   focusPerson=focusPerson===id?null:id;
-  ['countries','states','parks','landmarks'].forEach(t=>{updatePeopleBar(t);buildPersonChecks(t);});
+  ['countries','states','landmarks'].forEach(t=>{updatePeopleBar(t);buildPersonChecks(t);});
   renderTab(type);
 }
 
@@ -1667,6 +1675,7 @@ function filteredPlaces(type){
   const q=(document.getElementById('search-'+type)||{value:''}).value.toLowerCase();
   const vps=visibleParticipants();
   const places=getPlaces(type).filter(p=>{
+    if(type==='landmarks'&&landmarkCat!=='all'&&LANDMARK_CAT[p]!==landmarkCat)return false;
     const statuses=vps.map(person=>getEntry(type,p,person.id).status||'none');
     let show=true;
     if(f==='visited')show=statuses.some(s=>s==='visited');
@@ -1771,9 +1780,21 @@ function switchTab(tab,btn){
   btn.classList.add('active');
   if(tab==='map')setTimeout(renderMapTab,0);
 }
+function setLandmarkCat(k){landmarkCat=k;buildLandmarkCatBtns();renderTab('landmarks');}
+function buildLandmarkCatBtns(){
+  const wrap=document.getElementById('catbtns-landmarks');
+  if(!wrap)return;
+  const defs=[{k:'all',label:'All'},{k:'Park',label:'Parks'},{k:'Forest',label:'Forests'},{k:'Monument',label:'Monuments'},{k:'Wonder',label:'Wonders'}];
+  wrap.innerHTML=defs.map(d=>{
+    const n=d.k==='all'?LANDMARK_DATA.length:LANDMARK_DATA.filter(x=>x[2]===d.k).length;
+    const active=landmarkCat===d.k;
+    return'<button class="fbtn'+(active?' fa fall':'')+'" onclick="setLandmarkCat(\''+d.k+'\')">'+d.label+' <span style="opacity:.55">'+n+'</span></button>';
+  }).join('');
+}
 function refreshAll(){
   renderViewBars();
-  ['countries','states','parks','landmarks'].forEach(t=>{
+  buildLandmarkCatBtns();
+  ['countries','states','landmarks'].forEach(t=>{
     updatePeopleBar(t);
     updateLeaderboard(t);
     buildFilterBtns(t);
@@ -1848,8 +1869,42 @@ const LANDMARK_COORDS={
   "Bia\u0142owie\u017ca Forest":[52.7000,23.8700],"Daintree Rainforest":[-16.1700,145.4000],
   "Sherwood Forest":[53.2000,-1.0700],"Aokigahara":[35.4700,138.6200],
   "Sagano Bamboo Grove":[35.0170,135.6710],"Fontainebleau Forest":[48.4000,2.6700],
-  "Crooked Forest":[53.2150,14.4770],"Amazon Rainforest":[-3.4653,-62.2159]
+  "Crooked Forest":[53.2150,14.4770],"Amazon Rainforest":[-3.4653,-62.2159],
+  "Banff":[51.4968,-115.9281],"Jasper":[52.8734,-117.9543],"Yoho":[51.4500,-116.4800],
+  "Pacific Rim":[49.0000,-125.6500],"Waterton Lakes":[49.0500,-113.9000],"Gros Morne":[49.6000,-57.7500],
+  "Wood Buffalo":[59.5000,-112.3000],"Serengeti":[-2.3333,34.8333],"Kruger":[-23.9884,31.5547],
+  "Torres del Paine":[-50.9423,-73.4068],"Fiordland":[-45.4000,167.7000],"Tongariro":[-39.2833,175.5833],
+  "Plitvice Lakes":[44.8800,15.6200],"Swiss National Park":[46.6600,10.1800],"Sagarmatha":[27.9000,86.7000],
+  "Kakadu":[-12.9000,132.5000],"Gal\u00e1pagos":[-0.5000,-90.6000],"Etosha":[-18.8500,16.3300],
+  "Snowdonia":[53.0700,-3.9000],"Vatnaj\u00f6kull":[64.4000,-16.8000],"Jim Corbett":[29.5300,78.7700],
+  "Komodo":[-8.5500,119.4800],
+  "Kootenay":[50.9000,-116.0500],"Glacier (BC)":[51.3000,-117.5200],"Mount Revelstoke":[51.0800,-118.1000],
+  "Riding Mountain":[50.8700,-100.0300],"Prince Albert":[53.9600,-106.3300],"Cape Breton Highlands":[46.7500,-60.6500],
+  "Fundy":[45.6000,-64.9500],"Bruce Peninsula":[45.2300,-81.5500],"Point Pelee":[41.9600,-82.5100],
+  "La Mauricie":[46.7500,-72.9000],"Kluane":[60.7500,-138.5000],"Nahanni":[61.5000,-125.5800],
+  "Auyuittuq":[67.8800,-65.0000],"Elk Island":[53.6000,-112.8500],"Terra Nova":[48.5300,-53.9700],
+  "Georgian Bay Islands":[44.8800,-79.8700],"Thousand Islands":[44.3500,-75.9800],"Grasslands":[49.1000,-107.4000],
+  "Forillon":[48.8700,-64.3500],"Kejimkujik":[44.4000,-65.2200],"Prince Edward Island":[46.4200,-63.1000],
+  "Torngat Mountains":[59.0000,-63.8000],"Gwaii Haanas":[52.3500,-131.4000],
+  "Gran Paradiso":[45.5300,7.2700],"Stelvio":[46.5000,10.4500],"Cinque Terre":[44.1300,9.7100],
+  "Dolomiti Bellunesi":[46.2000,12.0500],"Abruzzo, Lazio and Molise":[41.8000,13.7800],"Vesuvius":[40.8200,14.4300],
+  "Gargano":[41.8000,15.9500],"Pollino":[39.9000,16.1800],"Sila":[39.3000,16.6000],
+  "Aspromonte":[38.1800,15.9800],"Cilento":[40.3000,15.3500],"Gran Sasso":[42.4700,13.5700],
+  "Monti Sibillini":[42.9000,13.2500],"Circeo":[41.3300,13.0700],"Val Grande":[46.0500,8.4700],
+  "Foreste Casentinesi":[43.8500,11.8300],"Majella":[42.1000,14.1000],"Asinara":[41.0600,8.2700],
+  "La Maddalena":[41.2200,9.4000],"Tuscan Archipelago":[42.8000,10.3200],"Appennino Tosco-Emiliano":[44.3000,10.3000],
+  "Alta Murgia":[40.8700,16.3500],
+  "Butrint":[39.7500,20.0200],"Llogara":[40.2000,19.6000],"Theth":[42.3900,19.7700],
+  "Valbona Valley":[42.4200,19.9000],"Divjak\u00eb-Karavasta":[40.9500,19.4800],"Dajti":[41.3600,19.9200],
+  "Shebenik-Jabllanic\u00eb":[41.2500,20.5000],"Prespa":[40.8000,20.9500],"Tomorr":[40.6200,20.1400],
+  "Lur\u00eb-Mount Dej\u00eb":[41.7700,20.2000],"Hotova-Dang\u00eblli":[40.2500,20.3500],"Karaburun-Sazan":[40.4000,19.3000],
+  "Bredhi i Drenov\u00ebs":[40.5800,20.7500],"Qaf\u00eb Shtama":[41.5000,19.9500],
+  "Parc Ela":[46.6000,9.6500],"Val M\u00fcstair":[46.6000,10.3500],"Beverin":[46.6500,9.3500],
+  "Jura Vaudois":[46.5500,6.2500],"Gruy\u00e8re Pays-d'Enhaut":[46.5000,7.2000],"Gantrisch":[46.7200,7.4200],
+  "Chasseral":[47.1300,7.0600],"Pfyn-Finges":[46.3000,7.6000],"Binntal":[46.3500,8.2000],
+  "Diemtigtal":[46.6200,7.5500],"Thal":[47.3200,7.6200],"Doubs":[47.2500,6.9500]
 };
+PARK_DATA.forEach(d=>{LANDMARK_COORDS[d[0]]=[d[2],d[3]];});
 function toggleLandmarks(){
   const el=document.getElementById('lm-toggle');
   showLandmarks=el?el.checked:!showLandmarks;
@@ -2283,7 +2338,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(SB_KEY==='PASTE_ANON_KEY_HERE'){setStatus('offline','Key not set');return;}
   await initSupabase(SB_URL,SB_KEY);
 });
-window.addEventListener('resize',()=>['countries','states','parks','landmarks'].forEach(t=>updateLeaderboard(t)));
+window.addEventListener('resize',()=>['countries','states','landmarks'].forEach(t=>updateLeaderboard(t)));
 </script>
 </body>
 </html>

@@ -3,6 +3,33 @@
 
 ---
 
+### v2.7.2 — Jul 11 2026
+**Feature: Canada, Italy, Albania & Switzerland park coverage**
+- Canada: added 32 more national parks (Kootenay, Glacier BC, Mount Revelstoke, Riding Mountain, Prince Albert, Cape Breton Highlands, Fundy, Bruce Peninsula, Point Pelee, La Mauricie, Kluane, Nahanni, Auyuittuq, Elk Island, Terra Nova, Georgian Bay Islands, Thousand Islands, Grasslands, Forillon, Kejimkujik, Prince Edward Island, Torngat Mountains, Gwaii Haanas) — 39 in total
+- Italy: added all 22 major national parks (Gran Paradiso, Stelvio, Cinque Terre, Dolomiti Bellunesi, Vesuvius, Gran Sasso, Pollino, Cilento, and more)
+- Albania: added 14 national parks (Butrint, Llogara, Theth, Valbona Valley, Divjakë-Karavasta, Dajti, Prespa, Tomorr, and more)
+- Switzerland: added its 12 regional nature parks (Parc Ela, Val Müstair, Gruyère Pays-d'Enhaut, Jura Vaudois, Gantrisch, Chasseral, and more) — Switzerland has only one official national park, which was already listed
+- Parks category now holds 156 entries; 236 places in total. Accent-free typing works throughout (e.g. "val mustair", "divjake-karavasta")
+
+---
+
+### v2.7.1 — Jul 10 2026
+**Feature: International national parks**
+- Added national parks from Canada (Banff, Jasper, Yoho, Pacific Rim, Waterton Lakes, Gros Morne, Wood Buffalo) and around the world (Serengeti, Kruger, Torres del Paine, Fiordland, Tongariro, Plitvice Lakes, Swiss National Park, Sagarmatha, Kakadu, Galápagos, Etosha, Snowdonia, Vatnajökull, Jim Corbett, Komodo)
+- The Park category now holds 85 parks across 16 countries; international parks show their country code (e.g. PRK·CA) and U.S. parks keep their state code
+
+---
+
+### v2.7.0 — Jul 10 2026
+**Feature: One unified Landmarks view (parks + forests + monuments + wonders)**
+- National parks, forests, monuments, and wonders now live together on a single "Landmarks" tab
+- Added category filter chips (All · Parks · Forests · Monuments · Wonders); each card is tagged PRK / FOR / MON / WON, and parks show their state
+- National parks now plot as dots on the world map alongside the other landmarks; the standalone Parks tab and the US parks map were retired
+- Existing national-park progress is migrated automatically from the old parks tracker
+- Fixed stray literal escape codes in the Landmarks header and search boxes
+
+---
+
 ### v2.6.1 — Jul 9 2026
 **Feature: Landmarks layer on the world map**
 - Landmarks now plot as a layer on the world map — each one is a dot coloured by the selected person's status (visited / planned / candidate / none)
